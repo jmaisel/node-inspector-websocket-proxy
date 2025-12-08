@@ -1,0 +1,30 @@
+{
+  "name": "debugger-wrapper",
+  "version": "1.0.0",
+  "description": "Simple wrapper for Node.js Inspector API with browser support",
+  "main": "inspector-wrapper.js",
+  "scripts": {
+    "test": "mocha 'test/**/*.test.js'",
+    "test:wrapper": "mocha test/inspector-wrapper.test.js",
+    "test:integration": "mocha test/integration.test.js",
+    "start": "node inspector-proxy-factory.js",
+    "dev": "node inspector-proxy-factory.js"
+  },
+  "keywords": [
+    "inspector",
+    "debugger",
+    "wrapper",
+    "browser",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.22.1",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "mocha": "^10.8.2"
+  }
+}
