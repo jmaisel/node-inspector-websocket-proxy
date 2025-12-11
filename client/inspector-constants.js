@@ -1,16 +1,27 @@
 // ============================================================================
 // Command Constants
+// Chrome DevTools Protocol domain commands and events
 // ============================================================================
 
 // ============================================================================
 // Simple EventEmitter for Browser
 // ============================================================================
 
+/**
+ * Lightweight EventEmitter implementation for browser environments
+ * Provides event registration, emission, and removal capabilities
+ */
 class EventEmitter {
     constructor() {
         this._events = {};
     }
 
+    /**
+     * Registers an event listener
+     * @param {string} event - Event name
+     * @param {Function} listener - Callback function
+     * @returns {EventEmitter} This instance for chaining
+     */
     on(event, listener) {
         if (!this._events[event]) {
             this._events[event] = [];
@@ -19,12 +30,24 @@ class EventEmitter {
         return this;
     }
 
+    /**
+     * Removes an event listener
+     * @param {string} event - Event name
+     * @param {Function} listener - Callback function to remove
+     * @returns {EventEmitter} This instance for chaining
+     */
     off(event, listener) {
         if (!this._events[event]) return this;
         this._events[event] = this._events[event].filter(l => l !== listener);
         return this;
     }
 
+    /**
+     * Emits an event to all registered listeners
+     * @param {string} event - Event name
+     * @param {...*} args - Arguments to pass to listeners
+     * @returns {boolean} True if event had listeners
+     */
     emit(event, ...args) {
         if (!this._events[event]) return false;
         this._events[event].forEach(listener => {
@@ -37,6 +60,12 @@ class EventEmitter {
         return true;
     }
 
+    /**
+     * Registers a one-time event listener
+     * @param {string} event - Event name
+     * @param {Function} listener - Callback function
+     * @returns {EventEmitter} This instance for chaining
+     */
     once(event, listener) {
         const onceWrapper = (...args) => {
             listener(...args);
@@ -46,6 +75,11 @@ class EventEmitter {
         return this;
     }
 
+    /**
+     * Removes all listeners for an event, or all events if no event specified
+     * @param {string} [event] - Optional event name
+     * @returns {EventEmitter} This instance for chaining
+     */
     removeAllListeners(event) {
         if (event) {
             delete this._events[event];
@@ -56,7 +90,11 @@ class EventEmitter {
     }
 }
 
-// Runtime Domain Commands
+/**
+ * Runtime domain commands
+ * Controls JavaScript runtime, enables evaluation and object inspection
+ * @constant {Object.<string, string>}
+ */
 const RUNTIME_COMMANDS = {
     ENABLE: 'enable',
     DISABLE: 'disable',
@@ -71,6 +109,11 @@ const RUNTIME_COMMANDS = {
     RUN_SCRIPT: 'runScript'
 };
 
+/**
+ * Runtime domain events
+ * Events emitted during JavaScript execution
+ * @constant {Object.<string, string>}
+ */
 const RUNTIME_EVENTS = {
     CONSOLE_API_CALLED: 'consoleAPICalled',
     EXCEPTION_THROWN: 'exceptionThrown',
@@ -81,7 +124,11 @@ const RUNTIME_EVENTS = {
     INSPECT_REQUESTED: 'inspectRequested'
 };
 
-// Debugger Domain Commands
+/**
+ * Debugger domain commands
+ * Controls script execution, breakpoints, and stepping
+ * @constant {Object.<string, string>}
+ */
 const DEBUGGER_COMMANDS = {
     ENABLE: 'enable',
     DISABLE: 'disable',
@@ -105,6 +152,11 @@ const DEBUGGER_COMMANDS = {
     SET_SKIP_ALL_PAUSES: 'setSkipAllPauses'
 };
 
+/**
+ * Debugger domain events
+ * Events emitted during script parsing and debugging
+ * @constant {Object.<string, string>}
+ */
 const DEBUGGER_EVENTS = {
     SCRIPT_PARSED: 'scriptParsed',
     SCRIPT_FAILED_TO_PARSE: 'scriptFailedToParse',
@@ -113,18 +165,31 @@ const DEBUGGER_EVENTS = {
     BREAKPOINT_RESOLVED: 'breakpointResolved'
 };
 
-// Console Domain Commands
+/**
+ * Console domain commands
+ * Controls console message handling
+ * @constant {Object.<string, string>}
+ */
 const CONSOLE_COMMANDS = {
     ENABLE: 'enable',
     DISABLE: 'disable',
     CLEAR_MESSAGES: 'clearMessages'
 };
 
+/**
+ * Console domain events
+ * Events for console messages
+ * @constant {Object.<string, string>}
+ */
 const CONSOLE_EVENTS = {
     MESSAGE_ADDED: 'messageAdded'
 };
 
-// Profiler Domain Commands
+/**
+ * Profiler domain commands
+ * Controls CPU profiling and code coverage
+ * @constant {Object.<string, string>}
+ */
 const PROFILER_COMMANDS = {
     ENABLE: 'enable',
     DISABLE: 'disable',
@@ -137,12 +202,21 @@ const PROFILER_COMMANDS = {
     GET_BEST_EFFORT_COVERAGE: 'getBestEffortCoverage'
 };
 
+/**
+ * Profiler domain events
+ * Events emitted during profiling
+ * @constant {Object.<string, string>}
+ */
 const PROFILER_EVENTS = {
     CONSOLE_PROFILE_STARTED: 'consoleProfileStarted',
     CONSOLE_PROFILE_FINISHED: 'consoleProfileFinished'
 };
 
-// HeapProfiler Domain Commands
+/**
+ * HeapProfiler domain commands
+ * Controls heap profiling and memory snapshots
+ * @constant {Object.<string, string>}
+ */
 const HEAP_PROFILER_COMMANDS = {
     ENABLE: 'enable',
     DISABLE: 'disable',
@@ -157,6 +231,11 @@ const HEAP_PROFILER_COMMANDS = {
     ADD_INSPECTED_HEAP_OBJECT: 'addInspectedHeapObject'
 };
 
+/**
+ * HeapProfiler domain events
+ * Events emitted during heap profiling
+ * @constant {Object.<string, string>}
+ */
 const HEAP_PROFILER_EVENTS = {
     ADD_HEAP_SNAPSHOT_CHUNK: 'addHeapSnapshotChunk',
     HEAP_STATS_UPDATE: 'heapStatsUpdate',
@@ -165,7 +244,11 @@ const HEAP_PROFILER_EVENTS = {
     RESET_PROFILES: 'resetProfiles'
 };
 
-// Schema Domain Commands
+/**
+ * Schema domain commands
+ * Provides information about protocol domains
+ * @constant {Object.<string, string>}
+ */
 const SCHEMA_COMMANDS = {
     GET_DOMAINS: 'getDomains'
 };
@@ -256,6 +339,10 @@ const HEAP_PROFILER_OBJECT_COMMANDS = Object.freeze({
 // Domain Registry
 // ============================================================================
 
+/**
+ * Central registry of all protocol domains with their commands, events, and hierarchies
+ * @constant {Object}
+ */
 const DOMAIN_REGISTRY = {
     RUNTIME: {
         name: 'Runtime',
@@ -315,23 +402,51 @@ const DOMAIN_REGISTRY = {
 // Utility Functions
 // ============================================================================
 
+/**
+ * Gets all commands for a specific domain
+ * @param {string} domain - Domain name (e.g., 'RUNTIME', 'DEBUGGER')
+ * @returns {string[]} Array of command names
+ */
 function getAllCommands(domain) {
     return Object.values(DOMAIN_REGISTRY[domain]?.commands || {});
 }
 
+/**
+ * Gets all events for a specific domain
+ * @param {string} domain - Domain name (e.g., 'RUNTIME', 'DEBUGGER')
+ * @returns {string[]} Array of event names
+ */
 function getAllEvents(domain) {
     return Object.values(DOMAIN_REGISTRY[domain]?.events || {});
 }
 
+/**
+ * Gets a command hierarchy subset for a domain
+ * @param {string} domain - Domain name
+ * @param {string} hierarchyName - Hierarchy name (e.g., 'execution', 'breakpoints')
+ * @returns {Object} Command hierarchy object
+ */
 function getCommandHierarchy(domain, hierarchyName) {
     return DOMAIN_REGISTRY[domain]?.hierarchies[hierarchyName] || {};
 }
 
+/**
+ * Checks if a command is valid for a domain
+ * @param {string} domain - Domain name
+ * @param {string} command - Command name to validate
+ * @returns {boolean} True if command exists in domain
+ */
 function isValidCommand(domain, command) {
     const commands = DOMAIN_REGISTRY[domain]?.commands;
     return commands ? Object.values(commands).includes(command) : false;
 }
 
+/**
+ * Checks if an event is valid for a domain
+ * @param {string} domain - Domain name
+ * @param {string} event - Event name to validate
+ * @returns {boolean} True if event exists in domain
+ */
 function isValidEvent(domain, event) {
     const events = DOMAIN_REGISTRY[domain]?.events;
     return events ? Object.values(events).includes(event) : false;
@@ -341,41 +456,41 @@ function isValidEvent(domain, event) {
 // Exports
 // ============================================================================
 
-module.exports = {
-    // Individual domain commands
-    RUNTIME_COMMANDS,
-    RUNTIME_EVENTS,
-    DEBUGGER_COMMANDS,
-    DEBUGGER_EVENTS,
-    CONSOLE_COMMANDS,
-    CONSOLE_EVENTS,
-    PROFILER_COMMANDS,
-    PROFILER_EVENTS,
-    HEAP_PROFILER_COMMANDS,
-    HEAP_PROFILER_EVENTS,
-    SCHEMA_COMMANDS,
-
-    // Hierarchies (immutable objects)
-    DEBUGGER_EXECUTION_COMMANDS,
-    DEBUGGER_STEP_COMMANDS,
-    DEBUGGER_BREAKPOINT_COMMANDS,
-    DEBUGGER_SCRIPT_COMMANDS,
-    RUNTIME_EVALUATION_COMMANDS,
-    RUNTIME_OBJECT_COMMANDS,
-    PROFILER_COVERAGE_COMMANDS,
-    PROFILER_SAMPLING_COMMANDS,
-    HEAP_PROFILER_TRACKING_COMMANDS,
-    HEAP_PROFILER_SAMPLING_COMMANDS,
-    HEAP_PROFILER_SNAPSHOT_COMMANDS,
-    HEAP_PROFILER_OBJECT_COMMANDS,
-
-    // Registry
-    DOMAIN_REGISTRY,
-
-    // Utilities
-    getAllCommands,
-    getAllEvents,
-    getCommandHierarchy,
-    isValidCommand,
-    isValidEvent
-};
+// module.exports = {
+//     // Individual domain commands
+//     RUNTIME_COMMANDS,
+//     RUNTIME_EVENTS,
+//     DEBUGGER_COMMANDS,
+//     DEBUGGER_EVENTS,
+//     CONSOLE_COMMANDS,
+//     CONSOLE_EVENTS,
+//     PROFILER_COMMANDS,
+//     PROFILER_EVENTS,
+//     HEAP_PROFILER_COMMANDS,
+//     HEAP_PROFILER_EVENTS,
+//     SCHEMA_COMMANDS,
+//
+//     // Hierarchies (immutable objects)
+//     DEBUGGER_EXECUTION_COMMANDS,
+//     DEBUGGER_STEP_COMMANDS,
+//     DEBUGGER_BREAKPOINT_COMMANDS,
+//     DEBUGGER_SCRIPT_COMMANDS,
+//     RUNTIME_EVALUATION_COMMANDS,
+//     RUNTIME_OBJECT_COMMANDS,
+//     PROFILER_COVERAGE_COMMANDS,
+//     PROFILER_SAMPLING_COMMANDS,
+//     HEAP_PROFILER_TRACKING_COMMANDS,
+//     HEAP_PROFILER_SAMPLING_COMMANDS,
+//     HEAP_PROFILER_SNAPSHOT_COMMANDS,
+//     HEAP_PROFILER_OBJECT_COMMANDS,
+//
+//     // Registry
+//     DOMAIN_REGISTRY,
+//
+//     // Utilities
+//     getAllCommands,
+//     getAllEvents,
+//     getCommandHierarchy,
+//     isValidCommand,
+//     isValidEvent
+// };

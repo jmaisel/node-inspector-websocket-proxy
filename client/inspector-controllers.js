@@ -1,101 +1,159 @@
-const EventEmitter = require('events');
+// const EventEmitter = require('events');
 
-const {
-    RUNTIME_COMMANDS,
-    RUNTIME_EVENTS,
-    DEBUGGER_COMMANDS,
-    DEBUGGER_EVENTS,
-    CONSOLE_COMMANDS,
-    CONSOLE_EVENTS,
-    PROFILER_COMMANDS,
-    PROFILER_EVENTS,
-    HEAP_PROFILER_COMMANDS,
-    HEAP_PROFILER_EVENTS,
-    SCHEMA_COMMANDS
-} = require('./inspector-constants');
+// const {
+//     RUNTIME_COMMANDS,
+//     RUNTIME_EVENTS,
+//     DEBUGGER_COMMANDS,
+//     DEBUGGER_EVENTS,
+//     CONSOLE_COMMANDS,
+//     CONSOLE_EVENTS,
+//     PROFILER_COMMANDS,
+//     PROFILER_EVENTS,
+//     HEAP_PROFILER_COMMANDS,
+//     HEAP_PROFILER_EVENTS,
+//     SCHEMA_COMMANDS
+// } = require('./inspector-constants');
+
+// Shared ID generator for all controllers
+let globalCommandId = 1;
 
 // ============================================================================
 // Abstract Base Controller
 // ============================================================================
+
+/**
+ * Base class for Chrome DevTools Protocol domain controllers
+ * Handles command sending, response handling, and event routing
+ * @extends EventEmitter
+ */
 class BaseDomainController extends EventEmitter {
+    /**
+     * Creates a base domain controller
+     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
+     * @param {string} domain - Protocol domain name (e.g., 'Runtime', 'Debugger')
+     * @param {Object} commandConstants - Command constants for this domain
+     * @param {Object} eventConstants - Event constants for this domain
+     */
     constructor(wsConnection, domain, commandConstants, eventConstants) {
         super();
         this.ws = wsConnection;
         this.domain = domain;
         this.commandConstants = commandConstants;
         this.eventConstants = eventConstants;
-        this.nextId = 1;
         this.pendingCommands = new Map();
-        this.idPrefix = `${domain}_`;
     }
 
+    /**
+     * Generates a unique numeric command ID using shared global counter
+     * @returns {number} Unique command ID
+     * @private
+     */
     generateId() {
-        return `${this.idPrefix}${this.nextId++}`;
+        return globalCommandId++;
     }
 
+    /**
+     * Sends a command to the inspector and returns a promise
+     * @param {string} method - Method name (without domain prefix)
+     * @param {Object} [params={}] - Method parameters
+     * @returns {Promise} Resolves with command result or rejects on error/timeout
+     */
     send(method, params = {}) {
         const id = this.generateId();
         const command = JSON.stringify({ id, method: `${this.domain}.${method}`, params });
 
         return new Promise((resolve, reject) => {
-            this.pendingCommands.set(id, { resolve, reject, method });
+
+            this.pendingCommands.set(id, { resolve, reject, method : `${this.domain}.${method}` });
 
             if (this.ws && this.ws.readyState === 1) {
+                console.log("sending command:", command);
                 this.ws.send(command);
             } else {
                 reject(new Error('WebSocket not connected'));
             }
-
-            setTimeout(() => {
-                if (this.pendingCommands.has(id)) {
-                    this.pendingCommands.delete(id);
-                    reject(new Error(`Command timeout: ${method}`));
-                }
-            }, 5000);
         });
     }
 
+    /**
+     * Routes incoming messages to appropriate handlers
+     * Handles both command responses and domain events
+     * @param {Object} message - Incoming WebSocket message
+     */
     handleMessage(message) {
+
+        // console.log('handleMessage', message);
+
         const { id, method, result, params, error } = message;
 
-        // Handle command responses (with our ID prefix)
-        if (id && typeof id === 'string' && id.startsWith(this.idPrefix)) {
-            if (this.pendingCommands.has(id)) {
-                const { resolve, reject, method: commandMethod } = this.pendingCommands.get(id);
-                this.pendingCommands.delete(id);
+        // Handle command responses (check if this controller has a pending command with this ID)
+        if (id !== undefined && this.pendingCommands.has(id)) {
 
-                if (error) {
-                    reject(new Error(error.message || 'Command failed'));
-                } else {
-                    const handlerName = `handle${this.toPascalCase(commandMethod)}Response`;
-                    const processedResult = this[handlerName] ? this[handlerName](result) : result;
-                    resolve(processedResult);
-                }
+            console.log("response id:", id, this.pendingCommands.has(id));
+
+            const { resolve, reject, method: commandMethod } = this.pendingCommands.get(id);
+
+            this.pendingCommands.delete(id);
+
+            if (error) {
+                reject(new Error(error.message || 'Command failed'));
+            } else {
+                // Call domain-specific response handler if it exists
+                const spec  = commandMethod.split(".");
+                const category = spec[0];
+                const eventName = spec[1];
+                const handlerName = `handle${this.toPascalCase(eventName)}Response`;
+
+                console.log(`trying to call handler ${handlerName} in ${this.domain} with id ${id}`, message);
+
+                const processedResult = this[handlerName] ? this[handlerName](result) : result;
+                console.log("emitting", spec, processedResult, id);
+                this.emit(method, processedResult);
+                resolve(processedResult);
             }
         }
 
         // Handle events (method matches our domain)
         if (method && method.startsWith(`${this.domain}.`)) {
-            const eventName = method.split('.')[1];
+            const spec  = method.split(".");
+            const category = spec[0];
+            const eventName = spec[1];
             const handlerName = `handle${this.toPascalCase(eventName)}Event`;
+            console.log(`calling method handler for category ${category} method ${method}`);
+            console.log("emitting", method);
 
+            // Call domain-specific event handler if it exists, then emit
             if (this[handlerName]) {
                 const processedEvent = this[handlerName](params);
-                this.emit(eventName, processedEvent);
+                this.emit(method, processedEvent);
             } else {
-                this.emit(eventName, params);
+                this.emit(method, params);
             }
         }
     }
 
+    /**
+     * Converts string to PascalCase
+     * @param {string} str - String to convert
+     * @returns {string} PascalCase string
+     * @private
+     */
     toPascalCase(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
+    /**
+     * Gets list of all available commands for this domain
+     * @returns {string[]} Array of command names
+     */
     getCommandList() {
         return Object.values(this.commandConstants);
     }
 
+    /**
+     * Gets list of all available events for this domain
+     * @returns {string[]} Array of event names
+     */
     getEventList() {
         return Object.values(this.eventConstants);
     }
@@ -104,7 +162,17 @@ class BaseDomainController extends EventEmitter {
 // ============================================================================
 // Runtime Controller
 // ============================================================================
+
+/**
+ * Controller for the Runtime domain
+ * Handles JavaScript execution, evaluation, and object inspection
+ * @extends BaseDomainController
+ */
 class RuntimeController extends BaseDomainController {
+    /**
+     * Creates a Runtime controller
+     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
+     */
     constructor(wsConnection) {
         super(wsConnection, 'Runtime', RUNTIME_COMMANDS, RUNTIME_EVENTS);
     }
@@ -291,7 +359,17 @@ class RuntimeController extends BaseDomainController {
 // ============================================================================
 // Debugger Controller
 // ============================================================================
+
+/**
+ * Controller for the Debugger domain
+ * Handles script debugging, breakpoints, stepping, and execution control
+ * @extends BaseDomainController
+ */
 class DebuggerController extends BaseDomainController {
+    /**
+     * Creates a Debugger controller
+     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
+     */
     constructor(wsConnection) {
         super(wsConnection, 'Debugger', DEBUGGER_COMMANDS, DEBUGGER_EVENTS);
     }
@@ -490,7 +568,17 @@ class DebuggerController extends BaseDomainController {
 // ============================================================================
 // Console Controller
 // ============================================================================
+
+/**
+ * Controller for the Console domain
+ * Handles console message collection and clearing
+ * @extends BaseDomainController
+ */
 class ConsoleController extends BaseDomainController {
+    /**
+     * Creates a Console controller
+     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
+     */
     constructor(wsConnection) {
         super(wsConnection, 'Console', CONSOLE_COMMANDS, CONSOLE_EVENTS);
     }
@@ -536,7 +624,17 @@ class ConsoleController extends BaseDomainController {
 // ============================================================================
 // Profiler Controller
 // ============================================================================
+
+/**
+ * Controller for the Profiler domain
+ * Handles CPU profiling and code coverage
+ * @extends BaseDomainController
+ */
 class ProfilerController extends BaseDomainController {
+    /**
+     * Creates a Profiler controller
+     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
+     */
     constructor(wsConnection) {
         super(wsConnection, 'Profiler', PROFILER_COMMANDS, PROFILER_EVENTS);
     }
@@ -662,7 +760,17 @@ class ProfilerController extends BaseDomainController {
 // ============================================================================
 // HeapProfiler Controller
 // ============================================================================
+
+/**
+ * Controller for the HeapProfiler domain
+ * Handles heap profiling, memory snapshots, and garbage collection
+ * @extends BaseDomainController
+ */
 class HeapProfilerController extends BaseDomainController {
+    /**
+     * Creates a HeapProfiler controller
+     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
+     */
     constructor(wsConnection) {
         super(wsConnection, 'HeapProfiler', HEAP_PROFILER_COMMANDS, HEAP_PROFILER_EVENTS);
     }
@@ -801,7 +909,17 @@ class HeapProfilerController extends BaseDomainController {
 // ============================================================================
 // Schema Controller
 // ============================================================================
+
+/**
+ * Controller for the Schema domain
+ * Provides information about the available protocol domains
+ * @extends BaseDomainController
+ */
 class SchemaController extends BaseDomainController {
+    /**
+     * Creates a Schema controller
+     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
+     */
     constructor(wsConnection) {
         super(wsConnection, 'Schema', SCHEMA_COMMANDS, {});
     }
@@ -821,15 +939,15 @@ class SchemaController extends BaseDomainController {
     }
 }
 
-// ============================================================================
-// Exports
-// ============================================================================
-module.exports = {
-    BaseDomainController,
-    RuntimeController,
-    DebuggerController,
-    ConsoleController,
-    ProfilerController,
-    HeapProfilerController,
-    SchemaController
-};
+// // ============================================================================
+// // Exports
+// // ============================================================================
+// module.exports = {
+//     BaseDomainController,
+//     RuntimeController,
+//     DebuggerController,
+//     ConsoleController,
+//     ProfilerController,
+//     HeapProfilerController,
+//     SchemaController
+// };

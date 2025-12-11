@@ -1,0 +1,75 @@
+{
+  "description": "Chrome DevTools Protocol command examples for the Node.js debugger. Each command is on a single line for line-delimited parsing.",
+  "commands": {
+    "debugger": {
+      "enable": {"id": 1, "method": "Debugger.enable", "params": {}},
+      "disable": {"id": 2, "method": "Debugger.disable", "params": {}},
+      "pause": {"id": 3, "method": "Debugger.pause", "params": {}},
+      "resume": {"id": 4, "method": "Debugger.resume", "params": {}},
+      "stepOver": {"id": 5, "method": "Debugger.stepOver", "params": {}},
+      "stepInto": {"id": 6, "method": "Debugger.stepInto", "params": {}},
+      "stepOut": {"id": 7, "method": "Debugger.stepOut", "params": {}},
+      "setBreakpointByUrl": {"id": 8, "method": "Debugger.setBreakpointByUrl", "params": {"lineNumber": 10, "url": "file:///path/to/script.js", "columnNumber": 0, "condition": ""}},
+      "setBreakpointByUrlWithCondition": {"id": 9, "method": "Debugger.setBreakpointByUrl", "params": {"lineNumber": 15, "url": "file:///path/to/script.js", "columnNumber": 0, "condition": "x > 10"}},
+      "setBreakpoint": {"id": 10, "method": "Debugger.setBreakpoint", "params": {"location": {"scriptId": "123", "lineNumber": 10, "columnNumber": 0}}},
+      "removeBreakpoint": {"id": 11, "method": "Debugger.removeBreakpoint", "params": {"breakpointId": "1:10:0:file:///path/to/script.js"}},
+      "setBreakpointsActive": {"id": 12, "method": "Debugger.setBreakpointsActive", "params": {"active": true}},
+      "setPauseOnExceptions": {"id": 13, "method": "Debugger.setPauseOnExceptions", "params": {"state": "uncaught"}},
+      "getScriptSource": {"id": 14, "method": "Debugger.getScriptSource", "params": {"scriptId": "123"}},
+      "continueToLocation": {"id": 15, "method": "Debugger.continueToLocation", "params": {"location": {"scriptId": "123", "lineNumber": 20, "columnNumber": 0}}},
+      "setVariableValue": {"id": 16, "method": "Debugger.setVariableValue", "params": {"scopeNumber": 0, "variableName": "myVar", "newValue": {"value": 42}, "callFrameId": "frameId123"}},
+      "setScriptSource": {"id": 17, "method": "Debugger.setScriptSource", "params": {"scriptId": "123", "scriptSource": "console.log('modified code');"}},
+      "restartFrame": {"id": 18, "method": "Debugger.restartFrame", "params": {"callFrameId": "frameId123"}},
+      "setAsyncCallStackDepth": {"id": 19, "method": "Debugger.setAsyncCallStackDepth", "params": {"maxDepth": 32}},
+      "setBlackboxPatterns": {"id": 20, "method": "Debugger.setBlackboxPatterns", "params": {"patterns": ["node_modules/**", "internal/**"]}},
+      "setSkipAllPauses": {"id": 21, "method": "Debugger.setSkipAllPauses", "params": {"skip": false}}
+    },
+    "runtime": {
+      "enable": {"id": 30, "method": "Runtime.enable", "params": {}},
+      "disable": {"id": 31, "method": "Runtime.disable", "params": {}},
+      "evaluate": {"id": 32, "method": "Runtime.evaluate", "params": {"expression": "2 + 2", "returnByValue": true, "awaitPromise": false}},
+      "evaluateAsync": {"id": 33, "method": "Runtime.evaluate", "params": {"expression": "Promise.resolve(42)", "returnByValue": true, "awaitPromise": true}},
+      "getProperties": {"id": 34, "method": "Runtime.getProperties", "params": {"objectId": "objectId123", "ownProperties": true}},
+      "callFunctionOn": {"id": 35, "method": "Runtime.callFunctionOn", "params": {"objectId": "objectId123", "functionDeclaration": "function() { return this.name; }", "arguments": []}},
+      "runIfWaitingForDebugger": {"id": 36, "method": "Runtime.runIfWaitingForDebugger", "params": {}},
+      "releaseObject": {"id": 37, "method": "Runtime.releaseObject", "params": {"objectId": "objectId123"}},
+      "releaseObjectGroup": {"id": 38, "method": "Runtime.releaseObjectGroup", "params": {"objectGroup": "console"}},
+      "getHeapUsage": {"id": 39, "method": "Runtime.getHeapUsage", "params": {}},
+      "compileScript": {"id": 40, "method": "Runtime.compileScript", "params": {"expression": "function test() { return 42; }", "sourceURL": "test.js", "persistScript": true}},
+      "runScript": {"id": 41, "method": "Runtime.runScript", "params": {"scriptId": "scriptId123", "executionContextId": 1}}
+    },
+    "console": {
+      "enable": {"id": 50, "method": "Console.enable", "params": {}},
+      "disable": {"id": 51, "method": "Console.disable", "params": {}},
+      "clearMessages": {"id": 52, "method": "Console.clearMessages", "params": {}}
+    },
+    "profiler": {
+      "enable": {"id": 60, "method": "Profiler.enable", "params": {}},
+      "disable": {"id": 61, "method": "Profiler.disable", "params": {}},
+      "start": {"id": 62, "method": "Profiler.start", "params": {}},
+      "stop": {"id": 63, "method": "Profiler.stop", "params": {}},
+      "setSamplingInterval": {"id": 64, "method": "Profiler.setSamplingInterval", "params": {"interval": 1000}},
+      "startPreciseCoverage": {"id": 65, "method": "Profiler.startPreciseCoverage", "params": {"callCount": true, "detailed": true}},
+      "stopPreciseCoverage": {"id": 66, "method": "Profiler.stopPreciseCoverage", "params": {}},
+      "takePreciseCoverage": {"id": 67, "method": "Profiler.takePreciseCoverage", "params": {}},
+      "getBestEffortCoverage": {"id": 68, "method": "Profiler.getBestEffortCoverage", "params": {}}
+    },
+    "heapProfiler": {
+      "enable": {"id": 70, "method": "HeapProfiler.enable", "params": {}},
+      "disable": {"id": 71, "method": "HeapProfiler.disable", "params": {}},
+      "takeHeapSnapshot": {"id": 72, "method": "HeapProfiler.takeHeapSnapshot", "params": {"reportProgress": true}},
+      "startTrackingHeapObjects": {"id": 73, "method": "HeapProfiler.startTrackingHeapObjects", "params": {"trackAllocations": true}},
+      "stopTrackingHeapObjects": {"id": 74, "method": "HeapProfiler.stopTrackingHeapObjects", "params": {"reportProgress": true}},
+      "collectGarbage": {"id": 75, "method": "HeapProfiler.collectGarbage", "params": {}},
+      "getObjectByHeapObjectId": {"id": 76, "method": "HeapProfiler.getObjectByHeapObjectId", "params": {"objectId": "heapObjectId123"}},
+      "getHeapObjectId": {"id": 77, "method": "HeapProfiler.getHeapObjectId", "params": {"objectId": "objectId123"}},
+      "startSampling": {"id": 78, "method": "HeapProfiler.startSampling", "params": {"samplingInterval": 32768}},
+      "stopSampling": {"id": 79, "method": "HeapProfiler.stopSampling", "params": {}},
+      "addInspectedHeapObject": {"id": 80, "method": "HeapProfiler.addInspectedHeapObject", "params": {"heapObjectId": "heapObjectId123"}}
+    },
+    "schema": {
+      "getDomains": {"id": 90, "method": "Schema.getDomains", "params": {}}
+    }
+  },
+  "usage": "Each command object is formatted on a single line for easy line-delimited parsing. Extract the command value and send it over WebSocket."
+}

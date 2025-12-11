@@ -25,6 +25,8 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
-    "mocha": "^10.8.2"
+    "chai": "^6.2.1",
+    "mocha": "^10.8.2",
+    "mocha-headless-chrome": "^5.1.0"
   }
 }

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Inspector Browser Client Tests</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha@10/mocha.css">
+</head>
+<body>
+<div id="mocha"></div>
+
+<!-- Load Mocha and Chai from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/mocha@10/mocha.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chai@4/chai.js"></script>
+
+<script>
+    mocha.setup('bdd');
+    const assert = chai.assert;
+</script>
+
+<!-- Load your client files in dependency order -->
+<script src="../client/inspector-constants.js"></script>
+<script src="../client/inspector-controllers.js"></script>
+<script src="../client/inspector-factory.js"></script>
+<script src="../client/inspector-browser-client.js"></script>
+
+<!-- Load test file -->
+<script src="./simple-tests.js"></script>
+
+<!-- Run tests -->
+<script>
+    mocha.run();
+</script>
+</body>
+</html>

@@ -3,17 +3,12 @@
 // Browser-specific wrapper for the Chrome DevTools Protocol
 // ============================================================================
 
-// Assumes the following files are already loaded:
-// - inspector-constants.js
-// - inspector-controllers.js
-// - inspector-factory.js
-
 class InspectorBrowserClient {
     constructor(url, options = {}) {
         this.url    = url;
         this.ws = null;
         this.options = {
-            autoReconnect: options.autoReconnect !== false,
+            autoReconnect: false || options.autoReconnect,
             reconnectDelay: options.reconnectDelay || 5000,
             onStatusChange: options.onStatusChange || null,
             onLog: options.onLog || null,
@@ -38,8 +33,15 @@ class InspectorBrowserClient {
     // ========================================================================
 
     connect() {
+
+        console.log("connect()");
+
         return new Promise((resolve, reject) => {
+
+            console.log("opening WebSocket to", this.url);
+
             this.ws = new WebSocket(this.url);
+            console.log("==>" + this.ws.readyState);
 
             this.ws.onopen = () => {
                 this._updateStatus('Connected', 'green');
@@ -76,9 +78,9 @@ class InspectorBrowserClient {
                 this._updateStatus('Disconnected', 'red');
                 this._log('Connection closed.', 'error');
 
-                if (this.options.autoReconnect) {
-                    setTimeout(() => this.connect(), this.options.reconnectDelay);
-                }
+                // if (this.options.autoReconnect) {
+                //     setTimeout(() => this.connect(), this.options.reconnectDelay);
+                // }
             };
 
             this.ws.onerror = (error) => {
@@ -88,6 +90,9 @@ class InspectorBrowserClient {
             };
 
             this.ws.onmessage = (event) => {
+
+                // console.log("onmessage", event);
+
                 try {
                     const message = JSON.parse(event.data);
 
@@ -119,7 +124,7 @@ class InspectorBrowserClient {
     }
 
     isConnected() {
-        return this.ws && this.ws.readyState === WebSocket.OPEN;
+        return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
     }
 
     // ========================================================================
@@ -128,9 +133,9 @@ class InspectorBrowserClient {
 
     async _initialize() {
         // Enable the main domains we'll be using
-        await this.runtime.enable();
-        await this.debugger.enable();
-        await this.console.enable();
+        // await this.runtime.enable();
+        // await this.debugger.enable();
+        // await this.console.enable();
 
         this._log('Inspector client initialized', 'info');
     }
@@ -181,16 +186,25 @@ class InspectorBrowserClient {
     // ========================================================================
     // High-Level Debugger API
     // ========================================================================
+    // async enable(){
+    //     if (!this.debugger) throw new Error('Not connected');
+    //     return await this.debugger.enable();
+    // }
 
-    async pause() {
-        if (!this.debugger) throw new Error('Not connected');
-        return await this.debugger.pause();
-    }
+    // async disable(){
+    //     if (!this.debugger) throw new Error('Not connected');
+    //     return await this.debugger.enable();
+    // }
 
-    async resume() {
-        if (!this.debugger) throw new Error('Not connected');
-        return await this.debugger.resume();
-    }
+    // async pause() {
+    //     if (!this.debugger) throw new Error('Not connected');
+    //     return await this.debugger.pause();
+    // }
+
+    // async resume() {
+    //     if (!this.debugger) throw new Error('Not connected');
+    //     return await this.debugger.resume();
+    // }
 
     async stepOver() {
         if (!this.debugger) throw new Error('Not connected');
@@ -253,7 +267,7 @@ class InspectorBrowserClient {
     // Evaluation API
     // ========================================================================
 
-    async eval(expression, options = {}) {
+    async evaluate(expression, options = {}) {
         if (!this.runtime) throw new Error('Not connected');
 
         const result = await this.runtime.evaluate(expression, options);
