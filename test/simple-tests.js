@@ -41,9 +41,9 @@ describe('InspectorBrowserClient Browser Tests', function() {
 
         it('should enable the Debugger, and get a series of scriptSources', async () => {
             // client.runtime.on("Runtime.enable", evt => console.log("Runtime.enable", evt));
-            client.debugger.on("Debugger.scriptParsed", evt =>{
-                console.log(evt);
-            });
+            // client.debugger.on("Debugger.scriptParsed", evt =>{
+            //     console.log(evt);
+            // });
             client.debugger.enable();
 
             // Set up promises that wait for events

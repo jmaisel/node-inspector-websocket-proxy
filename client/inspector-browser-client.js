@@ -23,6 +23,7 @@ class InspectorBrowserClient {
         this.heapProfiler = null;
         this.schema = null;
         this.controllers = [];
+        this.scriptSources = [];
 
         this.breakpoints = new Map(); // url -> Set of line numbers
         this.watches = new Map(); // variable -> expression
@@ -65,13 +66,12 @@ class InspectorBrowserClient {
                     this.schema
                 ];
 
-                // Set up event listeners
-                this._setupEventListeners();
+                this.debugger.on("Debugger.scriptParsed", evt => {
+                    console.log(evt);
+                    this.scriptSources.push(evt);
+                })
 
-                // Initialize all controllers
-                this._initialize()
-                    .then(() => resolve(this))
-                    .catch(reject);
+                resolve(this);
             };
 
             this.ws.onclose = () => {
@@ -106,6 +106,7 @@ class InspectorBrowserClient {
                     this._log(`Parse error: ${err.message}`, 'error');
                 }
             };
+
         });
     }
 
@@ -127,123 +128,6 @@ class InspectorBrowserClient {
         return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
     }
 
-    // ========================================================================
-    // Initialization
-    // ========================================================================
-
-    async _initialize() {
-        // Enable the main domains we'll be using
-        // await this.runtime.enable();
-        // await this.debugger.enable();
-        // await this.console.enable();
-
-        this._log('Inspector client initialized', 'info');
-    }
-
-    // ========================================================================
-    // Event Listeners Setup
-    // ========================================================================
-
-    _setupEventListeners() {
-        // Debugger events
-        this.debugger.on('paused', (data) => {
-            this._log(`Paused: ${data.reason}`, 'event');
-            this.emit('paused', data);
-        });
-
-        this.debugger.on('resumed', () => {
-            this._log('Resumed', 'event');
-            this.emit('resumed');
-        });
-
-        this.debugger.on('scriptParsed', (data) => {
-            this._log(`Script parsed: ${data.url}`, 'event');
-            this.emit('scriptParsed', data);
-        });
-
-        this.debugger.on('breakpointResolved', (data) => {
-            this._log(`Breakpoint resolved: ${data.breakpointId}`, 'event');
-            this.emit('breakpointResolved', data);
-        });
-
-        // Runtime events
-        this.runtime.on('consoleAPICalled', (data) => {
-            this._log(`Console ${data.type}: ${JSON.stringify(data.args)}`, 'console');
-            this.emit('console', data);
-        });
-
-        this.runtime.on('exceptionThrown', (data) => {
-            this._log(`Exception: ${data.exception}`, 'error');
-            this.emit('exception', data);
-        });
-
-        this.runtime.on('executionContextCreated', (data) => {
-            this._log(`Context created: ${data.name}`, 'event');
-            this.emit('contextCreated', data);
-        });
-    }
-
-    // ========================================================================
-    // High-Level Debugger API
-    // ========================================================================
-    // async enable(){
-    //     if (!this.debugger) throw new Error('Not connected');
-    //     return await this.debugger.enable();
-    // }
-
-    // async disable(){
-    //     if (!this.debugger) throw new Error('Not connected');
-    //     return await this.debugger.enable();
-    // }
-
-    // async pause() {
-    //     if (!this.debugger) throw new Error('Not connected');
-    //     return await this.debugger.pause();
-    // }
-
-    // async resume() {
-    //     if (!this.debugger) throw new Error('Not connected');
-    //     return await this.debugger.resume();
-    // }
-
-    async stepOver() {
-        if (!this.debugger) throw new Error('Not connected');
-        return await this.debugger.stepOver();
-    }
-
-    async stepInto() {
-        if (!this.debugger) throw new Error('Not connected');
-        return await this.debugger.stepInto();
-    }
-
-    async stepOut() {
-        if (!this.debugger) throw new Error('Not connected');
-        return await this.debugger.stepOut();
-    }
-
-    async setBreakpoint(url, line, options = {}) {
-        if (!this.debugger) throw new Error('Not connected');
-
-        const result = await this.debugger.setBreakpointByUrl(line, url, options);
-
-        // Track breakpoint locally
-        if (!this.breakpoints.has(url)) {
-            this.breakpoints.set(url, new Set());
-        }
-        this.breakpoints.get(url).add(line);
-
-        this._log(`Breakpoint set: ${url}:${line}`, 'info');
-        return result;
-    }
-
-    async clearBreakpoint(breakpointId) {
-        if (!this.debugger) throw new Error('Not connected');
-
-        const result = await this.debugger.removeBreakpoint(breakpointId);
-        this._log(`Breakpoint cleared: ${breakpointId}`, 'info');
-        return result;
-    }
-
     async clearAllBreakpoints() {
         if (!this.debugger) throw new Error('Not connected');
 
@@ -252,20 +136,6 @@ class InspectorBrowserClient {
         this.breakpoints.clear();
         this._log('All breakpoints cleared', 'info');
     }
-
-    async setBreakpointsActive(active = true) {
-        if (!this.debugger) throw new Error('Not connected');
-        return await this.debugger.setBreakpointsActive(active);
-    }
-
-    async setPauseOnExceptions(state = 'none') {
-        if (!this.debugger) throw new Error('Not connected');
-        return await this.debugger.setPauseOnExceptions(state);
-    }
-
-    // ========================================================================
-    // Evaluation API
-    // ========================================================================
 
     async evaluate(expression, options = {}) {
         if (!this.runtime) throw new Error('Not connected');
@@ -284,10 +154,6 @@ class InspectorBrowserClient {
         if (!this.debugger) throw new Error('Not connected');
         return await this.debugger.getScriptSource(scriptId);
     }
-
-    // ========================================================================
-    // Watch Expressions
-    // ========================================================================
 
     async watch(variable, expression = null) {
         const expr = expression || variable;
@@ -333,18 +199,10 @@ class InspectorBrowserClient {
         return results;
     }
 
-    // ========================================================================
-    // Console API
-    // ========================================================================
-
     async clearConsole() {
         if (!this.console) throw new Error('Not connected');
         return await this.console.clearMessages();
     }
-
-    // ========================================================================
-    // Profiling API
-    // ========================================================================
 
     async startProfiling() {
         if (!this.profiler) throw new Error('Not connected');
@@ -363,10 +221,6 @@ class InspectorBrowserClient {
         return await this.heapProfiler.takeHeapSnapshot();
     }
 
-    // ========================================================================
-    // Utility Methods
-    // ========================================================================
-
     _updateStatus(text, color) {
         if (this.options.onStatusChange) {
             this.options.onStatusChange(text, color);
@@ -377,29 +231,6 @@ class InspectorBrowserClient {
         if (this.options.onLog) {
             this.options.onLog(message, type);
         }
-    }
-
-    // Simple event emitter pattern
-    on(event, handler) {
-        if (!this._eventHandlers) this._eventHandlers = {};
-        if (!this._eventHandlers[event]) this._eventHandlers[event] = [];
-        this._eventHandlers[event].push(handler);
-    }
-
-    off(event, handler) {
-        if (!this._eventHandlers || !this._eventHandlers[event]) return;
-        this._eventHandlers[event] = this._eventHandlers[event].filter(h => h !== handler);
-    }
-
-    emit(event, data) {
-        if (!this._eventHandlers || !this._eventHandlers[event]) return;
-        this._eventHandlers[event].forEach(handler => {
-            try {
-                handler(data);
-            } catch (err) {
-                console.error('Event handler error:', err);
-            }
-        });
     }
 }
 

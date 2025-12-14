@@ -1,19 +1,3 @@
-// const EventEmitter = require('events');
-
-// const {
-//     RUNTIME_COMMANDS,
-//     RUNTIME_EVENTS,
-//     DEBUGGER_COMMANDS,
-//     DEBUGGER_EVENTS,
-//     CONSOLE_COMMANDS,
-//     CONSOLE_EVENTS,
-//     PROFILER_COMMANDS,
-//     PROFILER_EVENTS,
-//     HEAP_PROFILER_COMMANDS,
-//     HEAP_PROFILER_EVENTS,
-//     SCHEMA_COMMANDS
-// } = require('./inspector-constants');
-
 // Shared ID generator for all controllers
 let globalCommandId = 1;
 
@@ -107,7 +91,7 @@ class BaseDomainController extends EventEmitter {
                 console.log(`trying to call handler ${handlerName} in ${this.domain} with id ${id}`, message);
 
                 const processedResult = this[handlerName] ? this[handlerName](result) : result;
-                console.log("emitting", spec, processedResult, id);
+                console.log("emitting", commandMethod, processedResult, id);
                 this.emit(method, processedResult);
                 resolve(processedResult);
             }

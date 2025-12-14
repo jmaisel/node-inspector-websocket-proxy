@@ -119,6 +119,7 @@ class RemoteDebuggerProxyServer {
 
     handleNewClient(wsClient) {
         this.logger.info('Browser client connected');
+        // this.killChildProcess();
 
         // Create proxy immediately
         const proxy = new Proxy(this.wsDebugger, wsClient);
@@ -238,10 +239,22 @@ class RemoteDebuggerProxyServer {
     /**
      * Stops the proxy server and cleans up all resources
      */
+    killChildProcess() {
+        this.appProcess.kill();
+    }
+
+    restartChildProcess(){
+        this.appProcess.kill();
+        this.spawnTargetProcess();
+    }
+
+    /**
+     * Stops the proxy server and cleans up all resources
+     */
     stop() {
         if (this.server) this.server.close();
         if (this.wsDebugger) this.wsDebugger.close();
-        if (this.appProcess) this.appProcess.kill();
+        if (this.appProcess) this.killChildProcess();
         this.activeProxies.forEach(proxy => proxy.cleanup());
     }
 }
