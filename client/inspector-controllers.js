@@ -92,7 +92,7 @@ class BaseDomainController extends EventEmitter {
 
                 const processedResult = this[handlerName] ? this[handlerName](result) : result;
                 console.log("emitting", commandMethod, processedResult, id);
-                this.emit(method, processedResult);
+                this.emit(commandMethod, processedResult);
                 resolve(processedResult);
             }
         }

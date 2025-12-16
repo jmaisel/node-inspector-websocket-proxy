@@ -40,10 +40,6 @@ describe('InspectorBrowserClient Browser Tests', function() {
         });
 
         it('should enable the Debugger, and get a series of scriptSources', async () => {
-            // client.runtime.on("Runtime.enable", evt => console.log("Runtime.enable", evt));
-            // client.debugger.on("Debugger.scriptParsed", evt =>{
-            //     console.log(evt);
-            // });
             client.debugger.enable();
 
             // Set up promises that wait for events
@@ -59,9 +55,6 @@ describe('InspectorBrowserClient Browser Tests', function() {
         it('should handle domain events properly', async () => {
             assert.strictEqual(client.isConnected(), true, 'Should be connected after connect()');
 
-            client.runtime.enable();
-            client.console.enable();
-
             // Set up promises that wait for events
             const consolePromise = new Promise(resolve => {
                 client.console.once("Console.messageAdded", resolve);
@@ -71,10 +64,18 @@ describe('InspectorBrowserClient Browser Tests', function() {
                 client.runtime.once("Runtime.consoleAPICalled", resolve);
             });
 
-            const [c, r] = await Promise.all([consolePromise, runtimePromise]);
+            const boundResponsePromise = new Promise(resolve => {
+                client.runtime.once("Runtime.enable", resolve);
+            });
+
+            client.runtime.enable();
+            client.console.enable();
+
+            const [c, r, b] = await Promise.all([consolePromise, runtimePromise, boundResponsePromise]);
 
             assert.isNotNull(c, "Console.messageAdded event caught");
             assert.isNotNull(r, "Runtime.consoleAPICalled event caught");
+            assert.isNotNull(b, "Runtime.enable event caught");
         });
 
         it('should disconnect cleanly', async () => {

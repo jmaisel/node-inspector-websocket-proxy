@@ -93,7 +93,7 @@ class RemoteDebuggerProxyServer {
         this.server.listen(this.proxyPort, () => {
             this.logger.info(`Proxy API listening on http://localhost:${this.proxyPort}`);
             this.logger.info(`Connect your client to ws://localhost:${this.proxyPort}\n`);
-            this.spawnTargetProcess();
+            // Don't spawn process here - wait for client connection
         });
     }
 
@@ -119,29 +119,32 @@ class RemoteDebuggerProxyServer {
 
     handleNewClient(wsClient) {
         this.logger.info('Browser client connected');
-        // this.killChildProcess();
 
-        // Create proxy immediately
-        const proxy = new Proxy(this.wsDebugger, wsClient);
-        this.activeProxies.push(proxy);
+        // Spawn debugger process when client connects
+        this.spawnTargetProcess();
 
-        // If debugger is already ready, patch now
-        if (this.wsDebugger && this.wsDebugger.readyState === WebSocket.OPEN) {
-            proxy.patch();
-            this.logger.info('Proxy patched immediately');
-        } else {
-            // Wait for debugger to be ready
-            const clientTimer = setInterval(() => {
-                if(this.wsDebugger && this.wsDebugger.readyState === WebSocket.OPEN){
-                    proxy.patch();
-                    this.logger.info('Proxy patched after wait');
-                    clearInterval(clientTimer);
-                }
-            }, 100);
-        }
+        // Wait for debugger to be ready, then create proxy
+        const waitForDebugger = setInterval(() => {
+            if(this.wsDebugger && this.wsDebugger.readyState === WebSocket.OPEN){
+                clearInterval(waitForDebugger);
 
+                // Create and patch proxy
+                const proxy = new Proxy(this.wsDebugger, wsClient);
+                this.activeProxies.push(proxy);
+                proxy.patch();
+                this.logger.info('Proxy created and patched');
+            }
+        }, 1);
+
+        // When client closes, kill debugger process
         wsClient.on('close', () => {
-            this.activeProxies = this.activeProxies.filter(p => p !== proxy);
+            clearInterval(waitForDebugger);
+            this.logger.info('Client disconnected, killing debugger process');
+            this.activeProxies = this.activeProxies.filter(p => p.clientws !== wsClient);
+            this.killChildProcess();
+            // Reset state for next connection
+            this.wsDebugger = null;
+            this.debuggerURL = '';
         });
     }
 
@@ -198,8 +201,6 @@ class RemoteDebuggerProxyServer {
 
         this.wsDebugger.on('open', () => {
             this.logger.info('*** Internal connection to Node Debugger established. ***');
-            this.setupAllDebuggerForwarding();
-            this.flushAllBuffers();
         });
 
         this.wsDebugger.on('close', (code, reason) => {
@@ -209,23 +210,6 @@ class RemoteDebuggerProxyServer {
         this.wsDebugger.on('error', (err) => {
             this.logger.error('*** INTERNAL PROXY FATAL ERROR:', err.message);
         });
-    }
-
-    /**
-     * Sets up message forwarding for all active proxies
-     * @private
-     */
-    setupAllDebuggerForwarding() {
-        this.logger.info(`Setting up debugger forwarding for ${this.activeProxies.length} active client(s)...`);
-        this.activeProxies.forEach(proxy => proxy.setupDebuggerForwarding());
-    }
-
-    /**
-     * Flushes buffered messages for all active proxies
-     * @private
-     */
-    flushAllBuffers() {
-        this.activeProxies.forEach(proxy => proxy.flushBuffer());
     }
 
     /**
