@@ -40,12 +40,15 @@ describe('InspectorBrowserClient Browser Tests', function() {
         });
 
         it('should enable the Debugger, and get a series of scriptSources', async () => {
-            client.debugger.enable();
+            // Wait a bit for proxy to be fully set up
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Set up promises that wait for events
+            // Set up promises that wait for events BEFORE calling enable
             const consolePromise = new Promise(resolve => {
                 client.debugger.once ("Debugger.scriptParsed", resolve);
             });
+
+            client.debugger.enable();
 
             const [c] = await Promise.all([consolePromise]);
 
@@ -55,7 +58,7 @@ describe('InspectorBrowserClient Browser Tests', function() {
         it('should handle domain events properly', async () => {
             assert.strictEqual(client.isConnected(), true, 'Should be connected after connect()');
 
-            // Set up promises that wait for events
+            // Set up promises that wait for events BEFORE calling enable
             const consolePromise = new Promise(resolve => {
                 client.console.once("Console.messageAdded", resolve);
             });
