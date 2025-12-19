@@ -3,8 +3,9 @@
 // Browser-specific wrapper for the Chrome DevTools Protocol
 // ============================================================================
 
-class InspectorBrowserClient {
+class InspectorBrowserClient extends EventEmitter {
     constructor(url, options = {}) {
+        super();
         this.url    = url;
         this.ws = null;
         this.options = {
@@ -71,12 +72,29 @@ class InspectorBrowserClient {
                     this.scriptSources.push(evt);
                 })
 
-                resolve(this);
+                // Don't resolve yet - wait for proxy ready signal
             };
 
-            this.ws.onclose = () => {
+            this.ws.onclose = (event) => {
                 this._updateStatus('Disconnected', 'red');
                 this._log('Connection closed.', 'error');
+
+                // Clean up references
+                this.ws = null;
+                this.runtime = null;
+                this.debugger = null;
+                this.console = null;
+                this.profiler = null;
+                this.heapProfiler = null;
+                this.schema = null;
+                this.controllers = [];
+
+                // Emit Proxy.closed event
+                this.emit('Proxy.closed', {
+                    code: event.code,
+                    reason: event.reason,
+                    wasClean: event.wasClean
+                });
 
                 // if (this.options.autoReconnect) {
                 //     setTimeout(() => this.connect(), this.options.reconnectDelay);
@@ -96,6 +114,13 @@ class InspectorBrowserClient {
                 try {
                     const message = JSON.parse(event.data);
 
+                    // Check for proxy ready signal
+                    if (message.method === 'Proxy.ready') {
+                        console.log('Proxy is ready');
+                        resolve(this);
+                        return;
+                    }
+
                     // Route to all controllers
                     this.controllers.forEach(controller => {
                         controller.handleMessage(message);
@@ -112,15 +137,8 @@ class InspectorBrowserClient {
 
     disconnect() {
         if (this.ws) {
+            // Just close the WebSocket - onclose handler will do cleanup
             this.ws.close();
-            this.ws = null;
-            this.runtime = null;
-            this.debugger = null;
-            this.console = null;
-            this.profiler = null;
-            this.heapProfiler = null;
-            this.schema = null;
-            this.controllers = [];
         }
     }
 

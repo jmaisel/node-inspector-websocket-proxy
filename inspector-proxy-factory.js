@@ -120,8 +120,23 @@ class RemoteDebuggerProxyServer {
     handleNewClient(wsClient) {
         this.logger.info('Browser client connected');
 
-        // Spawn debugger process when client connects
-        this.spawnTargetProcess();
+        // If a process is being killed, wait for it to exit before spawning new one
+        const attemptSpawn = () => {
+            if (this.appProcess && !this.appProcess.killed) {
+                this.logger.info('Process still running, waiting...');
+                setTimeout(attemptSpawn, 100);
+                return;
+            }
+            if (this.appProcess && this.appProcess.killed) {
+                this.logger.info('Process is killed but not exited yet, waiting...');
+                setTimeout(attemptSpawn, 100);
+                return;
+            }
+            // Process is fully cleaned up, safe to spawn
+            this.spawnTargetProcess();
+        };
+
+        attemptSpawn();
 
         // Wait for debugger to be ready, then create proxy
         const waitForDebugger = setInterval(() => {
@@ -133,6 +148,12 @@ class RemoteDebuggerProxyServer {
                 this.activeProxies.push(proxy);
                 proxy.patch();
                 this.logger.info('Proxy created and patched');
+
+                // Send ready signal to client
+                wsClient.send(JSON.stringify({
+                    method: 'Proxy.ready',
+                    params: {}
+                }));
             }
         }, 1);
 
@@ -154,6 +175,12 @@ class RemoteDebuggerProxyServer {
      * @private
      */
     spawnTargetProcess() {
+        // Don't spawn if already running and alive
+        if (this.appProcess && !this.appProcess.killed) {
+            this.logger.info('Process already running, skipping spawn');
+            return;
+        }
+
         this.logger.info(`Spawning process for: ${this.targetScript}`);
 
         this.appProcess = spawn('node', [`--inspect=${this.inspectPort}`, this.targetScript]);
@@ -184,10 +211,13 @@ class RemoteDebuggerProxyServer {
 
         this.appProcess.on('error', (err) => {
             this.logger.error('Failed to spawn application process:', err);
+            this.appProcess = null;
         });
 
         this.appProcess.on('exit', (code) => {
             this.logger.info(`Process exited with code ${code}`);
+            // Clean up reference when process actually exits
+            this.appProcess = null;
         });
     }
 
@@ -224,11 +254,20 @@ class RemoteDebuggerProxyServer {
      * Stops the proxy server and cleans up all resources
      */
     killChildProcess() {
-        this.appProcess.kill();
+        if (this.appProcess) {
+            this.logger.info('Killing child process...');
+            try {
+                this.appProcess.kill();
+                // Don't set to null here - let the exit handler do it
+            } catch (err) {
+                this.logger.error('Error killing process:', err);
+                this.appProcess = null;
+            }
+        }
     }
 
     restartChildProcess(){
-        this.appProcess.kill();
+        this.killChildProcess();
         this.spawnTargetProcess();
     }
 

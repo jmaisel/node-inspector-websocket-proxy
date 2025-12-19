@@ -40,9 +40,6 @@ describe('InspectorBrowserClient Browser Tests', function() {
         });
 
         it('should enable the Debugger, and get a series of scriptSources', async () => {
-            // Wait a bit for proxy to be fully set up
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
             // Set up promises that wait for events BEFORE calling enable
             const consolePromise = new Promise(resolve => {
                 client.debugger.once ("Debugger.scriptParsed", resolve);
@@ -81,15 +78,41 @@ describe('InspectorBrowserClient Browser Tests', function() {
             assert.isNotNull(b, "Runtime.enable event caught");
         });
 
-        it('should disconnect cleanly', async () => {
-            assert.ok(client.isConnected(), 'Should be connected');
+        it('should connect, disconnect cleanly, and emit Proxy.closed event', async () => {
+            // Create a fresh client connection for this isolated test
+            const testClient = new InspectorBrowserClient(wsUrl);
 
-            client.disconnect();
+            // Connect
+            await testClient.connect();
+            assert.ok(testClient.isConnected(), 'Should be connected');
 
-            assert.strictEqual(client.ws, null, 'WebSocket should be null');
-            assert.strictEqual(client.isConnected(), false, 'Should not be connected');
-            assert.strictEqual(client.runtime, null, 'Runtime should be null');
-            assert.strictEqual(client.debugger, null, 'Debugger should be null');
+            // Set up promise to wait for Proxy.closed event
+            const closedPromise = new Promise(resolve => {
+                testClient.once('Proxy.closed', resolve);
+            });
+
+            // Trigger disconnect
+            testClient.disconnect();
+
+            // Wait for close to complete
+            const closeEvent = await closedPromise;
+
+            // Verify event was emitted with correct properties
+            assert.isNotNull(closeEvent, 'Proxy.closed event should be emitted');
+            assert.property(closeEvent, 'code', 'Event should have code property');
+            assert.property(closeEvent, 'reason', 'Event should have reason property');
+            assert.property(closeEvent, 'wasClean', 'Event should have wasClean property');
+
+            // Verify cleanup
+            assert.strictEqual(testClient.ws, null, 'WebSocket should be null');
+            assert.strictEqual(testClient.isConnected(), false, 'Should not be connected');
+            assert.strictEqual(testClient.runtime, null, 'Runtime should be null');
+            assert.strictEqual(testClient.debugger, null, 'Debugger should be null');
+            assert.strictEqual(testClient.console, null, 'Console should be null');
+            assert.strictEqual(testClient.profiler, null, 'Profiler should be null');
+            assert.strictEqual(testClient.heapProfiler, null, 'HeapProfiler should be null');
+            assert.strictEqual(testClient.schema, null, 'Schema should be null');
+            assert.strictEqual(testClient.controllers.length, 0, 'Controllers array should be empty');
         });
     });
 });
