@@ -1,7 +1,7 @@
 /**
  * Browser-based tests for InspectorBrowserClient
  * Assumes proxy server is already running on ws://localhost:8888
- * Run by opening test.html in a browser
+ * Run by opening smoke-tests.html in a browser
  */
 
 describe('InspectorBrowserClient Browser Tests', function() {
