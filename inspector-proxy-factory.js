@@ -122,14 +122,9 @@ class RemoteDebuggerProxyServer {
 
         // If a process is being killed, wait for it to exit before spawning new one
         const attemptSpawn = () => {
-            if (this.appProcess && !this.appProcess.killed) {
-                this.logger.info('Process still running, waiting...');
-                setTimeout(attemptSpawn, 100);
-                return;
-            }
-            if (this.appProcess && this.appProcess.killed) {
-                this.logger.info('Process is killed but not exited yet, waiting...');
-                setTimeout(attemptSpawn, 100);
+            if (this.appProcess) {
+                this.logger.info(this.appProcess.killed ? 'Process is killed but not exited yet, waiting...' : 'Process still running, waiting...');
+                setTimeout(attemptSpawn, 1000);
                 return;
             }
             // Process is fully cleaned up, safe to spawn

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js Debugger</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Node.js Debugger</h1>
+        <div class="status">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span id="statusText">Disconnected</span>
+        </div>
+    </div>
+
+    <div class="connection-panel" id="connectionPanel">
+        <label for="wsUrl">WebSocket URL:</label>
+        <input type="text" id="wsUrl" value="ws://localhost:8888" placeholder="ws://localhost:8888">
+        <button class="success" id="connectBtn">Connect</button>
+    </div>
+
+    <div class="controls" id="controls" style="display: none;">
+        <button id="pauseBtn">⏸ Pause</button>
+        <button id="resumeBtn" disabled>▶ Resume</button>
+        <button id="stepOverBtn" disabled>⤵ Step Over</button>
+        <button id="stepIntoBtn" disabled>⤓ Step Into</button>
+        <button id="stepOutBtn" disabled>⤒ Step Out</button>
+        <button class="danger" id="disconnectBtn">Disconnect</button>
+    </div>
+
+    <div class="content" id="content" style="display: none;">
+
+        <!-- Watches Panel -->
+        <div class="panel" id="watchesPanel">
+            <div class="panel-header" onclick="togglePanel('watchesPanel')">
+                <span>Watches</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="panel-content">
+                <div id="watchesList">
+                    <div class="empty-state">No watches added</div>
+                </div>
+                <div class="add-watch-form">
+                    <input type="text" class="add-watch-input" id="watchInput" placeholder="Expression to watch">
+                    <button class="add-watch-btn" id="addWatchBtn">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breakpoints Panel -->
+        <div class="panel" id="breakpointsPanel">
+            <div class="panel-header" onclick="togglePanel('breakpointsPanel')">
+                <span>Breakpoints</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="panel-content">
+                <div id="breakpointsList">
+                    <div class="empty-state">No breakpoints set</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call Stack Panel -->
+        <div class="panel" id="callstackPanel">
+            <div class="panel-header" onclick="togglePanel('callstackPanel')">
+                <span>Call Stack</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="panel-content" id="callstack">
+                <div class="empty-state">Pause execution to see call stack</div>
+            </div>
+        </div>
+
+        <!-- Scope Variables Panel -->
+        <div class="panel" id="scopePanel">
+            <div class="panel-header" onclick="togglePanel('scopePanel')">
+                <span>Scope</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="panel-content" id="scopeVariables">
+                <div class="empty-state">No scope information available</div>
+            </div>
+        </div>
+
+        <!-- Console/Debug Log Panel -->
+        <div class="panel" id="consolePanel">
+            <div class="panel-header" onclick="togglePanel('consolePanel')">
+                <span>Console</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="panel-content" id="debugLog">
+                <div class="empty-state">No console output</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../client/inspector-constants.js"></script>
+    <script src="../client/inspector-controllers.js"></script>
+    <script src="../client/inspector-factory.js"></script>
+    <script src="../client/inspector-browser-client.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
