@@ -4,9 +4,14 @@
   "description": "Simple wrapper for Node.js Inspector API with browser support",
   "main": "inspector-wrapper.js",
   "scripts": {
-    "test": "mocha 'test/**/*.test.js'",
-    "test:wrapper": "mocha test/inspector-wrapper.test.js",
-    "test:integration": "mocha test/integration.test.js",
+    "test": "echo 'Use npm run test:all to run all tests, or npm run test:ui:e2e for E2E tests'",
+    "test:ui:e2e": "node test/run-ui-tests.js e2e",
+    "test:ui:e2e:headed": "node test/run-ui-tests.js e2e --headed",
+    "test:ui:e2e:report": "node test/run-ui-tests.js e2e --report",
+    "test:ui:e2e:headed:report": "node test/run-ui-tests.js e2e --headed --report",
+    "test:ui:unit": "echo 'Open test/debugger-ui-unit.html in a browser to run unit tests'",
+    "test:smoke": "node test/run-ui-tests.js e2e --report",
+    "test:all": "node test/run-ui-tests.js e2e --report",
     "start": "node inspector-proxy-factory.js",
     "dev": "node inspector-proxy-factory.js"
   },
@@ -26,7 +31,12 @@
   },
   "devDependencies": {
     "chai": "^6.2.1",
+    "chromedriver": "^143.0.3",
     "mocha": "^10.8.2",
-    "mocha-headless-chrome": "^5.1.0"
+    "mocha-headless-chrome": "^5.1.0",
+    "mochawesome": "^7.1.4",
+    "mochawesome-merge": "^5.1.0",
+    "mochawesome-report-generator": "^6.3.2",
+    "selenium-webdriver": "^4.39.0"
   }
 }

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Debugger UI Unit Tests</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha@10/mocha.css">
+    <link rel="stylesheet" href="../debugger/styles.css">
+</head>
+<body>
+<div id="mocha"></div>
+
+<!-- Hidden test container -->
+<div id="test-container" style="position: absolute; left: -9999px;">
+    <!-- Minimal HTML needed for UI tests -->
+    <div id="statusIndicator"></div>
+    <span id="statusText"></span>
+    <input type="text" id="wsUrl" value="ws://localhost:8888">
+    <button id="connectBtn"></button>
+    <button id="pauseBtn"></button>
+    <button id="resumeBtn"></button>
+    <button id="stepOverBtn"></button>
+    <button id="stepIntoBtn"></button>
+    <button id="stepOutBtn"></button>
+    <button id="disconnectBtn"></button>
+    <div id="toolbar" data-icon-size="medium"></div>
+    <div id="settingsPanel" style="display: none;"></div>
+    <div class="tab-btn active" data-tab="console"></div>
+    <div class="tab-btn" data-tab="callstack"></div>
+    <div class="tab-btn" data-tab="files"></div>
+    <div class="tab-pane active" id="tab-console"></div>
+    <div class="tab-pane" id="tab-callstack"></div>
+    <div class="tab-pane" id="tab-files"></div>
+    <div id="debugLog" class="console-content"></div>
+    <div id="debugLogDock" class="console-dock-content"></div>
+    <div id="callstack"></div>
+    <div id="watchesList"></div>
+    <div id="breakpointsList"></div>
+    <div id="scopeVariables"></div>
+    <div id="projectFiles"></div>
+    <div id="dependencies"></div>
+    <div id="devDependencies"></div>
+    <div id="nodeInternalFiles"></div>
+    <input type="text" id="consoleSearchInput">
+    <input type="text" id="consoleSearchInputDock">
+    <input type="checkbox" id="consoleSearchRegex">
+    <input type="checkbox" id="consoleSearchRegexDock">
+    <div id="consoleDock" class="docked"></div>
+    <div id="toolbarDockZone"></div>
+</div>
+
+<!-- Load jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<!-- Load Mocha and Chai from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/mocha@10/mocha.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chai@4/chai.js"></script>
+
+<script>
+    mocha.setup('bdd');
+    const assert = chai.assert;
+    const expect = chai.expect;
+</script>
+
+<!-- Load client files (for mocking) -->
+<script src="../client/inspector-constants.js"></script>
+<script src="../client/inspector-controllers.js"></script>
+<script src="../client/inspector-factory.js"></script>
+<script src="../client/inspector-browser-client.js"></script>
+
+<!-- Load main.js functions (but prevent auto-initialization) -->
+<script>
+    // Mock to prevent auto-connection
+    const TESTING_MODE = true;
+</script>
+
+<!-- Load test file -->
+<script src="debugger-ui-unit.test.js"></script>
+
+<!-- Run tests -->
+<script>
+    mocha.run();
+</script>
+</body>
+</html>
