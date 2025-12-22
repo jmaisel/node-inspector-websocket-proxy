@@ -105,6 +105,7 @@ class RemoteDebuggerProxyServer {
         this.server.on('upgrade', (request, socket, head) => {
             const wss = new WebSocket.Server({ noServer: true });
             wss.handleUpgrade(request, socket, head, (wsClient) => {
+                this.killChildProcess();
                 this.handleNewClient(wsClient);
             });
         });
@@ -128,7 +129,8 @@ class RemoteDebuggerProxyServer {
                 return;
             }
             // Process is fully cleaned up, safe to spawn
-            this.spawnTargetProcess();
+            // this.spawnTargetProcess();
+            this.restartChildProcess();
         };
 
         attemptSpawn();
@@ -262,7 +264,14 @@ class RemoteDebuggerProxyServer {
     }
 
     restartChildProcess(){
-        this.killChildProcess();
+
+        try{
+            this.killChildProcess();
+        }
+        catch (e){
+            console.error(e);
+        }
+
         this.spawnTargetProcess();
     }
 

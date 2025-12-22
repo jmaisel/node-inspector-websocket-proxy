@@ -3,10 +3,11 @@
  * Tests actual user workflows with a real browser
  *
  * Prerequisites:
- * - Debugger proxy server must be running on ws://localhost:8888
- * - A Node.js script must be running with --inspect flag
+ * - Automatically starts servers if not already running
+ * - Checks for existing servers on ports 8888 (proxy) and 9229 (debuggee)
  *
  * Run with: npm run test:e2e
+ * Run with visible browser: HEADED_MODE=true npm run test:e2e
  */
 
 const { Builder, By, until, Key } = require('selenium-webdriver');
@@ -14,14 +15,13 @@ const chrome = require('selenium-webdriver/chrome');
 const assert = require('chai').assert;
 const expect = require('chai').expect;
 const path = require('path');
-const { spawn } = require('child_process');
+const { createServerManager } = require('./helpers/server-manager');
 
 describe('Debugger UI E2E Tests', function() {
     this.timeout(30000); // E2E tests need more time
 
     let driver;
-    let proxyServer;
-    let debuggeeProcess;
+    let serverManager;
     const baseUrl = `file://${path.resolve(__dirname, '../debugger/debugger.html')}`;
 
     // Helper: Click using JavaScript to bypass overlay issues with floating toolbar
@@ -29,44 +29,19 @@ describe('Debugger UI E2E Tests', function() {
         await driver.executeScript("arguments[0].click();", element);
     }
 
-    // Start proxy server and debuggee before all tests
+    // Start servers and browser before all tests
     before(async function() {
-        // Start the proxy server
-        console.log('Starting proxy server...');
-        proxyServer = spawn('node', ['inspector-proxy-factory.js'], {
-            cwd: path.resolve(__dirname, '..'),
-            stdio: 'pipe'
+        // Create server manager (checks for existing servers first)
+        serverManager = createServerManager({
+            checkExisting: true,
+            proxyPort: 8888,
+            inspectPort: 9229,
+            debugScript: 'test/fixtures/busy-script.js'
         });
 
-        // Wait for server to start
-        await new Promise((resolve) => {
-            proxyServer.stdout.on('data', (data) => {
-                if (data.toString().includes('listening') || data.toString().includes('8888')) {
-                    console.log('Proxy server started');
-                    resolve();
-                }
-            });
-            // Fallback timeout
-            setTimeout(resolve, 2000);
-        });
-
-        // Start a debuggee process
-        console.log('Starting debuggee process...');
-        debuggeeProcess = spawn('node', ['--inspect=9229', 'test/fixtures/busy-script.js'], {
-            cwd: path.resolve(__dirname, '..'),
-            stdio: 'pipe'
-        });
-
-        // Wait for debuggee to be ready
-        await new Promise((resolve) => {
-            debuggeeProcess.stderr.on('data', (data) => {
-                if (data.toString().includes('Debugger listening')) {
-                    console.log('Debuggee process started');
-                    resolve();
-                }
-            });
-            setTimeout(resolve, 2000);
-        });
+        // Start servers (or detect existing ones)
+        console.log('Setting up test servers...');
+        await serverManager.start();
 
         // Initialize Selenium WebDriver
         console.log('Initializing Selenium WebDriver...');
@@ -100,11 +75,8 @@ describe('Debugger UI E2E Tests', function() {
         if (driver) {
             await driver.quit();
         }
-        if (debuggeeProcess) {
-            debuggeeProcess.kill();
-        }
-        if (proxyServer) {
-            proxyServer.kill();
+        if (serverManager) {
+            await serverManager.stop();
         }
     });
 
