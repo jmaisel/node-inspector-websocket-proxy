@@ -42,95 +42,9 @@ class InspectorBrowserClient extends EventEmitter {
 
             console.log("opening WebSocket to", this.url);
 
-            this.ws = new WebSocket(this.url);
+            // this.ws = new WebSocket(this.url);
             console.log("==>" + this.ws.readyState);
 
-            this.ws.onopen = () => {
-                this._updateStatus('Connected', 'green');
-                this._log('Connection established to WebSocket.', 'info');
-
-                // Create all controllers using the factory
-                this.runtime = controllerFactory.createRuntime(this.ws);
-                this.debugger = controllerFactory.createDebugger(this.ws);
-                this.console = controllerFactory.createConsole(this.ws);
-                this.profiler = controllerFactory.createProfiler(this.ws);
-                this.heapProfiler = controllerFactory.createHeapProfiler(this.ws);
-                this.schema = controllerFactory.createSchema(this.ws);
-
-                // Store in array for easy iteration
-                this.controllers = [
-                    this.runtime,
-                    this.debugger,
-                    this.console,
-                    this.profiler,
-                    this.heapProfiler,
-                    this.schema
-                ];
-
-                this.debugger.on("Debugger.scriptParsed", evt => {
-                    console.log(evt);
-                    this.scriptSources.push(evt);
-                })
-
-                // Don't resolve yet - wait for proxy ready signal
-            };
-
-            this.ws.onclose = (event) => {
-                this._updateStatus('Disconnected', 'red');
-                this._log('Connection closed.', 'error');
-
-                // Clean up references
-                this.ws = null;
-                this.runtime = null;
-                this.debugger = null;
-                this.console = null;
-                this.profiler = null;
-                this.heapProfiler = null;
-                this.schema = null;
-                this.controllers = [];
-
-                // Emit Proxy.closed event
-                this.emit('Proxy.closed', {
-                    code: event.code,
-                    reason: event.reason,
-                    wasClean: event.wasClean
-                });
-
-                // if (this.options.autoReconnect) {
-                //     setTimeout(() => this.connect(), this.options.reconnectDelay);
-                // }
-            };
-
-            this.ws.onerror = (error) => {
-                this._updateStatus('Error', 'red');
-                this._log(`WebSocket Error: ${error.message}`, 'error');
-                reject(error);
-            };
-
-            this.ws.onmessage = (event) => {
-
-                // console.log("onmessage", event);
-
-                try {
-                    const message = JSON.parse(event.data);
-
-                    // Check for proxy ready signal
-                    if (message.method === 'Proxy.ready') {
-                        console.log('Proxy is ready');
-                        resolve(this);
-                        return;
-                    }
-
-                    // Route to all controllers
-                    this.controllers.forEach(controller => {
-                        controller.handleMessage(message);
-                    });
-
-                    this._log(`Received: ${event.data.substring(0, 100)}...`, 'received');
-                } catch (err) {
-                    this._log(`Parse error: ${err.message}`, 'error');
-                }
-            };
 
         });
     }
