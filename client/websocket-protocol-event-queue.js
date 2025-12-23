@@ -15,11 +15,22 @@ class WebsocketProtocolEventQueue {
   constructor(wsSpec) {
     console.log("new WebsocketProtocolEventQueue", wsSpec);
     this.queue = new RegexPubSub();
+    this.messageId = 1;
+    this.wsSpec = wsSpec;
+    // Controllers will be initialized after this instance is set as static eventQueue
+    this.consoleController = null;
+    this.runtimeController = null;
+    this.debuggerController = null;
+  }
+
+  /**
+   * Initialize controllers after the eventQueue is set as static instance
+   * This must be called after BaseDomainController.eventQueue is set
+   */
+  initControllers() {
     this.consoleController = new ConsoleController();
     this.runtimeController = new RuntimeController();
     this.debuggerController = new DebuggerController();
-    this.messageId = 1;
-    this.wsSpec = wsSpec;
   }
 
   connect(){
@@ -80,8 +91,8 @@ class WebsocketProtocolEventQueue {
       console.warn(`   Type: ⚠️  UNKNOWN message type:`, message);
     }
 
-    console.log(JSON.stringify(message, null, 2));
-    console.log('='.repeat(60));
+    // console.log(JSON.stringify(message, null, 2));
+    // console.log('='.repeat(60));
   }
 
   send(method, params={}){
@@ -91,7 +102,7 @@ class WebsocketProtocolEventQueue {
       params: params
     };
 
-    console.log('==> Sending command:');
+    console.log('==> Sending command:', command);
     console.log(JSON.stringify(command, null, 2));
 
     this.ws.send(JSON.stringify(command));
@@ -99,6 +110,9 @@ class WebsocketProtocolEventQueue {
   }
 
   async enable() {
+
+    alert();
+
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       throw new Error('WebSocket not connected');
     }
@@ -114,9 +128,14 @@ class WebsocketProtocolEventQueue {
       console.log('Runtime.enable result:', runtimeResult);
       console.log('Runtime domain enabled - you should see console.log events');
 
-      return { consoleResult, runtimeResult };
+      console.log('Enabling Debugger domain...');
+      const debuggerResult = await this.debuggerController.enable();
+      debuggerResult.runIfWaitingForDebugger();
+      console.log('Debugger.enable result:', debuggerResult);
+
+      return { consoleResult, runtimeResult, debuggerResult };
     } catch (error) {
-      console.error('Error enabling Console/Runtime:', error);
+      console.error('Error enabling Console/Runtime/Debugger:', error);
       throw error;
     }
   }

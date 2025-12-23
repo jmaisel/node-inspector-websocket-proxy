@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .log {
+            margin: 10px 0;
+            padding: 10px;
+            background: #2d2d2d;
+            border-left: 3px solid #007acc;
+        }
+        .error {
+            border-left-color: #f44336;
+            color: #f44336;
+        }
+        .success {
+            border-left-color: #4caf50;
+            color: #4caf50;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            background: #007acc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebsocketProtocolEventQueue Diagnostic Test</h1>
+    <div id="status">Loading...</div>
+
+    <div>
+        <button onclick="testConnect()">Test Connect</button>
+        <button onclick="testEnableDomains()">Enable Domains</button>
+        <button onclick="testPause()">Pause</button>
+        <button onclick="testResume()">Resume</button>
+        <button onclick="testDisconnect()">Disconnect</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <div id="logs"></div>
+
+    <!-- Load source files -->
+    <script src="../client/regex-pubsub.js"></script>
+    <script src="../client/inspector-constants.js"></script>
+    <script src="../client/inspector-controllers.js"></script>
+    <script src="../client/websocket-protocol-event-queue.js"></script>
+
+    <script>
+        let eventQueue = null;
+        let connectionEstablished = false;
+
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log ${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            try {
+                log('🔧 Initializing BaseDomainController...', 'info');
+                BaseDomainController.initialize('ws://localhost:8888');
+                eventQueue = BaseDomainController.getEventQueue();
+
+                log('✓ BaseDomainController initialized', 'success');
+                log(`EventQueue: ${eventQueue ? 'Created' : 'NULL'}`, eventQueue ? 'success' : 'error');
+                log(`Controllers: Console=${!!eventQueue?.consoleController}, Runtime=${!!eventQueue?.runtimeController}, Debugger=${!!eventQueue?.debuggerController}`, 'info');
+
+                // Setup event listeners
+                if (eventQueue && eventQueue.runtimeController) {
+                    eventQueue.runtimeController.on('Runtime.consoleAPICalled', (params) => {
+                        log(`📋 Console: ${JSON.stringify(params.args?.[0]?.value || params)}`, 'info');
+                    });
+
+                    eventQueue.debuggerController.on('Debugger.paused', (params) => {
+                        log(`⏸️  Paused: ${params.reason}`, 'success');
+                    });
+
+                    eventQueue.debuggerController.on('Debugger.resumed', (params) => {
+                        log(`▶️  Resumed`, 'success');
+                    });
+                }
+
+                updateStatus('✓ Ready - Click "Test Connect" to start', 'success');
+            } catch (error) {
+                log(`❌ Initialization error: ${error.message}`, 'error');
+                console.error(error);
+                updateStatus('❌ Initialization failed', 'error');
+            }
+        });
+
+        async function testConnect() {
+            try {
+                log('🔌 Connecting to ws://localhost:8888...', 'info');
+
+                eventQueue.connect();
+
+                // Wait for open event
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => reject(new Error('Connection timeout')), 5000);
+
+                    eventQueue.ws.addEventListener('open', () => {
+                        clearTimeout(timeout);
+                        log('✓ WebSocket connected', 'success');
+                        connectionEstablished = true;
+                        resolve();
+                    });
+
+                    eventQueue.ws.addEventListener('error', (error) => {
+                        clearTimeout(timeout);
+                        reject(error);
+                    });
+                });
+
+                // Wait for Proxy.ready
+                log('Waiting for Proxy.ready event...', 'info');
+                await new Promise((resolve) => {
+                    const subId = eventQueue.queue.subscribe('Proxy.ready', (topic, message) => {
+                        log('✓ Proxy ready', 'success');
+                        eventQueue.queue.unsubscribe(subId);
+                        resolve();
+                    });
+
+                    setTimeout(() => {
+                        log('⚠️ Proxy.ready timeout (might be ok)', 'info');
+                        resolve();
+                    }, 3000);
+                });
+
+                updateStatus('✓ Connected', 'success');
+            } catch (error) {
+                log(`❌ Connection error: ${error.message}`, 'error');
+                console.error(error);
+                updateStatus('❌ Connection failed', 'error');
+            }
+        }
+
+        async function testEnableDomains() {
+            if (!connectionEstablished) {
+                log('❌ Not connected. Click "Test Connect" first.', 'error');
+                return;
+            }
+
+            try {
+                log('Enabling Console domain...', 'info');
+                await eventQueue.consoleController.enable();
+                log('✓ Console enabled', 'success');
+
+                log('Enabling Runtime domain...', 'info');
+                await eventQueue.runtimeController.enable();
+                log('✓ Runtime enabled', 'success');
+
+                log('Enabling Debugger domain...', 'info');
+                await eventQueue.debuggerController.enable();
+                log('✓ Debugger enabled', 'success');
+
+                log('Running debugger if waiting...', 'info');
+                await eventQueue.runtimeController.runIfWaitingForDebugger();
+                log('✓ All domains enabled', 'success');
+
+                updateStatus('✓ Domains enabled - Receiving events', 'success');
+            } catch (error) {
+                log(`❌ Enable error: ${error.message}`, 'error');
+                console.error(error);
+                updateStatus('❌ Enable failed', 'error');
+            }
+        }
+
+        async function testPause() {
+            try {
+                log('Sending pause command...', 'info');
+                await eventQueue.debuggerController.pause();
+                log('✓ Pause command sent', 'success');
+            } catch (error) {
+                log(`❌ Pause error: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function testResume() {
+            try {
+                log('Sending resume command...', 'info');
+                await eventQueue.debuggerController.resume();
+                log('✓ Resume command sent', 'success');
+            } catch (error) {
+                log(`❌ Resume error: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        function testDisconnect() {
+            if (eventQueue && eventQueue.ws) {
+                log('Disconnecting...', 'info');
+                eventQueue.ws.close();
+                connectionEstablished = false;
+                log('✓ Disconnected', 'success');
+                updateStatus('✓ Disconnected', 'info');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -111,6 +111,50 @@ class RegexPubSub {
   }
 
   /**
+   * Subscribe to a single message matching a pattern, then auto-unsubscribe
+   *
+   * @param {string|RegExp} pattern - Regular expression pattern to match topics
+   * @param {Function} callback - Callback function (topic, data) => void
+   * @returns {number} Subscription ID (will be auto-unsubscribed after first match)
+   *
+   * @example
+   * pubsub.once(/^response:123$/, (topic, data) => {
+   *   console.log('Got response:', data);
+   * });
+   */
+  once(pattern, callback) {
+    if (typeof callback !== 'function') {
+      throw new TypeError('Callback must be a function');
+    }
+
+    // Convert string to RegExp if needed
+    const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+
+    if (!(regex instanceof RegExp)) {
+      throw new TypeError('Pattern must be a string or RegExp');
+    }
+
+    const subscriptionId = this.nextSubscriptionId++;
+
+    // Wrap callback to auto-unsubscribe after first invocation
+    const wrappedCallback = (topic, data) => {
+      try {
+        callback(topic, data);
+      } finally {
+        // Always unsubscribe after callback, even if it throws
+        this.unsubscribe(subscriptionId);
+      }
+    };
+
+    this.subscriptions.set(subscriptionId, {
+      pattern: regex,
+      callback: wrappedCallback
+    });
+
+    return subscriptionId;
+  }
+
+  /**
    * Get all topics that would match a given pattern
    *
    * @param {string} topic - Topic to test

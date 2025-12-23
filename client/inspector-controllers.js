@@ -28,6 +28,8 @@ class BaseDomainController extends EventEmitter {
             return BaseDomainController.eventQueue;
         }
         BaseDomainController.eventQueue = new WebsocketProtocolEventQueue(wsUrl);
+        // Initialize controllers after eventQueue is set
+        BaseDomainController.eventQueue.initControllers();
         return BaseDomainController.eventQueue;
     }
 
@@ -55,6 +57,37 @@ class BaseDomainController extends EventEmitter {
         this.domain = domain;
         this.commandConstants = commandConstants;
         this.eventConstants = eventConstants;
+
+        // Automatically subscribe to all domain events and forward them to EventEmitter
+        this.setupEventForwarding();
+    }
+
+    /**
+     * Sets up automatic forwarding of WebSocket protocol events to EventEmitter
+     * Subscribes to all events for this domain and emits them via EventEmitter
+     * @private
+     */
+    setupEventForwarding() {
+        try {
+            const queue = BaseDomainController.getEventQueue();
+            const domainPattern = `^${this.domain}\\.`;
+
+            // Subscribe to all events for this domain
+            queue.queue.subscribe(domainPattern, (topic, message) => {
+                // Extract event name and params from the message
+                const eventName = message.method;
+                const eventParams = message.params || {};
+
+                // Emit the event via EventEmitter
+                // Emit with both the full event name and just the params
+                this.emit(eventName, eventParams);
+
+                console.log(`[${this.domain}] Event forwarded: ${eventName}`, eventParams);
+            });
+        } catch (error) {
+            console.warn(`Cannot set up event forwarding for ${this.domain}: ${error.message}`);
+            console.warn('Make sure to call BaseDomainController.initialize(wsUrl) before creating controller instances');
+        }
     }
 
     /**
@@ -71,21 +104,20 @@ class BaseDomainController extends EventEmitter {
         const fullMethod = `${this.domain}.${method}`;
 
         return new Promise((resolve, reject) => {
-            // Send command and get the ID
-            const commandId = queue.send(fullMethod, params);
+            // Peek at the next message ID (don't send yet)
+            const commandId = queue.messageId;
 
             // Set up timeout
+            let timeoutId;
             const timeout = setTimeout(() => {
-                queue.queue.unsubscribe(subscriptionId);
                 reject(new Error(`Command timeout: ${fullMethod}`));
             }, 30000); // 30 second timeout
 
-            // Subscribe to the response for this specific command ID
+            // Subscribe to the response BEFORE sending (fixes race condition)
             const responsePattern = `^response:${commandId}$`;
-            const subscriptionId = queue.queue.subscribe(responsePattern, (topic, message) => {
-                // Clear timeout and unsubscribe
+            queue.queue.once(responsePattern, (topic, message) => {
+                // Clear timeout
                 clearTimeout(timeout);
-                queue.queue.unsubscribe(subscriptionId);
 
                 if (message.error) {
                     reject(new Error(`${message.error.message} (code: ${message.error.code})`));
@@ -93,6 +125,14 @@ class BaseDomainController extends EventEmitter {
                     resolve(message.result);
                 }
             });
+
+            // NOW send the command (subscription is already listening)
+            const actualCommandId = queue.send(fullMethod, params);
+
+            // Sanity check
+            if (actualCommandId !== commandId) {
+                console.error(`ID mismatch! Expected ${commandId}, got ${actualCommandId}`);
+            }
         });
     }
 

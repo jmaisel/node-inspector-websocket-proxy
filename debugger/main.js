@@ -915,10 +915,62 @@ $('#connectBtn').click(async function() {
         const wsUrl = $('#wsUrl').val();
         log(`Connecting to ${wsUrl}...`, 'info');
 
-        client = new InspectorBrowserClient(wsUrl);
-        await client.connect();
+        // Initialize the BaseDomainController with the WebSocket URL
+        const eventQueue = BaseDomainController.initialize(wsUrl);
+
+        // Subscribe to console events before connecting
+        eventQueue.queue.subscribe('Runtime.consoleAPICalled', (topic, message) => {
+            const event = message.params;
+            const args = event.args?.map(arg => arg.value ?? arg.description).join(' ') || '';
+            const logType = event.type === 'error' ? 'error' : 'info';
+            log(`console.${event.type}: ${args}`, logType);
+        });
+
+        // Subscribe to connection lifecycle events
+        eventQueue.queue.subscribe('WebSocket.close', () => {
+            log('Connection closed', 'error');
+            updateStatus('Disconnected', 'disconnected');
+            $('#debugControls').hide();
+            $('#connectionControls').show();
+            client = null;
+        });
+
+        // Connect to the WebSocket
+        eventQueue.connect();
+
+        // Wait for Proxy.ready event
+        await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                reject(new Error('Connection timeout'));
+            }, 10000);
+
+            eventQueue.queue.subscribe('Proxy.ready', () => {
+                clearTimeout(timeoutId);
+                log('Proxy ready', 'info');
+                resolve();
+            });
+
+            eventQueue.queue.subscribe('WebSocket.error', (topic, data) => {
+                clearTimeout(timeoutId);
+                reject(new Error('Connection failed'));
+            });
+        });
+
         log('Connected successfully', 'info');
         updateStatus('Connected', 'connected');
+
+        // Use controller instances from the event queue
+        // Create a client-like object for compatibility with existing code
+        client = {
+            debugger: eventQueue.debuggerController,
+            runtime: eventQueue.runtimeController,
+            console: eventQueue.consoleController,
+            disconnect: () => {
+                if (eventQueue.ws) {
+                    eventQueue.ws.close();
+                }
+            }
+        };
 
         // Debugger events
         client.debugger.on('Debugger.paused', async (event) => {
@@ -929,11 +981,15 @@ $('#connectBtn').click(async function() {
             isPaused = true;
             updateStatus('Paused', 'paused');
             updateControls();
-            renderCallStack(event.callFrames);
 
-            // Evaluate all watches
-            for (let i = 0; i < watches.length; i++) {
-                await evaluateWatch(watches[i].expression, i);
+            // Await call stack rendering to complete before evaluating watches
+            await renderCallStack(event.callFrames);
+
+            // Evaluate all watches (only if still paused - user might have resumed)
+            if (isPaused) {
+                for (let i = 0; i < watches.length; i++) {
+                    await evaluateWatch(watches[i].expression, i);
+                }
             }
         });
 
@@ -978,31 +1034,31 @@ $('#connectBtn').click(async function() {
             log(`Exception: ${msg}`, 'error');
         });
 
-        client.debugger.on('Debugger.enable', (event) => {
-            log('Debugger enabled', 'info');
-            $('#connectionControls').hide();
-            $('#debugControls').show();
-            updateControls();
-        });
-
         // Enable debugger and runtime
+        await client.console.enable();
         await client.debugger.enable();
         await client.runtime.enable();
 
-        // Configure debugger for better call stack capture
-        try {
-            await client.debugger.setAsyncCallStackDepth(32);
-            log('Async call stack depth set to 32', 'info');
-        } catch (err) {
-            console.warn('Could not set async call stack depth:', err);
-        }
+        // Update UI after successful connection and enable
+        log('Debugger enabled', 'info');
+        $('#connectionControls').hide();
+        $('#debugControls').show();
+        updateControls();
 
-        // Don't skip any pauses
-        try {
-            await client.debugger.setSkipAllPauses(false);
-        } catch (err) {
-            console.warn('Could not set skip pauses:', err);
-        }
+        // // Configure debugger for better call stack capture
+        // try {
+        //     await client.debugger.setAsyncCallStackDepth(32);
+        //     log('Async call stack depth set to 32', 'info');
+        // } catch (err) {
+        //     console.warn('Could not set async call stack depth:', err);
+        // }
+        //
+        // // Don't skip any pauses
+        // try {
+        //     await client.debugger.setSkipAllPauses(false);
+        // } catch (err) {
+        //     console.warn('Could not set skip pauses:', err);
+        // }
 
     } catch (error) {
         log(`Connection error: ${error.message}`, 'error');
@@ -1038,7 +1094,9 @@ $('#disconnectBtn').click(function() {
 
 // Control button handlers
 $('#pauseBtn').click(() => client.debugger.pause());
+
 $('#resumeBtn').click(() => client.debugger.resume());
+
 $('#stepOverBtn').click(() => {
     client.debugger.stepOver();
     $('.tab-btn[data-tab="callstack"]').click();

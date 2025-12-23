@@ -10,10 +10,12 @@
     "test:ui:e2e:report": "node test/run-ui-tests.js e2e --report",
     "test:ui:e2e:headed:report": "node test/run-ui-tests.js e2e --headed --report",
     "test:ui:unit": "echo 'Open test/debugger-ui-unit.html in a browser to run unit tests'",
-    "test:smoke": "node test/run-ui-tests.js e2e --report",
+    "test:protocol:race": "node test/protocol/test-event-queue-race-conditions.js",
+    "test:smoke": "echo 'Open http://localhost:8080/test/websocket-protocol-event-queue-smoke.html in a browser (server must be running: npm start)'",
     "test:all": "node test/run-ui-tests.js e2e --report",
-    "start": "node inspector-proxy-factory.js",
-    "dev": "node inspector-proxy-factory.js"
+    "start": "node start-server.js",
+    "dev": "node start-server.js",
+    "server": "node test-server.js"
   },
   "keywords": [
     "inspector",
