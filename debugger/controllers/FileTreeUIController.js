@@ -122,6 +122,7 @@ export class FileTreeUIController extends BaseUIController {
             <div class="tree-file" data-script-id="${scriptId}" data-url="${url}" title="${url}">
                 <span class="tree-file-icon">📄</span>
                 <span class="tree-file-name">${fileName}</span>
+                <button class="tree-file-bp-btn" data-url="${url}" title="Set breakpoint in this file">🔴</button>
             </div>
         `;
 
@@ -133,7 +134,12 @@ export class FileTreeUIController extends BaseUIController {
      */
     setupEventHandlers() {
         // File selection handler
-        $(document).on('click', '.tree-file', function() {
+        $(document).on('click', '.tree-file', function(e) {
+            // Don't trigger if clicking the breakpoint button
+            if ($(e.target).hasClass('tree-file-bp-btn')) {
+                return;
+            }
+
             $('.tree-file').removeClass('active');
             $(this).addClass('active');
 
@@ -142,6 +148,24 @@ export class FileTreeUIController extends BaseUIController {
 
             log(`Selected file: ${url} (scriptId: ${scriptId})`, 'info');
             // TODO: Load and display source code
+        });
+
+        // Breakpoint button handler
+        $(document).on('click', '.tree-file-bp-btn', function(e) {
+            e.stopPropagation(); // Prevent file selection
+
+            const url = $(this).data('url');
+
+            // Switch to breakpoints tab
+            $('.tab-btn[data-tab="breakpoints"]').click();
+
+            // Pre-fill the URL input
+            $('#bpUrl').val(url);
+
+            // Focus on line number input
+            $('#bpLine').focus();
+
+            log(`Ready to set breakpoint in: ${url}`, 'info');
         });
 
         // Tree node toggle handler (using global function for onclick in HTML)

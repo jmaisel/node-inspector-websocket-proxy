@@ -14,6 +14,7 @@ import { ConsoleUIController } from './controllers/ConsoleUIController.js';
 import { CallStackUIController } from './controllers/CallStackUIController.js';
 import { DebuggerUIController } from './controllers/DebuggerUIController.js';
 import { FileTreeUIController } from './controllers/FileTreeUIController.js';
+import { BreakpointUIController } from './controllers/BreakpointUIController.js';
 
 // Re-export all classes
 export {
@@ -24,5 +25,6 @@ export {
     ConsoleUIController,
     CallStackUIController,
     DebuggerUIController,
-    FileTreeUIController
+    FileTreeUIController,
+    BreakpointUIController
 };

@@ -5,7 +5,8 @@ import {
     ConsoleUIController,
     DebuggerUIController,
     CallStackUIController,
-    FileTreeUIController
+    FileTreeUIController,
+    BreakpointUIController
 } from './controllers.js';
 
 // =============================================================================
@@ -18,6 +19,7 @@ window.fileTreeController = null;
 window.consoleController = null;
 window.debuggerController = null;
 window.callStackController = null;
+window.breakpointController = null;
 
 class DebuggerUI{
     constructor() {
@@ -47,6 +49,10 @@ class DebuggerUI{
         // File tree initialization
         window.fileTreeController = new FileTreeUIController();
         await window.fileTreeController.initialize();
+
+        // Breakpoint initialization
+        window.breakpointController = new BreakpointUIController();
+        window.breakpointController.initialize();
     }
 }
 

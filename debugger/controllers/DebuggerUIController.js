@@ -95,6 +95,10 @@ export class DebuggerUIController extends BaseUIController {
             await this.client.debugger.enable();
             await this.client.runtime.enable();
 
+            // Activate breakpoints (required for breakpoints to work)
+            await this.client.debugger.setBreakpointsActive(true);
+            log('Breakpoints activated', 'info');
+
             // Update UI after successful connection and enable
             log('Debugger enabled', 'info');
             $('#connectionControls').hide();
@@ -157,6 +161,9 @@ export class DebuggerUIController extends BaseUIController {
             this.updateStatus('Paused', 'paused');
             this.updateControls();
 
+            // Switch to Call Stack tab to show where we paused
+            $('.tab-btn[data-tab="callstack"]').click();
+
             // Render call stack (uses global function for now)
             if (window.renderCallStack) {
                 await window.renderCallStack(event.callFrames);
@@ -196,7 +203,13 @@ export class DebuggerUIController extends BaseUIController {
         });
 
         this.client.debugger.on('Debugger.breakpointResolved', (event) => {
-            log(`Breakpoint resolved: ${event.breakpointId}`, 'info');
+            log(`Breakpoint resolved: ${event.breakpointId} at line ${event.location.lineNumber}`, 'info');
+            console.log('Breakpoint resolved event:', event);
+
+            // Update breakpoint controller if available
+            if (window.breakpointController) {
+                window.breakpointController.handleBreakpointResolved(event);
+            }
         });
 
         // Runtime events
