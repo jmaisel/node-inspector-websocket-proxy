@@ -1,10 +1,18 @@
 /**
  * ToolbarUIController - Manages the dockable toolbar and settings panel
  */
-class ToolbarUIController extends BaseUIController {
+class ToolbarUIController extends DockableUIController {
     constructor() {
-        super();
-        this.$toolbar = $('#toolbar');
+        // Configure the dockable behavior
+        super({
+            $element: $('#toolbar'),
+            storagePrefix: 'debugger-toolbar',
+            draggableConfig: {
+                handle: '#toolbarGrip',
+                containment: 'window'
+            }
+        });
+
         this.$zone = $('#toolbarDockZone');
         this.$settingsPanel = $('#settingsPanel');
     }
@@ -14,73 +22,124 @@ class ToolbarUIController extends BaseUIController {
      * @param {string} size - 'small', 'medium', or 'large'
      */
     setIconSize(size) {
-        this.$toolbar.attr('data-icon-size', size);
+        this.$element.attr('data-icon-size', size);
         localStorage.setItem('debugger-icon-size', size);
         this.$settingsPanel.hide();
     }
 
     /**
-     * Dock the toolbar to its designated zone
+     * Dock the toolbar to its designated zone (implements DockableUIController.dock)
      */
-    dockToolbarToZone() {
-        // Disable draggable
-        if (this.$toolbar.data('ui-draggable')) {
-            this.$toolbar.draggable('destroy');
-        }
-
+    dock() {
         // Move toolbar to docking zone
-        this.$toolbar.addClass('docked-to-zone');
-        this.$toolbar.css({ top: '', left: '', position: '' });
-        this.$zone.append(this.$toolbar);
+        this.$element.addClass('docked-to-zone');
+        this.applyPosition({
+            position: '',
+            top: '',
+            left: '',
+            right: '',
+            bottom: '',
+            width: ''
+        });
+        this.$zone.append(this.$element);
         this.$zone.addClass('has-toolbar');
 
         // Hide redock button when docked
         $('#toolbarRedockBtn').hide();
 
         // Save docked state
-        localStorage.setItem('debugger-toolbar-docked', 'true');
-        localStorage.removeItem('debugger-toolbar-pos');
+        this.saveDockState(true);
+        this.clearPosition();
 
-        // Re-enable draggable with updated behavior
-        this.$toolbar.draggable({
-            handle: '#toolbarGrip',
-            start: () => {
-                // Undock on drag start
-                this.undockToolbarFromZone();
+        // Re-enable draggable with updated behavior (undock on drag start)
+        this.initDraggable({
+            start: (event, ui) => {
+                // Undock immediately - move to body and set position before drag continues
+                this.$element.removeClass('docked-to-zone');
+                this.$zone.removeClass('has-toolbar');
+
+                // Calculate current offset position
+                const offset = this.$element.offset();
+
+                // Move to body
+                $('body').append(this.$element);
+
+                // Set absolute position to match current location
+                this.applyPosition({
+                    position: 'absolute',
+                    top: offset.top,
+                    left: offset.left,
+                    right: 'auto',
+                    bottom: 'auto',
+                    width: 'auto'
+                });
+
+                // Show redock button
+                $('#toolbarRedockBtn').show();
+
+                // Save undocked state
+                this.saveDockState(false);
+            },
+            drag: (event, ui) => {
+                // Check if near docking zone
+                const zoneOffset = this.$zone.offset();
+                const zoneHeight = 50;
+
+                if (ui.offset.top < zoneOffset.top + zoneHeight &&
+                    ui.offset.top > zoneOffset.top - zoneHeight) {
+                    this.$zone.addClass('pulsate-dock-target');
+                } else {
+                    this.$zone.removeClass('pulsate-dock-target');
+                }
+            },
+            stop: (event, ui) => {
+                // Remove highlight
+                this.$zone.removeClass('pulsate-dock-target');
+
+                // Check if near docking zone
+                const zoneOffset = this.$zone.offset();
+                const zoneHeight = 50;
+
+                if (ui.offset.top < zoneOffset.top + zoneHeight &&
+                    ui.offset.top > zoneOffset.top - zoneHeight) {
+                    // Snap to docking zone
+                    this.dock();
+                } else {
+                    // Save floating position
+                    this.savePosition(ui.position);
+                }
             }
         });
     }
 
     /**
-     * Undock the toolbar from its zone (make it floating)
+     * Undock the toolbar from its zone - make it floating (implements DockableUIController.undock)
      */
-    undockToolbarFromZone() {
+    undock() {
         // Remove from zone
-        this.$toolbar.removeClass('docked-to-zone');
+        this.$element.removeClass('docked-to-zone');
         this.$zone.removeClass('has-toolbar');
-        $('body').append(this.$toolbar);
+        $('body').append(this.$element);
 
-        // Make floating
-        this.$toolbar.css({
+        // Make floating - ensure all position properties are set correctly
+        // Clear width to prevent constraint from docked mode
+        this.applyPosition({
             position: 'absolute',
             top: 40,
-            left: 0
+            left: 0,
+            right: 'auto',
+            bottom: 'auto',
+            width: 'auto'
         });
 
         // Show redock button when floating
         $('#toolbarRedockBtn').show();
 
         // Save undocked state
-        localStorage.setItem('debugger-toolbar-docked', 'false');
+        this.saveDockState(false);
 
-        // Re-enable draggable
-        if (this.$toolbar.data('ui-draggable')) {
-            this.$toolbar.draggable('destroy');
-        }
-
-        this.$toolbar.draggable({
-            handle: '#toolbarGrip',
-            containment: 'window',
+        // Re-enable draggable with zone-snapping behavior
+        this.initDraggable({
             stop: (event, ui) => {
                 // Check if near docking zone
                 const zoneOffset = this.$zone.offset();
@@ -89,16 +148,27 @@ class ToolbarUIController extends BaseUIController {
                 if (ui.offset.top < zoneOffset.top + zoneHeight &&
                     ui.offset.top > zoneOffset.top - zoneHeight) {
                     // Snap to docking zone
-                    this.dockToolbarToZone();
+                    this.dock();
                 } else {
                     // Save floating position
-                    localStorage.setItem('debugger-toolbar-pos', JSON.stringify({
-                        top: ui.position.top,
-                        left: ui.position.left
-                    }));
+                    this.savePosition(ui.position);
                 }
             }
         });
+    }
+
+    /**
+     * Dock the toolbar to its designated zone (public API for backwards compatibility)
+     */
+    dockToolbarToZone() {
+        this.dock();
+    }
+
+    /**
+     * Undock the toolbar from its zone (public API for backwards compatibility)
+     */
+    undockToolbarFromZone() {
+        this.undock();
     }
 
     /**
@@ -155,26 +225,30 @@ class ToolbarUIController extends BaseUIController {
         this.setIconSize(savedSize);
 
         // Check if toolbar should be docked
-        const isDocked = localStorage.getItem('debugger-toolbar-docked');
+        const isDocked = this.restoreDockState(true);
 
-        if (isDocked === 'true') {
+        if (isDocked) {
             // Dock to zone
-            this.dockToolbarToZone();
+            this.dock();
         } else {
             // Show redock button for floating toolbar
             $('#toolbarRedockBtn').show();
 
             // Restore floating position or use default
-            const savedPos = localStorage.getItem('debugger-toolbar-pos');
+            const savedPos = this.restorePosition();
             if (savedPos) {
-                const pos = JSON.parse(savedPos);
-                this.$toolbar.css({ top: pos.top, left: pos.left });
+                this.applyPosition({
+                    position: 'absolute',
+                    top: savedPos.top,
+                    left: savedPos.left,
+                    right: 'auto',
+                    bottom: 'auto',
+                    width: 'auto'
+                });
             }
 
-            // Make toolbar draggable
-            this.$toolbar.draggable({
-                handle: '#toolbarGrip',
-                containment: 'window',
+            // Make toolbar draggable with zone-snapping behavior
+            this.initDraggable({
                 stop: (event, ui) => {
                     // Check if near docking zone
                     const zoneOffset = this.$zone.offset();
@@ -183,13 +257,10 @@ class ToolbarUIController extends BaseUIController {
                     if (ui.offset.top < zoneOffset.top + zoneHeight &&
                         ui.offset.top > zoneOffset.top - zoneHeight) {
                         // Snap to docking zone
-                        this.dockToolbarToZone();
+                        this.dock();
                     } else {
                         // Save floating position
-                        localStorage.setItem('debugger-toolbar-pos', JSON.stringify({
-                            top: ui.position.top,
-                            left: ui.position.left
-                        }));
+                        this.savePosition(ui.position);
                     }
                 }
             });

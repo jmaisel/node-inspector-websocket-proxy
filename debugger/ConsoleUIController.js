@@ -1,12 +1,27 @@
 /**
  * ConsoleUIController - Manages console output, search, and docking behavior
  */
-class ConsoleUIController extends BaseUIController {
+class ConsoleUIController extends DockableUIController {
     constructor() {
-        super();
+        // Configure the dockable behavior
+        super({
+            $element: $('#consoleDock'),
+            storagePrefix: 'console',
+            draggableConfig: {
+                handle: '#consoleDockGrip',
+                containment: 'window',
+                disabled: true
+            },
+            resizableConfig: {
+                handles: 'n, e, s, w, ne, nw, se, sw',
+                minHeight: 100,
+                minWidth: 300,
+                maxHeight: 600
+            }
+        });
+
         this.consoleAutoScroll = true;
         this.consoleDockAutoScroll = true;
-        this.$dock = null;
     }
 
     /**
@@ -92,52 +107,63 @@ class ConsoleUIController extends BaseUIController {
     }
 
     /**
-     * Undock console to a floating window
+     * Undock console to a floating window (implements DockableUIController.undock)
      */
-    undockConsole() {
+    undock() {
         // Keep console tab visible, but show redock placeholder in tab content
         $('.console-container').addClass('undocked-mode');
         $('#tab-console').addClass('show-redock-placeholder');
 
         // Remove docked class, add floating class
-        this.$dock.removeClass('docked').addClass('floating');
+        this.$element.removeClass('docked').addClass('floating');
 
         // Restore saved position or center it
-        const savedPos = localStorage.getItem('console-dock-pos');
+        const savedPos = this.restorePosition();
         if (savedPos) {
-            const pos = JSON.parse(savedPos);
-            this.$dock.css({ top: pos.top, left: pos.left, bottom: 'auto', right: 'auto' });
+            this.applyPosition({
+                top: savedPos.top,
+                left: savedPos.left,
+                bottom: 'auto',
+                right: 'auto'
+            });
         } else {
             // Center the console panel
-            const left = ($(window).width() - 600) / 2;
-            const top = ($(window).height() - 300) / 2;
-            this.$dock.css({ top: top, left: left, bottom: 'auto', right: 'auto' });
+            const pos = this.centerInWindow(600, 300);
+            this.applyPosition({
+                top: pos.top,
+                left: pos.left,
+                bottom: 'auto',
+                right: 'auto'
+            });
         }
 
         // Show the dock first
-        this.$dock.show();
+        this.$element.show();
 
         // Enable draggable and resizable for floating mode
-        this.$dock.draggable('enable');
-        this.$dock.resizable('enable');
-        this.$dock.resizable('option', 'handles', 'n, e, s, w, ne, nw, se, sw');
-        this.$dock.resizable('option', 'maxHeight', 800);
+        this.setDraggableEnabled(true);
+        this.setResizableEnabled(true);
+        this.setResizableOption('handles', 'n, e, s, w, ne, nw, se, sw');
+        this.setResizableOption('maxHeight', 800);
+
+        // Save state
+        this.saveDockState(false);
 
         // Add hover effect on console tab when console is undocked
         $('.tab-btn[data-tab="console"]').on('mouseenter.consoledock', () => {
             $(this).addClass('pulsate-dock-target');
         }).on('mouseleave.consoledock', () => {
             // Only remove if not currently dragging
-            if (!this.$dock.hasClass('ui-draggable-dragging')) {
+            if (!this.$element.hasClass('ui-draggable-dragging')) {
                 $(this).removeClass('pulsate-dock-target');
             }
         });
     }
 
     /**
-     * Redock console to the tab panel
+     * Redock console to the tab panel (implements DockableUIController.dock)
      */
-    redockConsole() {
+    dock() {
         // Remove undocked mode from console tab
         $('.console-container').removeClass('undocked-mode');
         $('#tab-console').removeClass('show-redock-placeholder');
@@ -147,20 +173,23 @@ class ConsoleUIController extends BaseUIController {
         $('.tab-btn[data-tab="console"]').removeClass('pulsate-dock-target');
 
         // Disable draggable
-        this.$dock.draggable('disable');
+        this.setDraggableEnabled(false);
 
         // Configure resizable for docked mode (only top handle)
-        this.$dock.resizable('option', 'handles', 'n');
-        this.$dock.resizable('option', 'maxHeight', 600);
+        this.setResizableOption('handles', 'n');
+        this.setResizableOption('maxHeight', 600);
 
         // Remove floating class, add docked class
-        this.$dock.removeClass('floating').addClass('docked');
+        this.$element.removeClass('floating').addClass('docked');
 
         // Reset to bottom docked position
-        this.$dock.css({ top: 'auto', left: 0, right: 0, bottom: 0 });
+        this.applyPosition({ top: 'auto', left: 0, right: 0, bottom: 0 });
 
         // Hide floating window
-        this.$dock.hide();
+        this.$element.hide();
+
+        // Save state
+        this.saveDockState(true);
 
         // Force scroll to bottom after tab is displayed if auto-scroll is enabled
         setTimeout(() => {
@@ -169,6 +198,20 @@ class ConsoleUIController extends BaseUIController {
                 debugLogEl.scrollTop = debugLogEl.scrollHeight;
             }
         }, 50);
+    }
+
+    /**
+     * Undock console to a floating window (public API for backwards compatibility)
+     */
+    undockConsole() {
+        this.undock();
+    }
+
+    /**
+     * Redock console to the tab panel (public API for backwards compatibility)
+     */
+    redockConsole() {
+        this.dock();
     }
 
     /**
@@ -235,12 +278,8 @@ class ConsoleUIController extends BaseUIController {
      * Setup console dock draggable and resizable behavior
      */
     setupConsoleDock() {
-        this.$dock = $('#consoleDock');
-
-        this.$dock.draggable({
-            handle: '#consoleDockGrip',
-            containment: 'window',
-            disabled: true,
+        // Initialize draggable with custom drag/stop handlers
+        this.initDraggable({
             drag: (event, ui) => {
                 const consoleTab = $('.tab-btn[data-tab="console"]');
                 const tabOffset = consoleTab.offset();
@@ -248,7 +287,7 @@ class ConsoleUIController extends BaseUIController {
                 const tabHeight = consoleTab.outerHeight();
 
                 const dockOffset = ui.offset;
-                const dockWidth = this.$dock.outerWidth();
+                const dockWidth = this.$element.outerWidth();
                 const dockHeight = 50;
 
                 const nearTab = dockOffset.left < tabOffset.left + tabWidth + 100 &&
@@ -264,20 +303,12 @@ class ConsoleUIController extends BaseUIController {
             },
             stop: (event, ui) => {
                 $('.tab-btn[data-tab="console"]').removeClass('pulsate-dock-target');
-
-                localStorage.setItem('console-dock-pos', JSON.stringify({
-                    top: ui.position.top,
-                    left: ui.position.left
-                }));
+                this.savePosition(ui.position);
             }
         });
 
-        this.$dock.resizable({
-            handles: 'n, e, s, w, ne, nw, se, sw',
-            minHeight: 100,
-            minWidth: 300,
-            maxHeight: 600
-        });
+        // Initialize resizable
+        this.initResizable();
     }
 
     /**
