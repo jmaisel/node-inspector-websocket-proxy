@@ -25,12 +25,14 @@ class Proxy{
     patch(){
 
         this.clientws.addEventListener("message", message =>{
-            this.logger.info("clientws onmessage", message.data);
+            // Logging disabled - causes CPU pegging with high message volume
+            // this.logger.info("clientws onmessage", message.data);
             this.nodews.send(message.data);
         });
 
         this.nodews.on("message", message =>{
-            this.logger.info("nodews onmessage", message.toString());
+            // Logging disabled - causes CPU pegging with high message volume
+            // this.logger.info("nodews onmessage", message.toString());
             this.clientws.send(message.toString());
         });
 
@@ -135,28 +137,45 @@ class RemoteDebuggerProxyServer {
 
         attemptSpawn();
 
-        // Wait for debugger to be ready, then create proxy
-        const waitForDebugger = setInterval(() => {
-            if(this.wsDebugger && this.wsDebugger.readyState === WebSocket.OPEN){
-                clearInterval(waitForDebugger);
+        // Event-driven proxy setup (replaces busy-wait polling)
+        const setupProxy = () => {
+            // Create and patch proxy
+            const proxy = new Proxy(this.wsDebugger, wsClient);
+            this.activeProxies.push(proxy);
+            proxy.patch();
+            this.logger.info('Proxy created and patched');
 
-                // Create and patch proxy
-                const proxy = new Proxy(this.wsDebugger, wsClient);
-                this.activeProxies.push(proxy);
-                proxy.patch();
-                this.logger.info('Proxy created and patched');
+            // Send ready signal to client
+            wsClient.send(JSON.stringify({
+                method: 'Proxy.ready',
+                params: {}
+            }));
+        };
 
-                // Send ready signal to client
-                wsClient.send(JSON.stringify({
-                    method: 'Proxy.ready',
-                    params: {}
-                }));
+        // Set up event listener for when debugger becomes ready
+        const onDebuggerReady = () => {
+            if (this.wsDebugger && this.wsDebugger.readyState === WebSocket.OPEN) {
+                setupProxy();
+            } else if (this.wsDebugger) {
+                this.wsDebugger.once('open', setupProxy);
             }
-        }, 1);
+        };
+
+        // Check if debugger is already open, otherwise wait for it
+        onDebuggerReady();
+
+        // Also check periodically in case wsDebugger gets set after this point
+        // (but at a reasonable 100ms interval, not 1ms)
+        const checkDebuggerInterval = setInterval(() => {
+            if (this.wsDebugger) {
+                clearInterval(checkDebuggerInterval);
+                onDebuggerReady();
+            }
+        }, 100);
 
         // When client closes, kill debugger process
         wsClient.on('close', () => {
-            clearInterval(waitForDebugger);
+            clearInterval(checkDebuggerInterval);
             this.logger.info('Client disconnected, killing debugger process');
             this.activeProxies = this.activeProxies.filter(p => p.clientws !== wsClient);
             this.killChildProcess();

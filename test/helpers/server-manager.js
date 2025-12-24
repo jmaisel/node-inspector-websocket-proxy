@@ -1,6 +1,7 @@
 /**
  * Shared server lifecycle management for tests
  * Handles starting/stopping servers with proper port checking and cleanup
+ * Now uses UnifiedTestServer for consistent HTTP + WebSocket management
  */
 
 const { spawn } = require('child_process');
@@ -9,7 +10,7 @@ const net = require('net');
 const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 const path = require('path');
-const RemoteDebuggerProxyServer = require('../../inspector-proxy-factory');
+const { UnifiedTestServer } = require('../../test-server');
 
 /**
  * Check if a port is in use
@@ -145,29 +146,35 @@ class ServerManager {
     }
 
     /**
-     * Start proxy server using RemoteDebuggerProxyServer class
+     * Start unified server (HTTP + WebSocket proxy)
      * @private
      */
     async _startProxyServer() {
-        console.log('Starting proxy server...');
+        console.log('Starting unified server (HTTP + WebSocket)...');
 
-        // Instantiate RemoteDebuggerProxyServer with target script
+        // Instantiate UnifiedTestServer with target script
         const scriptPath = path.resolve(this.options.debugScript);
-        this.proxyServer = new RemoteDebuggerProxyServer(scriptPath, {
+        this.proxyServer = new UnifiedTestServer({
+            httpPort: this.options.httpPort,
+            proxyPort: this.options.proxyPort,
             inspectPort: this.options.inspectPort,
-            proxyPort: this.options.proxyPort
+            debugScript: scriptPath
         });
 
-        // Start the proxy server
-        this.proxyServer.start();
+        // Start the unified server
+        await this.proxyServer.start();
 
-        // Wait for proxy server to be ready
-        const ready = await waitForServer(this.options.proxyPort, 30, 500);
-        if (!ready) {
-            throw new Error('Proxy server failed to start');
+        // Verify both servers are ready
+        const httpReady = await waitForServer(this.options.httpPort, 30, 500);
+        const proxyReady = await waitForServer(this.options.proxyPort, 30, 500);
+
+        if (!httpReady || !proxyReady) {
+            throw new Error('Unified server failed to start');
         }
 
-        console.log(`Proxy server ready on port ${this.options.proxyPort}`);
+        console.log(`Unified server ready:`);
+        console.log(`  - HTTP on port ${this.options.httpPort}`);
+        console.log(`  - WebSocket on port ${this.options.proxyPort}`);
     }
 
     /**

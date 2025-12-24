@@ -188,6 +188,11 @@
                 <div id="breakpointsList">
                     <div class="empty-state">No breakpoints set</div>
                 </div>
+                <div class="add-breakpoint-form">
+                    <input type="text" class="add-bp-input" id="bpUrl" placeholder="File URL or path">
+                    <input type="number" class="add-bp-input" id="bpLine" placeholder="Line #" min="1">
+                    <button class="add-bp-btn" id="addBreakpointBtn">Add</button>
+                </div>
             </div>
 
             <!-- Watches Tab -->
@@ -236,9 +241,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="../client/inspector-constants.js"></script>
+    <script src="../client/regex-pubsub.js"></script>
+    <script src="../client/inspector-browser-proxy.js"></script>
     <script src="../client/inspector-controllers.js"></script>
     <script src="../client/inspector-factory.js"></script>
-    <script src="../client/inspector-browser-client.js"></script>
-    <script src="main.js"></script>
+    <script src="./utils.js"></script>
+    <script type="module" src="./main.js"></script>
 </body>
 </html>

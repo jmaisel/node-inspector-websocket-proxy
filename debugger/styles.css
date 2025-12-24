@@ -14,6 +14,7 @@
     --status-disconnected: #dc3545;
     --status-connected: #28a745;
     --status-paused: #ffc107;
+    --danger-color: #dc3545;
 
     /* Sizing tokens */
     --header-height: clamp(40px, 8vh, 60px);
@@ -559,6 +560,29 @@ button {
     white-space: nowrap;
 }
 
+.tree-file-bp-btn {
+    background: transparent;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 2px 4px;
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+
+.tree-file:hover .tree-file-bp-btn {
+    opacity: 1;
+    color: var(--text-muted);
+}
+
+.tree-file-bp-btn:hover {
+    color: #f48771;
+    transform: scale(1.2);
+}
+
 /* List Item Styles (Callstack, Breakpoints, Watches) */
 .list-item {
     background: var(--bg-primary);
@@ -722,15 +746,48 @@ button {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.breakpoint-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.breakpoint-item.disabled {
+    opacity: 0.5;
+}
+
+.bp-toggle {
+    flex-shrink: 0;
+    cursor: pointer;
 }
 
 .breakpoint-checkbox {
     flex-shrink: 0;
 }
 
+.bp-info {
+    flex: 1;
+    min-width: 0;
+}
+
 .breakpoint-info {
     flex: 1;
     min-width: 0;
+}
+
+.bp-location {
+    font-size: var(--font-sm);
+    color: var(--text-primary);
+    font-family: 'Courier New', Consolas, monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .breakpoint-location {
@@ -742,6 +799,63 @@ button {
 .breakpoint-line {
     font-size: var(--font-xs);
     color: var(--text-muted);
+}
+
+.bp-remove-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 var(--spacing-xs);
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.breakpoint-item:hover .bp-remove-btn {
+    opacity: 1;
+}
+
+.bp-remove-btn:hover {
+    color: var(--danger-color);
+}
+
+/* Add breakpoint form */
+.add-breakpoint-form {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+}
+
+.add-bp-input {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 3px;
+    font-size: var(--font-sm);
+    font-family: 'Courier New', Consolas, monospace;
+}
+
+.add-bp-input:first-of-type {
+    flex: 2;
+}
+
+.add-bp-input:nth-of-type(2) {
+    flex: 0 0 80px;
+}
+
+.add-bp-input:focus {
+    outline: 1px solid var(--accent-primary);
+}
+
+.add-bp-btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+    min-height: auto;
+    flex-shrink: 0;
 }
 
 /* Watch/Variable specific */

@@ -1,145 +1,160 @@
-// Shared ID generator for all controllers
-let globalCommandId = 1;
-
 // ============================================================================
 // Abstract Base Controller
 // ============================================================================
 
 /**
  * Base class for Chrome DevTools Protocol domain controllers
- * Handles command sending, response handling, and event routing
+ * Handles command sending, response handling, and event routing via static InspectorBrowserProxy
  * @extends EventEmitter
  */
 class BaseDomainController extends EventEmitter {
     /**
+     * Static InspectorBrowserProxy instance shared by all controllers
+     * @static
+     * @type {InspectorBrowserProxy}
+     */
+    static eventQueue = null;
+
+    /**
+     * Initializes the static WebSocket connection and event queue
+     * Must be called before creating any controller instances
+     * @static
+     * @param {string} wsUrl - WebSocket URL (e.g., 'ws://localhost:8888')
+     * @returns {InspectorBrowserProxy} The initialized event queue
+     */
+    static initialize(wsUrl) {
+        if (BaseDomainController.eventQueue) {
+            console.warn('BaseDomainController already initialized. Returning existing event queue.');
+            return BaseDomainController.eventQueue;
+        }
+        BaseDomainController.eventQueue = new InspectorBrowserProxy(wsUrl);
+        // Initialize controllers after eventQueue is set
+        BaseDomainController.eventQueue.initControllers();
+        return BaseDomainController.eventQueue;
+    }
+
+    /**
+     * Gets the static event queue instance
+     * @static
+     * @returns {InspectorBrowserProxy} The event queue
+     * @throws {Error} If event queue not initialized
+     */
+    static getEventQueue() {
+        if (!BaseDomainController.eventQueue) {
+            throw new Error('BaseDomainController not initialized. Call BaseDomainController.initialize(wsUrl) first.');
+        }
+        return BaseDomainController.eventQueue;
+    }
+
+    /**
      * Creates a base domain controller
-     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
      * @param {string} domain - Protocol domain name (e.g., 'Runtime', 'Debugger')
      * @param {Object} commandConstants - Command constants for this domain
      * @param {Object} eventConstants - Event constants for this domain
      */
-    constructor(wsConnection, domain, commandConstants, eventConstants) {
+    constructor(domain, commandConstants, eventConstants) {
         super();
-        this.ws = wsConnection;
         this.domain = domain;
         this.commandConstants = commandConstants;
         this.eventConstants = eventConstants;
-        this.pendingCommands = new Map();
+
+        // Automatically subscribe to all domain events and forward them to EventEmitter
+        this.setupEventForwarding();
     }
 
     /**
-     * Generates a unique numeric command ID using shared global counter
-     * @returns {number} Unique command ID
+     * Sets up automatic forwarding of WebSocket protocol events to EventEmitter
+     * Subscribes to all events for this domain and emits them via EventEmitter
      * @private
      */
-    generateId() {
-        return globalCommandId++;
+    setupEventForwarding() {
+        try {
+            const queue = BaseDomainController.getEventQueue();
+            const domainPattern = `^${this.domain}\\.`;
+
+            // Subscribe to all events for this domain
+            queue.queue.subscribe(domainPattern, (topic, message) => {
+                // Extract event name and params from the message
+                const eventName = message.method;
+                const eventParams = message.params || {};
+
+                // Emit the event via EventEmitter
+                // Emit with both the full event name and just the params
+                this.emit(eventName, eventParams);
+
+                console.log(`[${this.domain}] Event forwarded: ${eventName}`, eventParams);
+            });
+        } catch (error) {
+            console.warn(`Cannot set up event forwarding for ${this.domain}: ${error.message}`);
+            console.warn('Make sure to call BaseDomainController.initialize(wsUrl) before creating controller instances');
+        }
     }
 
     /**
-     * Sends a command to the inspector and returns a promise
+     * Sends a command to the inspector via the static event queue and returns a promise
      * @param {string} method - Method name (without domain prefix)
      * @param {Object} [params={}] - Method parameters
      * @returns {Promise} Resolves with command result or rejects on error/timeout
      */
     send(method, params = {}) {
-        const id = this.generateId();
-        const command = JSON.stringify({ id, method: `${this.domain}.${method}`, params });
+
+        console.log("send:", method, params);
+
+        const queue = BaseDomainController.getEventQueue();
+        const fullMethod = `${this.domain}.${method}`;
 
         return new Promise((resolve, reject) => {
+            // Peek at the next message ID (don't send yet)
+            const commandId = queue.messageId;
 
-            this.pendingCommands.set(id, { resolve, reject, method : `${this.domain}.${method}` });
+            // Set up timeout
+            let timeoutId;
+            const timeout = setTimeout(() => {
+                reject(new Error(`Command timeout: ${fullMethod}`));
+            }, 30000); // 30 second timeout
 
-            if (this.ws && this.ws.readyState === 1) {
-                console.log("sending command:", command);
-                this.ws.send(command);
-            } else {
-                reject(new Error('WebSocket not connected'));
+            // Subscribe to the response BEFORE sending (fixes race condition)
+            const responsePattern = `^response:${commandId}$`;
+            queue.queue.once(responsePattern, (topic, message) => {
+                // Clear timeout
+                clearTimeout(timeout);
+
+                if (message.error) {
+                    reject(new Error(`${message.error.message} (code: ${message.error.code})`));
+                } else {
+                    resolve(message.result);
+                }
+            });
+
+            // NOW send the command (subscription is already listening)
+            const actualCommandId = queue.send(fullMethod, params);
+
+            // Sanity check
+            if (actualCommandId !== commandId) {
+                console.error(`ID mismatch! Expected ${commandId}, got ${actualCommandId}`);
             }
         });
     }
 
     /**
-     * Routes incoming messages to appropriate handlers
-     * Handles both command responses and domain events
-     * @param {Object} message - Incoming WebSocket message
+     * Subscribes to domain events using regex patterns
+     * @param {string|RegExp} eventPattern - Event pattern to match (e.g., 'Debugger.paused' or /^Debugger\./)
+     * @param {Function} callback - Callback function (topic, message) => void
+     * @returns {number} Subscription ID for unsubscribing
      */
-    handleMessage(message) {
-
-        // console.log('handleMessage', message);
-
-        const { id, method, result, params, error } = message;
-
-        // Handle command responses (check if this controller has a pending command with this ID)
-        if (id !== undefined && this.pendingCommands.has(id)) {
-
-            console.log("response id:", id, this.pendingCommands.has(id));
-
-            const { resolve, reject, method: commandMethod } = this.pendingCommands.get(id);
-
-            this.pendingCommands.delete(id);
-
-            if (error) {
-                reject(new Error(error.message || 'Command failed'));
-            } else {
-                // Call domain-specific response handler if it exists
-                const spec  = commandMethod.split(".");
-                const category = spec[0];
-                const eventName = spec[1];
-                const handlerName = `handle${this.toPascalCase(eventName)}Response`;
-
-                console.log(`trying to call handler ${handlerName} in ${this.domain} with id ${id}`, message);
-
-                const processedResult = this[handlerName] ? this[handlerName](result) : result;
-                console.log("emitting", commandMethod, processedResult, id);
-                this.emit(commandMethod, processedResult);
-                resolve(processedResult);
-            }
-        }
-
-        // Handle events (method matches our domain)
-        if (method && method.startsWith(`${this.domain}.`)) {
-            const spec  = method.split(".");
-            const category = spec[0];
-            const eventName = spec[1];
-            const handlerName = `handle${this.toPascalCase(eventName)}Event`;
-            console.log(`calling method handler for category ${category} method ${method}`);
-            console.log("emitting", method);
-
-            // Call domain-specific event handler if it exists, then emit
-            if (this[handlerName]) {
-                const processedEvent = this[handlerName](params);
-                this.emit(method, processedEvent);
-            } else {
-                this.emit(method, params);
-            }
-        }
+    subscribeToEvent(eventPattern, callback) {
+        const queue = BaseDomainController.getEventQueue();
+        return queue.queue.subscribe(eventPattern, callback);
     }
 
     /**
-     * Converts string to PascalCase
-     * @param {string} str - String to convert
-     * @returns {string} PascalCase string
-     * @private
+     * Unsubscribes from an event
+     * @param {number} subscriptionId - The subscription ID returned from subscribeToEvent()
+     * @returns {boolean} True if unsubscribed successfully
      */
-    toPascalCase(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    /**
-     * Gets list of all available commands for this domain
-     * @returns {string[]} Array of command names
-     */
-    getCommandList() {
-        return Object.values(this.commandConstants);
-    }
-
-    /**
-     * Gets list of all available events for this domain
-     * @returns {string[]} Array of event names
-     */
-    getEventList() {
-        return Object.values(this.eventConstants);
+    unsubscribeFromEvent(subscriptionId) {
+        const queue = BaseDomainController.getEventQueue();
+        return queue.queue.unsubscribe(subscriptionId);
     }
 }
 
@@ -155,10 +170,9 @@ class BaseDomainController extends EventEmitter {
 class RuntimeController extends BaseDomainController {
     /**
      * Creates a Runtime controller
-     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
      */
-    constructor(wsConnection) {
-        super(wsConnection, 'Runtime', RUNTIME_COMMANDS, RUNTIME_EVENTS);
+    constructor() {
+        super('Runtime', RUNTIME_COMMANDS, RUNTIME_EVENTS);
     }
 
     enable() {
@@ -224,120 +238,6 @@ class RuntimeController extends BaseDomainController {
             ...options
         });
     }
-
-    // Response Handlers
-    handleEnableResponse(result) {
-        return { success: true };
-    }
-
-    handleEvaluateResponse(result) {
-        return {
-            success: !result.exceptionDetails,
-            result: result.result,
-            value: result.result?.value,
-            type: result.result?.type,
-            objectId: result.result?.objectId,
-            exception: result.exceptionDetails
-        };
-    }
-
-    handleGetPropertiesResponse(result) {
-        return {
-            properties: result.result.map(prop => ({
-                name: prop.name,
-                value: prop.value?.value,
-                type: prop.value?.type,
-                objectId: prop.value?.objectId,
-                writable: prop.writable,
-                configurable: prop.configurable,
-                enumerable: prop.enumerable
-            })),
-            internalProperties: result.internalProperties || []
-        };
-    }
-
-    handleCallFunctionOnResponse(result) {
-        return {
-            success: !result.exceptionDetails,
-            result: result.result,
-            value: result.result?.value,
-            exception: result.exceptionDetails
-        };
-    }
-
-    handleGetHeapUsageResponse(result) {
-        return {
-            usedSize: result.usedSize,
-            totalSize: result.totalSize
-        };
-    }
-
-    handleCompileScriptResponse(result) {
-        return {
-            scriptId: result.scriptId,
-            exceptionDetails: result.exceptionDetails
-        };
-    }
-
-    handleRunScriptResponse(result) {
-        return {
-            result: result.result,
-            exceptionDetails: result.exceptionDetails
-        };
-    }
-
-    // Event Handlers
-    handleConsoleAPICalledEvent(params) {
-        return {
-            type: params.type,
-            args: params.args.map(arg => ({
-                type: arg.type,
-                value: arg.value,
-                description: arg.description
-            })),
-            stackTrace: params.stackTrace,
-            timestamp: params.timestamp
-        };
-    }
-
-    handleExceptionThrownEvent(params) {
-        return {
-            timestamp: params.timestamp,
-            exception: params.exceptionDetails
-        };
-    }
-
-    handleExceptionRevokedEvent(params) {
-        return {
-            reason: params.reason,
-            exceptionId: params.exceptionId
-        };
-    }
-
-    handleExecutionContextCreatedEvent(params) {
-        return {
-            contextId: params.context.id,
-            name: params.context.name,
-            origin: params.context.origin
-        };
-    }
-
-    handleExecutionContextDestroyedEvent(params) {
-        return {
-            executionContextId: params.executionContextId
-        };
-    }
-
-    handleExecutionContextsClearedEvent(params) {
-        return {};
-    }
-
-    handleInspectRequestedEvent(params) {
-        return {
-            object: params.object,
-            hints: params.hints
-        };
-    }
 }
 
 // ============================================================================
@@ -352,10 +252,9 @@ class RuntimeController extends BaseDomainController {
 class DebuggerController extends BaseDomainController {
     /**
      * Creates a Debugger controller
-     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
      */
-    constructor(wsConnection) {
-        super(wsConnection, 'Debugger', DEBUGGER_COMMANDS, DEBUGGER_EVENTS);
+    constructor() {
+        super('Debugger', DEBUGGER_COMMANDS, DEBUGGER_EVENTS);
     }
 
     enable() {
@@ -447,106 +346,6 @@ class DebuggerController extends BaseDomainController {
     setSkipAllPauses(skip) {
         return this.send(DEBUGGER_COMMANDS.SET_SKIP_ALL_PAUSES, { skip });
     }
-
-    // Response Handlers
-    handleEnableResponse(result) {
-        return {
-            success: true,
-            debuggerId: result.debuggerId
-        };
-    }
-
-    handleSetBreakpointByUrlResponse(result) {
-        return {
-            breakpointId: result.breakpointId,
-            locations: result.locations.map(loc => ({
-                scriptId: loc.scriptId,
-                lineNumber: loc.lineNumber,
-                columnNumber: loc.columnNumber
-            }))
-        };
-    }
-
-    handleSetBreakpointResponse(result) {
-        return {
-            breakpointId: result.breakpointId,
-            actualLocation: result.actualLocation
-        };
-    }
-
-    handleGetScriptSourceResponse(result) {
-        return {
-            scriptSource: result.scriptSource,
-            bytecode: result.bytecode
-        };
-    }
-
-    handleSetScriptSourceResponse(result) {
-        return {
-            success: !result.exceptionDetails,
-            callFrames: result.callFrames,
-            stackChanged: result.stackChanged,
-            exception: result.exceptionDetails
-        };
-    }
-
-    handleRestartFrameResponse(result) {
-        return {
-            callFrames: result.callFrames,
-            asyncStackTrace: result.asyncStackTrace
-        };
-    }
-
-    // Event Handlers
-    handleScriptParsedEvent(params) {
-        return {
-            scriptId: params.scriptId,
-            url: params.url,
-            startLine: params.startLine,
-            startColumn: params.startColumn,
-            endLine: params.endLine,
-            endColumn: params.endColumn,
-            executionContextId: params.executionContextId,
-            hash: params.hash,
-            isModule: params.isModule
-        };
-    }
-
-    handleScriptFailedToParseEvent(params) {
-        return {
-            scriptId: params.scriptId,
-            url: params.url,
-            errorMessage: params.errorMessage
-        };
-    }
-
-    handlePausedEvent(params) {
-        return {
-            reason: params.reason,
-            data: params.data,
-            callFrames: params.callFrames.map(frame => ({
-                callFrameId: frame.callFrameId,
-                functionName: frame.functionName,
-                location: frame.location,
-                url: frame.url,
-                scopeChain: frame.scopeChain,
-                this: frame.this
-            })),
-            hitBreakpoints: params.hitBreakpoints,
-            asyncStackTrace: params.asyncStackTrace
-        };
-    }
-
-    handleResumedEvent(params) {
-        return {};
-    }
-
-    handleBreakpointResolvedEvent(params) {
-        return {
-            breakpointId: params.breakpointId,
-            location: params.location
-        };
-    }
 }
 
 // ============================================================================
@@ -561,10 +360,9 @@ class DebuggerController extends BaseDomainController {
 class ConsoleController extends BaseDomainController {
     /**
      * Creates a Console controller
-     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
      */
-    constructor(wsConnection) {
-        super(wsConnection, 'Console', CONSOLE_COMMANDS, CONSOLE_EVENTS);
+    constructor() {
+        super('Console', CONSOLE_COMMANDS, CONSOLE_EVENTS);
     }
 
     enable() {
@@ -577,31 +375,6 @@ class ConsoleController extends BaseDomainController {
 
     clearMessages() {
         return this.send(CONSOLE_COMMANDS.CLEAR_MESSAGES);
-    }
-
-    // Response Handlers
-    handleEnableResponse(result) {
-        return { success: true };
-    }
-
-    handleDisableResponse(result) {
-        return { success: true };
-    }
-
-    handleClearMessagesResponse(result) {
-        return { success: true };
-    }
-
-    // Event Handlers
-    handleMessageAddedEvent(params) {
-        return {
-            source: params.message.source,
-            level: params.message.level,
-            text: params.message.text,
-            url: params.message.url,
-            line: params.message.line,
-            column: params.message.column
-        };
     }
 }
 
@@ -617,10 +390,9 @@ class ConsoleController extends BaseDomainController {
 class ProfilerController extends BaseDomainController {
     /**
      * Creates a Profiler controller
-     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
      */
-    constructor(wsConnection) {
-        super(wsConnection, 'Profiler', PROFILER_COMMANDS, PROFILER_EVENTS);
+    constructor() {
+        super('Profiler', PROFILER_COMMANDS, PROFILER_EVENTS);
     }
 
     enable() {
@@ -661,84 +433,6 @@ class ProfilerController extends BaseDomainController {
     getBestEffortCoverage() {
         return this.send(PROFILER_COMMANDS.GET_BEST_EFFORT_COVERAGE);
     }
-
-    // Response Handlers
-    handleEnableResponse(result) {
-        return { success: true };
-    }
-
-    handleDisableResponse(result) {
-        return { success: true };
-    }
-
-    handleStartResponse(result) {
-        return { success: true };
-    }
-
-    handleStopResponse(result) {
-        return {
-            profile: {
-                nodes: result.profile.nodes,
-                startTime: result.profile.startTime,
-                endTime: result.profile.endTime,
-                samples: result.profile.samples,
-                timeDeltas: result.profile.timeDeltas
-            }
-        };
-    }
-
-    handleSetSamplingIntervalResponse(result) {
-        return { success: true };
-    }
-
-    handleStartPreciseCoverageResponse(result) {
-        return {
-            timestamp: result.timestamp
-        };
-    }
-
-    handleStopPreciseCoverageResponse(result) {
-        return { success: true };
-    }
-
-    handleTakePreciseCoverageResponse(result) {
-        return {
-            coverage: result.result.map(script => ({
-                scriptId: script.scriptId,
-                url: script.url,
-                functions: script.functions
-            })),
-            timestamp: result.timestamp
-        };
-    }
-
-    handleGetBestEffortCoverageResponse(result) {
-        return {
-            coverage: result.result.map(script => ({
-                scriptId: script.scriptId,
-                url: script.url,
-                functions: script.functions
-            }))
-        };
-    }
-
-    // Event Handlers
-    handleConsoleProfileStartedEvent(params) {
-        return {
-            id: params.id,
-            location: params.location,
-            title: params.title
-        };
-    }
-
-    handleConsoleProfileFinishedEvent(params) {
-        return {
-            id: params.id,
-            location: params.location,
-            profile: params.profile,
-            title: params.title
-        };
-    }
 }
 
 // ============================================================================
@@ -753,10 +447,9 @@ class ProfilerController extends BaseDomainController {
 class HeapProfilerController extends BaseDomainController {
     /**
      * Creates a HeapProfiler controller
-     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
      */
-    constructor(wsConnection) {
-        super(wsConnection, 'HeapProfiler', HEAP_PROFILER_COMMANDS, HEAP_PROFILER_EVENTS);
+    constructor() {
+        super('HeapProfiler', HEAP_PROFILER_COMMANDS, HEAP_PROFILER_EVENTS);
     }
 
     enable() {
@@ -802,92 +495,6 @@ class HeapProfilerController extends BaseDomainController {
     addInspectedHeapObject(heapObjectId) {
         return this.send(HEAP_PROFILER_COMMANDS.ADD_INSPECTED_HEAP_OBJECT, { heapObjectId });
     }
-
-    // Response Handlers
-    handleEnableResponse(result) {
-        return { success: true };
-    }
-
-    handleDisableResponse(result) {
-        return { success: true };
-    }
-
-    handleTakeHeapSnapshotResponse(result) {
-        return { success: true };
-    }
-
-    handleStartTrackingHeapObjectsResponse(result) {
-        return { success: true };
-    }
-
-    handleStopTrackingHeapObjectsResponse(result) {
-        return { success: true };
-    }
-
-    handleCollectGarbageResponse(result) {
-        return { success: true };
-    }
-
-    handleGetObjectByHeapObjectIdResponse(result) {
-        return {
-            object: result.result
-        };
-    }
-
-    handleGetHeapObjectIdResponse(result) {
-        return {
-            heapSnapshotObjectId: result.heapSnapshotObjectId
-        };
-    }
-
-    handleStartSamplingResponse(result) {
-        return { success: true };
-    }
-
-    handleStopSamplingResponse(result) {
-        return {
-            profile: {
-                head: result.profile.head,
-                samples: result.profile.samples
-            }
-        };
-    }
-
-    handleAddInspectedHeapObjectResponse(result) {
-        return { success: true };
-    }
-
-    // Event Handlers
-    handleAddHeapSnapshotChunkEvent(params) {
-        return {
-            chunk: params.chunk
-        };
-    }
-
-    handleHeapStatsUpdateEvent(params) {
-        return {
-            statsUpdate: params.statsUpdate
-        };
-    }
-
-    handleLastSeenObjectIdEvent(params) {
-        return {
-            lastSeenObjectId: params.lastSeenObjectId,
-            timestamp: params.timestamp
-        };
-    }
-
-    handleReportHeapSnapshotProgressEvent(params) {
-        return {
-            done: params.done,
-            total: params.total,
-            finished: params.finished
-        };
-    }
-
-    handleResetProfilesEvent(params) {
-        return {};
-    }
 }
 
 // ============================================================================
@@ -902,24 +509,13 @@ class HeapProfilerController extends BaseDomainController {
 class SchemaController extends BaseDomainController {
     /**
      * Creates a Schema controller
-     * @param {WebSocket} wsConnection - WebSocket connection to the inspector
      */
-    constructor(wsConnection) {
-        super(wsConnection, 'Schema', SCHEMA_COMMANDS, {});
+    constructor() {
+        super('Schema', SCHEMA_COMMANDS, {});
     }
 
     getDomains() {
         return this.send(SCHEMA_COMMANDS.GET_DOMAINS);
-    }
-
-    // Response Handlers
-    handleGetDomainsResponse(result) {
-        return {
-            domains: result.domains.map(domain => ({
-                name: domain.name,
-                version: domain.version
-            }))
-        };
     }
 }
 
