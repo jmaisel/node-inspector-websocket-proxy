@@ -10,10 +10,10 @@ const METHOD_TYPE = {
   EVENT: "EVENT"
 }
 
-class WebsocketProtocolEventQueue {
+class InspectorBrowserProxy {
 
   constructor(wsSpec) {
-    console.log("new WebsocketProtocolEventQueue", wsSpec);
+    console.log("new InspectorBrowserProxy", wsSpec);
     this.queue = new RegexPubSub();
     this.messageId = 1;
     this.wsSpec = wsSpec;

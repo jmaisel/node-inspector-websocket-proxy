@@ -4,14 +4,14 @@
 
 /**
  * Base class for Chrome DevTools Protocol domain controllers
- * Handles command sending, response handling, and event routing via static WebsocketProtocolEventQueue
+ * Handles command sending, response handling, and event routing via static InspectorBrowserProxy
  * @extends EventEmitter
  */
 class BaseDomainController extends EventEmitter {
     /**
-     * Static WebsocketProtocolEventQueue instance shared by all controllers
+     * Static InspectorBrowserProxy instance shared by all controllers
      * @static
-     * @type {WebsocketProtocolEventQueue}
+     * @type {InspectorBrowserProxy}
      */
     static eventQueue = null;
 
@@ -20,14 +20,14 @@ class BaseDomainController extends EventEmitter {
      * Must be called before creating any controller instances
      * @static
      * @param {string} wsUrl - WebSocket URL (e.g., 'ws://localhost:8888')
-     * @returns {WebsocketProtocolEventQueue} The initialized event queue
+     * @returns {InspectorBrowserProxy} The initialized event queue
      */
     static initialize(wsUrl) {
         if (BaseDomainController.eventQueue) {
             console.warn('BaseDomainController already initialized. Returning existing event queue.');
             return BaseDomainController.eventQueue;
         }
-        BaseDomainController.eventQueue = new WebsocketProtocolEventQueue(wsUrl);
+        BaseDomainController.eventQueue = new InspectorBrowserProxy(wsUrl);
         // Initialize controllers after eventQueue is set
         BaseDomainController.eventQueue.initControllers();
         return BaseDomainController.eventQueue;
@@ -36,7 +36,7 @@ class BaseDomainController extends EventEmitter {
     /**
      * Gets the static event queue instance
      * @static
-     * @returns {WebsocketProtocolEventQueue} The event queue
+     * @returns {InspectorBrowserProxy} The event queue
      * @throws {Error} If event queue not initialized
      */
     static getEventQueue() {

@@ -1,7 +1,9 @@
+import { BaseUIController } from './BaseUIController.js';
+
 /**
  * TabNavigationUIController - Manages tab switching in the debugger UI
  */
-class TabNavigationUIController extends BaseUIController {
+export class TabNavigationUIController extends BaseUIController {
     constructor() {
         super();
     }

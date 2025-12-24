@@ -1,7 +1,9 @@
+import { BaseUIController } from './BaseUIController.js';
+
 /**
  * DebuggerUIController - Manages debugger connection, control, and protocol events
  */
-class DebuggerUIController extends BaseUIController {
+export class DebuggerUIController extends BaseUIController {
     constructor() {
         super();
         this.client = null;
@@ -38,14 +40,6 @@ class DebuggerUIController extends BaseUIController {
 
             // Initialize the BaseDomainController with the WebSocket URL
             const eventQueue = BaseDomainController.initialize(wsUrl);
-
-            // Subscribe to console events before connecting
-            eventQueue.queue.subscribe('Runtime.consoleAPICalled', (topic, message) => {
-                const event = message.params;
-                const args = event.args?.map(arg => arg.value ?? arg.description).join(' ') || '';
-                const logType = event.type === 'error' ? 'error' : 'info';
-                log(`console.${event.type}: ${args}`, logType);
-            });
 
             // Subscribe to connection lifecycle events
             eventQueue.queue.subscribe('WebSocket.close', () => {

@@ -1,12 +1,23 @@
+// Import all controller classes
+import {
+    ToolbarUIController,
+    TabNavigationUIController,
+    ConsoleUIController,
+    DebuggerUIController,
+    CallStackUIController,
+    FileTreeUIController
+} from './controllers.js';
+
 // =============================================================================
 // GLOBAL STATE - Organized by Domain
 // =============================================================================
 
 // UI Controllers (global references for event handlers)
-let fileTreeController = null;
-let consoleController = null;
-let debuggerController = null;
-let callStackController = null;
+// Attached to window for cross-module access
+window.fileTreeController = null;
+window.consoleController = null;
+window.debuggerController = null;
+window.callStackController = null;
 
 class DebuggerUI{
     constructor() {
@@ -22,20 +33,20 @@ class DebuggerUI{
         tabNavController.initialize();
 
         // Console initialization
-        consoleController = new ConsoleUIController();
-        consoleController.initialize();
+        window.consoleController = new ConsoleUIController();
+        window.consoleController.initialize();
 
         // Debugger initialization
-        debuggerController = new DebuggerUIController();
-        debuggerController.initialize();
+        window.debuggerController = new DebuggerUIController();
+        window.debuggerController.initialize();
 
         // Call Stack initialization
-        callStackController = new CallStackUIController();
-        callStackController.initialize();
+        window.callStackController = new CallStackUIController();
+        window.callStackController.initialize();
 
         // File tree initialization
-        fileTreeController = new FileTreeUIController();
-        await fileTreeController.initialize();
+        window.fileTreeController = new FileTreeUIController();
+        await window.fileTreeController.initialize();
     }
 }
 

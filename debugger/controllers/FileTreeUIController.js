@@ -1,7 +1,9 @@
+import { BaseUIController } from './BaseUIController.js';
+
 /**
  * FileTreeUIController - Manages the file tree display and categorization
  */
-class FileTreeUIController extends BaseUIController {
+export class FileTreeUIController extends BaseUIController {
     constructor() {
         super();
         this.packageDependencies = new Set();

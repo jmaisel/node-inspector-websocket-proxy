@@ -1,3 +1,5 @@
+import { BaseUIController } from './BaseUIController.js';
+
 /**
  * DockableUIController - Base class for UI controllers that support docking/undocking
  *
@@ -9,7 +11,7 @@
  * - dock(): Dock the element to its designated position
  * - undock(): Undock the element (make it floating)
  */
-class DockableUIController extends BaseUIController {
+export class DockableUIController extends BaseUIController {
     /**
      * @param {Object} config - Configuration object
      * @param {jQuery} config.$element - The jQuery element to make dockable

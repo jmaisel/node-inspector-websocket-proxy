@@ -1,7 +1,9 @@
+import { DockableUIController } from './DockableUIController.js';
+
 /**
  * ConsoleUIController - Manages console output, search, and docking behavior
  */
-class ConsoleUIController extends DockableUIController {
+export class ConsoleUIController extends DockableUIController {
     constructor() {
         // Configure the dockable behavior
         super({

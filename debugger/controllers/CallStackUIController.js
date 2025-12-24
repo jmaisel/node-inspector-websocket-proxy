@@ -1,7 +1,9 @@
+import { BaseUIController } from './BaseUIController.js';
+
 /**
  * CallStackUIController - Manages call stack display and scope variables
  */
-class CallStackUIController extends BaseUIController {
+export class CallStackUIController extends BaseUIController {
     constructor() {
         super();
     }

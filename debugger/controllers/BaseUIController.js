@@ -5,7 +5,7 @@
  * Controllers handle specific domains of the UI (toolbar, console, file tree, etc.)
  * and encapsulate their state, behavior, and event handling.
  */
-class BaseUIController {
+export class BaseUIController {
     constructor() {
         // Base initialization - can be extended in the future
     }

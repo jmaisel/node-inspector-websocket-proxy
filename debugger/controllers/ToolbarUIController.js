@@ -1,7 +1,9 @@
+import { DockableUIController } from './DockableUIController.js';
+
 /**
  * ToolbarUIController - Manages the dockable toolbar and settings panel
  */
-class ToolbarUIController extends DockableUIController {
+export class ToolbarUIController extends DockableUIController {
     constructor() {
         // Configure the dockable behavior
         super({
