@@ -46,6 +46,65 @@
             let pausedEvents = [];
             let resumedEvents = [];
             let scriptParsedEvents = [];
+            let debugSession = null;
+
+            // Helper to setup workspace and start debug session
+            async function setupDebugSession() {
+                console.log('Setting up debug session...');
+
+                // Step 1: Copy test files to workspace (if not already done)
+                try {
+                    const copyResponse = await fetch('http://localhost:8080/api/projects/copy-test-files', {
+                        method: 'POST'
+                    });
+                    const copyResult = await copyResponse.json();
+                    console.log('Test files:', copyResult.message);
+                } catch (err) {
+                    console.warn('Could not copy test files (may already exist):', err.message);
+                }
+
+                // Step 2: Start debug session
+                const debugResponse = await fetch('http://localhost:8080/debug/session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        file: 'test-fixtures/fixtures/steppable-script.js'
+                    })
+                });
+
+                if (!debugResponse.ok) {
+                    const error = await debugResponse.json();
+                    throw new Error(`Failed to start debug session: ${error.message || error.error}`);
+                }
+
+                debugSession = await debugResponse.json();
+                console.log('Debug session started:', debugSession.session.sessionId);
+                console.log('WebSocket URL:', debugSession.session.wsUrl);
+
+                // Wait a bit for the debugger to be ready
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                return debugSession.session;
+            }
+
+            // Helper to cleanup debug session
+            async function cleanupDebugSession() {
+                if (!debugSession) return;
+
+                console.log('Cleaning up debug session...');
+                try {
+                    const response = await fetch(`http://localhost:8080/debug/session/${debugSession.session.sessionId}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    console.log('Debug session stopped:', result.message);
+                    debugSession = null;
+                } catch (err) {
+                    console.error('Failed to cleanup debug session:', err);
+                }
+            }
 
             // Helper to wait for an event
             function waitForEvent(eventMethod, timeout = 15000) {
@@ -97,6 +156,30 @@
                 await eventQueue.debuggerController.enable();
                 await eventQueue.runtimeController.runIfWaitingForDebugger();
             }
+
+            // Before all tests: setup workspace and start debug session
+            before(async function() {
+                this.timeout(15000);
+                console.log('\n=== Setting up test environment ===\n');
+                try {
+                    const session = await setupDebugSession();
+                    console.log('✓ Debug session ready:', session.sessionId);
+                    console.log('✓ File:', session.targetFile);
+                    console.log('✓ WebSocket:', session.wsUrl);
+                    console.log('\n=== Starting tests ===\n');
+                } catch (error) {
+                    console.error('Failed to setup debug session:', error);
+                    throw error;
+                }
+            });
+
+            // After all tests: cleanup debug session
+            after(async function() {
+                this.timeout(5000);
+                console.log('\n=== Cleaning up test environment ===\n');
+                await cleanupDebugSession();
+                console.log('✓ Debug session cleaned up');
+            });
 
             // Before each test: reset tracking arrays and create new event queue
             beforeEach(function() {

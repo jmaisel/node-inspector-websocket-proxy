@@ -12,15 +12,18 @@ const METHOD_TYPE = {
 
 class InspectorBrowserProxy {
 
-  constructor(wsSpec) {
+  constructor(wsSpec, options = {}) {
     console.log("new InspectorBrowserProxy", wsSpec);
     this.queue = new RegexPubSub();
     this.messageId = 1;
     this.wsSpec = wsSpec;
+    this.options = options;
     // Controllers will be initialized after this instance is set as static eventQueue
     this.consoleController = null;
     this.runtimeController = null;
     this.debuggerController = null;
+    // Session guard (if provided)
+    this.sessionGuard = options.sessionGuard || null;
   }
 
   /**
@@ -33,7 +36,20 @@ class InspectorBrowserProxy {
     this.debuggerController = new DebuggerController();
   }
 
-  connect(){
+  async connect(){
+
+    // ⚠️ STATE ENFORCEMENT: Check if session guard is enabled
+    if (this.sessionGuard) {
+      console.log("🔒 Checking for active debug session...");
+      try {
+        const session = await this.sessionGuard.getActiveSession();
+        console.log("✓ Active session found:", session.sessionId);
+      } catch (error) {
+        console.error("✗ Cannot connect: " + error.message);
+        console.error("💡 Start a session first via POST /debug/session or click Debug on a file");
+        throw error;
+      }
+    }
 
     console.log("connecting to " + this.wsSpec);
 
@@ -111,8 +127,6 @@ class InspectorBrowserProxy {
 
   async enable() {
 
-    alert();
-
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       throw new Error('WebSocket not connected');
     }
@@ -130,7 +144,7 @@ class InspectorBrowserProxy {
 
       console.log('Enabling Debugger domain...');
       const debuggerResult = await this.debuggerController.enable();
-      debuggerResult.runIfWaitingForDebugger();
+      // runtimeResult.runIfWaitingForDebugger();
       console.log('Debugger.enable result:', debuggerResult);
 
       return { consoleResult, runtimeResult, debuggerResult };

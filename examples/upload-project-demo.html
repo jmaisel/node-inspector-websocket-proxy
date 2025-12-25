@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Project Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #34495e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .step {
+            margin-bottom: 25px;
+        }
+
+        .step h3 {
+            color: #2980b9;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .step p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .file-label:hover {
+            background: #2980b9;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .output.empty {
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        .success {
+            color: #27ae60;
+            font-weight: 500;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .info {
+            background: #e8f4f8;
+            color: #2980b9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .selected-file {
+            color: #27ae60;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Project Demo</h1>
+    <p class="subtitle">Examples of creating/opening projects using the Workspace API</p>
+
+    <!-- Step 1: Check Workspace -->
+    <div class="section">
+        <h2>Step 1: Check Workspace</h2>
+        <div class="step">
+            <h3>Get Workspace Information</h3>
+            <p>First, perform a handshake to check the workspace status and capabilities.</p>
+            <button onclick="checkWorkspace()">Check Workspace</button>
+            <div id="workspace-output" class="output empty">Click the button to check workspace...</div>
+        </div>
+    </div>
+
+    <!-- Step 2: Upload Project -->
+    <div class="section">
+        <h2>Step 2: Upload a Project (ZIP)</h2>
+        <div class="step">
+            <h3>Upload ZIP File to Workspace</h3>
+            <p>Upload a ZIP file containing your project. It will be extracted to the workspace root.</p>
+
+            <div class="info">
+                <strong>Note:</strong> The ZIP file should contain your project files. The contents will be extracted
+                to the workspace directory specified on the server.
+            </div>
+
+            <input type="file" id="zipFile" class="file-input" accept=".zip" onchange="fileSelected()">
+            <label for="zipFile" class="file-label">Choose ZIP File</label>
+            <div id="selected-file"></div>
+
+            <div style="margin-top: 15px;">
+                <input type="text" id="uploadPath" placeholder="Upload path (e.g., /my-project or / for root)" value="/">
+                <button onclick="uploadProject()" id="uploadBtn" disabled>Upload Project</button>
+            </div>
+
+            <div id="upload-output" class="output empty">Select a ZIP file to upload...</div>
+        </div>
+    </div>
+
+    <!-- Step 3: Browse Uploaded Files -->
+    <div class="section">
+        <h2>Step 3: Browse Uploaded Files</h2>
+        <div class="step">
+            <h3>List Files in Workspace</h3>
+            <p>Browse the files in your workspace after uploading.</p>
+
+            <input type="text" id="browsePath" placeholder="Path to browse (e.g., / or /my-project)" value="/">
+            <button onclick="browseFiles()">Browse Files</button>
+
+            <div id="browse-output" class="output empty">Click the button to browse files...</div>
+        </div>
+    </div>
+
+    <!-- Step 4: Start Debug Session -->
+    <div class="section">
+        <h2>Step 4: Start Debug Session</h2>
+        <div class="step">
+            <h3>Start Debugging a File</h3>
+            <p>Start a debug session for a JavaScript file in your workspace.</p>
+
+            <input type="text" id="debugFile" placeholder="File path (e.g., test/fixtures/steppable-script.js)" value="test/fixtures/steppable-script.js">
+            <button onclick="startDebugSession()">Start Debug Session</button>
+
+            <div id="debug-output" class="output empty">Click the button to start debugging...</div>
+        </div>
+    </div>
+
+    <!-- Code Examples -->
+    <div class="section">
+        <h2>Code Examples</h2>
+
+        <h3>Example 1: Check Workspace Info</h3>
+        <div class="code">const response = await fetch('http://localhost:8080/workspace/info');
+const workspaceInfo = await response.json();
+console.log('Workspace Root:', workspaceInfo.workspaceRoot);
+console.log('Features:', workspaceInfo.features);</div>
+
+        <h3 style="margin-top: 20px;">Example 2: Upload ZIP Project</h3>
+        <div class="code">const formData = new FormData();
+formData.append('file', zipFile);
+
+const response = await fetch('http://localhost:8080/project/', {
+    method: 'POST',
+    headers: {
+        'X-Workspace-API-Key': 'dev-key-123',
+        'Content-Type': 'application/zip'
+    },
+    body: zipFile  // Send ZIP file directly
+});
+
+const result = await response.json();
+console.log('Uploaded:', result.filesExtracted, 'files');</div>
+
+        <h3 style="margin-top: 20px;">Example 3: Start Debug Session</h3>
+        <div class="code">const response = await fetch('http://localhost:8080/debug/session', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        file: 'test/fixtures/steppable-script.js'
+    })
+});
+
+const session = await response.json();
+console.log('Session ID:', session.session.sessionId);
+console.log('WebSocket URL:', session.session.wsUrl);</div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        const API_KEY = 'dev-key-123';
+        let selectedFile = null;
+
+        function log(elementId, message, type = 'info') {
+            const output = document.getElementById(elementId);
+            output.classList.remove('empty');
+
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#ecf0f1';
+
+            const line = document.createElement('div');
+            line.innerHTML = `<span style="color: #95a5a6;">[${timestamp}]</span> <span style="color: ${color};">${message}</span>`;
+            output.appendChild(line);
+
+            // Scroll to bottom
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearLog(elementId) {
+            const output = document.getElementById(elementId);
+            output.innerHTML = '';
+            output.classList.add('empty');
+        }
+
+        async function checkWorkspace() {
+            clearLog('workspace-output');
+            log('workspace-output', 'Checking workspace...');
+
+            try {
+                const response = await fetch(`${API_BASE}/workspace/info`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const info = await response.json();
+
+                log('workspace-output', `✓ Workspace Root: ${info.workspaceRoot}`, 'success');
+                log('workspace-output', `✓ API Version: ${info.apiVersion}`, 'success');
+                log('workspace-output', `✓ Features: upload=${info.features.upload}, download=${info.features.download}, zip=${info.features.zip}`, 'success');
+                log('workspace-output', `✓ Last Modified: ${info.modified}`, 'success');
+
+            } catch (error) {
+                log('workspace-output', `✗ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function fileSelected() {
+            const input = document.getElementById('zipFile');
+            const fileDisplay = document.getElementById('selected-file');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            if (input.files.length > 0) {
+                selectedFile = input.files[0];
+                fileDisplay.innerHTML = `<div class="selected-file">✓ Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)</div>`;
+                uploadBtn.disabled = false;
+            } else {
+                selectedFile = null;
+                fileDisplay.innerHTML = '';
+                uploadBtn.disabled = true;
+            }
+        }
+
+        async function uploadProject() {
+            if (!selectedFile) {
+                alert('Please select a ZIP file first');
+                return;
+            }
+
+            clearLog('upload-output');
+            const uploadPath = document.getElementById('uploadPath').value || '/';
+
+            log('upload-output', `Uploading ${selectedFile.name} to ${uploadPath}...`);
+
+            try {
+                const response = await fetch(`${API_BASE}/project${uploadPath}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Workspace-API-Key': API_KEY,
+                        'Content-Type': 'application/zip'
+                    },
+                    body: selectedFile
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || `HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                log('upload-output', `✓ Upload successful!`, 'success');
+                log('upload-output', `✓ Target: ${result.targetPath}`, 'success');
+                log('upload-output', `✓ Files extracted: ${result.filesExtracted}`, 'success');
+                log('upload-output', `✓ Total size: ${(result.totalSize / 1024).toFixed(2)} KB`, 'success');
+
+                if (result.files && result.files.length > 0) {
+                    log('upload-output', `✓ Extracted files:`);
+                    result.files.slice(0, 10).forEach(file => {
+                        log('upload-output', `  - ${file}`);
+                    });
+                    if (result.files.length > 10) {
+                        log('upload-output', `  ... and ${result.files.length - 10} more files`);
+                    }
+                }
+
+            } catch (error) {
+                log('upload-output', `✗ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function browseFiles() {
+            clearLog('browse-output');
+            const browsePath = document.getElementById('browsePath').value || '/';
+
+            log('browse-output', `Browsing ${browsePath}...`);
+
+            try {
+                const response = await fetch(`${API_BASE}/project${browsePath}`);
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || `HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                log('browse-output', `✓ Path: ${result.path}`, 'success');
+                log('browse-output', `✓ Type: ${result.type}`, 'success');
+
+                if (result.contents) {
+                    log('browse-output', `✓ Contents (${result.contents.length} items):`);
+                    result.contents.forEach(item => {
+                        const icon = item.type === 'directory' ? '📁' : '📄';
+                        const size = item.type === 'file' ? ` (${(item.size / 1024).toFixed(2)} KB)` : '';
+                        log('browse-output', `  ${icon} ${item.name}${size}`);
+                    });
+                }
+
+            } catch (error) {
+                log('browse-output', `✗ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function startDebugSession() {
+            clearLog('debug-output');
+            const debugFile = document.getElementById('debugFile').value;
+
+            if (!debugFile) {
+                alert('Please enter a file path');
+                return;
+            }
+
+            log('debug-output', `Starting debug session for ${debugFile}...`);
+
+            try {
+                const response = await fetch(`${API_BASE}/debug/session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ file: debugFile })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || `HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                log('debug-output', `✓ Debug session started!`, 'success');
+                log('debug-output', `✓ Session ID: ${result.session.sessionId}`, 'success');
+                log('debug-output', `✓ Target File: ${result.session.targetFile}`, 'success');
+                log('debug-output', `✓ WebSocket URL: ${result.session.wsUrl}`, 'success');
+                log('debug-output', `✓ Status: ${result.session.status}`, 'success');
+                log('debug-output', `→ You can now connect to the WebSocket to debug`);
+
+            } catch (error) {
+                log('debug-output', `✗ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check workspace on load
+        window.addEventListener('load', () => {
+            setTimeout(checkWorkspace, 500);
+        });
+    </script>
+</body>
+</html>

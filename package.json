@@ -15,7 +15,8 @@
     "test:all": "node test/run-ui-tests.js e2e --report",
     "start": "node start-server.js",
     "dev": "node start-server.js",
-    "server": "node test-server.js"
+    "server": "node test-server.js",
+    "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp client/*.js ../pithagoras/war/debugger-client/"
   },
   "keywords": [
     "inspector",
@@ -27,8 +28,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "archiver": "^7.0.1",
     "cors": "^2.8.5",
     "express": "^4.22.1",
+    "unzipper": "^0.12.3",
     "ws": "^8.18.3"
   },
   "devDependencies": {
