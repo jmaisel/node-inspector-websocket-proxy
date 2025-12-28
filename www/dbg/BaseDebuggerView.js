@@ -1,0 +1,4 @@
+class BaseDebuggerView{
+    constructor() {
+    }
+}

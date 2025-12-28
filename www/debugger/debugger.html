@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js Debugger</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Node.js Debugger</h1>
+        <div class="status">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span id="statusText">Disconnected</span>
+        </div>
+    </div>
+
+    <!-- Compact Dockable Toolbar -->
+    <div class="toolbar" id="toolbar" data-icon-size="medium">
+        <div class="toolbar-grip" id="toolbar-grip" title="Drag to dock">⋮⋮</div>
+
+        <!-- Connection Controls -->
+        <div id="toolbar-connection-controls" class="toolbar-group">
+            <input type="text" id="toolbar-ws-url" class="toolbar-input" value="ws://localhost:8888" placeholder="ws://localhost:8888" title="WebSocket URL">
+            <button class="toolbar-btn success" id="toolbar-connect-btn">
+                <span class="btn-icon">🔌</span>
+                <span class="btn-label">Connect</span>
+            </button>
+        </div>
+
+        <!-- Debug Controls -->
+        <div id="toolbar-debug-controls" class="toolbar-group" style="display: none;">
+            <button class="toolbar-btn" id="toolbar-pause-btn">
+                <span class="btn-icon">⏸</span>
+                <span class="btn-label">Pause</span>
+            </button>
+            <button class="toolbar-btn" id="toolbar-resume-btn" disabled>
+                <span class="btn-icon">▶</span>
+                <span class="btn-label">Resume</span>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" id="toolbar-step-over-btn" disabled>
+                <span class="btn-icon">⤵</span>
+                <span class="btn-label">Over</span>
+            </button>
+            <button class="toolbar-btn" id="toolbar-step-into-btn" disabled>
+                <span class="btn-icon">⤓</span>
+                <span class="btn-label">Into</span>
+            </button>
+            <button class="toolbar-btn" id="toolbar-step-out-btn" disabled>
+                <span class="btn-icon">⤒</span>
+                <span class="btn-label">Out</span>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn danger" id="toolbar-disconnect-btn">
+                <span class="btn-icon">✗</span>
+                <span class="btn-label">Disconnect</span>
+            </button>
+        </div>
+
+        <!-- Settings Controls -->
+        <div class="toolbar-group toolbar-settings">
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn small" id="toolbar-redock-btn" title="Dock toolbar above tabs" style="display: none;">
+                <span class="btn-icon">⇲</span>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn small" id="toolbar-settings-btn" title="Settings">
+                <span class="btn-icon">⚙️</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="toolbar-settings-panel" style="display: none;">
+        <div class="settings-header">Icon Size</div>
+        <div class="settings-options">
+            <button class="settings-option-btn" id="toolbar-icon-size-small" data-size="small">
+                <span class="btn-icon">S</span>
+                <span class="btn-label">Small</span>
+            </button>
+            <button class="settings-option-btn" id="toolbar-icon-size-medium" data-size="medium">
+                <span class="btn-icon">M</span>
+                <span class="btn-label">Medium</span>
+            </button>
+            <button class="settings-option-btn" id="toolbar-icon-size-large" data-size="large">
+                <span class="btn-icon">L</span>
+                <span class="btn-label">Large</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="content" id="content">
+        <!-- Toolbar Docking Zone -->
+        <div class="toolbar-dock-zone" id="toolbarDockZone"></div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="console">Console</button>
+            <button class="tab-btn" data-tab="callstack">Call Stack</button>
+            <button class="tab-btn" data-tab="files">Files</button>
+            <button class="tab-btn" data-tab="breakpoints">Breakpoints</button>
+            <button class="tab-btn" data-tab="watches">Watches</button>
+            <button class="tab-btn" data-tab="scope">Scope</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Console Tab -->
+            <div class="tab-pane active" id="console-tab-pane">
+                <div class="console-redock-placeholder">
+                    <button class="console-redock-large-btn" id="console-redock-large-btn" title="Re-dock console to this tab">
+                        <span class="redock-icon">⇲</span>
+                        <span class="redock-label">Re-dock Console</span>
+                    </button>
+                </div>
+                <div class="console-container" style="display: flex;">
+                    <div class="console-search-wrapper collapsed">
+                        <button class="console-search-toggle" id="console-search-toggle" title="Toggle search">🔍</button>
+                        <div class="console-search">
+                            <input type="text" id="console-search-input" class="search-input" placeholder="Search console...">
+                            <label class="search-option">
+                                <input type="checkbox" id="console-search-regex"> Regex
+                            </label>
+                            <button id="console-clear-search" class="search-clear-btn" title="Clear search">✕</button>
+                        </div>
+                    </div>
+                    <div class="console-controls">
+                        <button class="console-control-btn" id="console-undock-btn" title="Undock console">⇱</button>
+                    </div>
+                    <div id="console-log" class="console-content">
+                        <div class="empty-state">No console output</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call Stack Tab -->
+            <div class="tab-pane" id="callstack-tab-pane">
+                <div id="callstack">
+                    <div class="empty-state">Pause execution to see call stack</div>
+                </div>
+            </div>
+
+            <!-- Files Tab -->
+            <div class="tab-pane" id="tab-files">
+                <div id="fileTree">
+                    <div class="tree-node">
+                        <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                            <span class="tree-icon">▶</span>
+                            <span class="tree-label">📁 Project Files</span>
+                        </div>
+                        <div class="tree-children" id="projectFiles"></div>
+                    </div>
+                    <div class="tree-node">
+                        <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                            <span class="tree-icon">▶</span>
+                            <span class="tree-label">📚 Libraries</span>
+                        </div>
+                        <div class="tree-children">
+                            <div class="tree-node">
+                                <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                                    <span class="tree-icon">▶</span>
+                                    <span class="tree-label">📦 Dependencies</span>
+                                </div>
+                                <div class="tree-children" id="dependencies"></div>
+                            </div>
+                            <div class="tree-node">
+                                <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                                    <span class="tree-icon">▶</span>
+                                    <span class="tree-label">🔧 Dev Dependencies</span>
+                                </div>
+                                <div class="tree-children" id="devDependencies"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tree-node">
+                        <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                            <span class="tree-icon">▶</span>
+                            <span class="tree-label">⚙️ Node Internal</span>
+                        </div>
+                        <div class="tree-children" id="nodeInternalFiles"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breakpoints Tab -->
+            <div class="tab-pane" id="breakpoints-tab-pane">
+                <div id="breakpoints-list">
+                    <div class="empty-state">No breakpoints set</div>
+                </div>
+                <div class="add-breakpoint-form">
+                    <input type="text" class="add-bp-input" id="breakpoints-url" placeholder="File URL or path">
+                    <input type="number" class="add-bp-input" id="breakpoints-line" placeholder="Line #" min="1">
+                    <button class="add-bp-btn" id="breakpoints-add-btn">Add</button>
+                </div>
+            </div>
+
+            <!-- Watches Tab -->
+            <div class="tab-pane" id="tab-watches">
+                <div id="watchesList">
+                    <div class="empty-state">No watches added</div>
+                </div>
+                <div class="add-watch-form">
+                    <input type="text" class="add-watch-input" id="watchInput" placeholder="Expression to watch">
+                    <button class="add-watch-btn" id="addWatchBtn">Add</button>
+                </div>
+            </div>
+
+            <!-- Scope Tab -->
+            <div class="tab-pane" id="tab-scope">
+                <div id="scopeVariables">
+                    <div class="empty-state">No scope information available</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dockable Console Panel -->
+    <div class="console-dock docked" id="console-dock" style="display: none;">
+        <div class="console-dock-header" id="console-dock-grip">
+            <span class="console-dock-title">📜 Console</span>
+            <div class="console-dock-controls">
+                <button class="console-dock-btn" id="console-redock-btn" title="Re-dock to tab panel">⇲</button>
+            </div>
+        </div>
+        <div class="console-search-wrapper collapsed">
+            <button class="console-search-toggle" id="console-search-toggle-dock" title="Toggle search">🔍</button>
+            <div class="console-search">
+                <input type="text" id="console-search-input-dock" class="search-input" placeholder="Search console...">
+                <label class="search-option">
+                    <input type="checkbox" id="console-search-regex-dock"> Regex
+                </label>
+                <button id="console-clear-search-dock" class="search-clear-btn" title="Clear search">✕</button>
+            </div>
+        </div>
+        <div id="console-log-dock" class="console-dock-content">
+            <!-- Same content as console-log, synced -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="../client/inspector-constants.js"></script>
+    <script src="../client/regex-pubsub.js"></script>
+    <script src="../client/inspector-browser-proxy.js"></script>
+    <script src="../client/inspector-controllers.js"></script>
+    <script src="../client/inspector-factory.js"></script>
+    <script src="./utils.js"></script>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
