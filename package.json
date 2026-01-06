@@ -5,18 +5,18 @@
   "main": "inspector-wrapper.js",
   "scripts": {
     "test": "echo 'Use npm run test:all to run all tests, or npm run test:ui:e2e for E2E tests'",
-    "test:ui:e2e": "node test/run-ui-tests.js e2e",
-    "test:ui:e2e:headed": "node test/run-ui-tests.js e2e --headed",
-    "test:ui:e2e:report": "node test/run-ui-tests.js e2e --report",
-    "test:ui:e2e:headed:report": "node test/run-ui-tests.js e2e --headed --report",
-    "test:ui:unit": "echo 'Open test/debugger-ui-unit.html in a browser to run unit tests'",
-    "test:protocol:race": "node test/protocol/test-event-queue-race-conditions.js",
+    "test:ui:e2e": "node cruft/test/run-ui-tests.js e2e",
+    "test:ui:e2e:headed": "node cruft/test/run-ui-tests.js e2e --headed",
+    "test:ui:e2e:report": "node cruft/test/run-ui-tests.js e2e --report",
+    "test:ui:e2e:headed:report": "node cruft/test/run-ui-tests.js e2e --headed --report",
+    "test:ui:unit": "echo 'Open cruft/test/debugger-ui-unit.html in a browser to run unit tests'",
+    "test:protocol:race": "node cruft/test/protocol/test-event-queue-race-conditions.js",
     "test:smoke": "echo 'Open http://localhost:8080/test/websocket-protocol-event-queue-smoke.html in a browser (server must be running: npm start)'",
-    "test:all": "node test/run-ui-tests.js e2e --report",
+    "test:all": "node cruft/test/run-ui-tests.js e2e --report",
     "start": "node start-server.js",
     "dev": "node start-server.js",
     "server": "node test-server.js",
-    "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp client/*.js ../pithagoras/war/debugger-client/"
+    "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp cruft/client/*.js ../pithagoras/war/debugger-client/"
   },
   "keywords": [
     "inspector",
@@ -43,5 +43,18 @@
     "mochawesome-merge": "^5.1.0",
     "mochawesome-report-generator": "^6.3.2",
     "selenium-webdriver": "^4.39.0"
+  },
+  "server.config": {
+    "httpPort": 8080,
+    "proxyPort": 8888,
+    "inspectPort": 9229,
+    "workspaceRoot": "/tmp/debugger-workspace",
+    "demoProjectPath": "www/test",
+    "staticDirs": ["~/Code/debugger-wrapper/www", "~/Code/pithagoras/war"],
+    "logLevels": {
+      "http": "debug",
+      "static": "debug",
+      "websocket": "debug"
+    }
   }
 }

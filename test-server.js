@@ -18,6 +18,11 @@ class UnifiedTestServer {
             inspectPort: options.inspectPort || 9229,
             workspaceRoot: options.workspaceRoot || process.cwd(),
             staticDirs: options.staticDirs || [path.resolve(__dirname)],
+            logLevels: options.logLevels || {
+                http: 'debug',
+                static: 'debug',
+                websocket: 'debug'
+            },
             ...options
         };
 
@@ -32,6 +37,8 @@ class UnifiedTestServer {
         this.httpServer = null;
         this.proxyServer = null;
         this.logger = new Logger('UnifiedTestServer');
+        this.httpLogger = new Logger('HTTP', 'info', this.options.logLevels.http);
+        this.staticLogger = new Logger('Static', 'info', this.options.logLevels.static);
         this.isRunning = false;
     }
 
@@ -91,11 +98,13 @@ class UnifiedTestServer {
      */
     serveFromMultipleDirectories(req, res, next) {
         const requestedPath = req.path;
+        const startTime = Date.now();
 
         // Try each static directory in order
         const tryNextDirectory = (index) => {
             if (index >= this.options.staticDirs.length) {
                 // No file found in any directory, pass to next middleware
+                this.staticLogger.debug(`404 ${req.method} ${requestedPath} - not found in any static directory`);
                 return next();
             }
 
@@ -110,11 +119,15 @@ class UnifiedTestServer {
                 }
 
                 // File found, serve it
+                this.staticLogger.debug(`Serving ${requestedPath} from ${baseDir}`);
                 res.sendFile(filePath, (sendErr) => {
                     if (sendErr) {
                         // Error sending file, try next directory
+                        this.staticLogger.warn(`Error serving ${requestedPath} from ${baseDir}:`, sendErr.message);
                         return tryNextDirectory(index + 1);
                     }
+                    const duration = Date.now() - startTime;
+                    this.staticLogger.info(`${res.statusCode} ${req.method} ${requestedPath} - ${duration}ms`);
                 });
             });
         };
@@ -133,6 +146,32 @@ class UnifiedTestServer {
             // Parse JSON request bodies
             app.use(express.json());
             app.use(express.urlencoded({ extended: true }));
+
+            // HTTP request logging middleware (logs all non-static API requests)
+            app.use((req, res, next) => {
+                // Skip logging for static files (handled by static middleware)
+                const isApiRequest = req.path.startsWith('/api') ||
+                                    req.path.startsWith('/debug') ||
+                                    req.path.startsWith('/project') ||
+                                    req.path.startsWith('/workspace') ||
+                                    req.path === '/health' ||
+                                    req.path === '/';
+
+                if (isApiRequest) {
+                    const startTime = Date.now();
+                    this.httpLogger.debug(`→ ${req.method} ${req.path}`);
+
+                    // Capture response
+                    const originalSend = res.send;
+                    res.send = function(data) {
+                        const duration = Date.now() - startTime;
+                        this.httpLogger.info(`← ${res.statusCode} ${req.method} ${req.path} - ${duration}ms`);
+                        return originalSend.call(res, data);
+                    }.bind(this);
+                }
+
+                next();
+            });
 
             // Add CORS headers for WebSocket connections
             app.use((req, res, next) => {
@@ -158,6 +197,7 @@ class UnifiedTestServer {
             const createWorkspaceApi = require('./server/workspace-api');
             const workspaceConfig = {
                 workspaceRoot: this.options.workspaceRoot || process.cwd(),
+                demoProjectPath: this.options.demoProjectPath,
                 apiKeys: [process.env.WORKSPACE_API_KEY || 'dev-key-123']
             };
             const workspaceRouter = createWorkspaceApi(workspaceConfig);
@@ -172,7 +212,8 @@ class UnifiedTestServer {
                 proxyPort: this.options.proxyPort,
                 inspectPort: this.options.inspectPort,
                 apiKeys: [process.env.WORKSPACE_API_KEY || 'dev-key-123'],
-                requireAuth: false
+                requireAuth: false,
+                websocketLogLevel: this.options.logLevels.websocket
             };
             const debugRouter = createDebuggerSessionApi(debugConfig);
             app.use('/debug', debugRouter);
@@ -509,37 +550,37 @@ class UnifiedTestServer {
                         <div class="link-box">
                             <h3>Test Debug Workflow</h3>
                             <p>Test the complete debug workflow step-by-step</p>
-                            <a href="/examples/test-debug-workflow.html">Test Workflow</a>
+                            <a href="/cruft/examples/test-debug-workflow.html">Test Workflow</a>
                         </div>
 
                         <div class="link-box">
                             <h3>Debugger UI</h3>
                             <p>Interactive debugger interface</p>
-                            <a href="/debugger/debugger.html">Open Debugger</a>
+                            <a href="/cruft/debugger/debugger.html">Open Debugger</a>
                         </div>
 
                         <div class="link-box">
                             <h3>Upload Project</h3>
                             <p>Upload and create projects using ZIP files</p>
-                            <a href="/examples/upload-project-demo.html">Upload Demo</a>
+                            <a href="/cruft/examples/upload-project-demo.html">Upload Demo</a>
                         </div>
 
                         <div class="link-box">
                             <h3>Workspace Browser</h3>
                             <p>Browse and manage workspace files</p>
-                            <a href="/examples/workspace-browser-demo.html">Open Workspace Browser</a>
+                            <a href="/cruft/examples/workspace-browser-demo.html">Open Workspace Browser</a>
                         </div>
 
                         <div class="link-box">
                             <h3>Diagnostic Test</h3>
                             <p>Verify WebSocket connection and basic operations</p>
-                            <a href="/test/diagnostic-test.html">Run Diagnostics</a>
+                            <a href="/cruft/test/diagnostic-test.html">Run Diagnostics</a>
                         </div>
 
                         <div class="link-box">
                             <h3>Smoke Tests</h3>
                             <p>Comprehensive WebsocketProtocolEventQueue integration tests</p>
-                            <a href="/test/websocket-protocol-event-queue-smoke.html">Run Tests</a>
+                            <a href="/cruft/test/websocket-protocol-event-queue-smoke.html">Run Tests</a>
                         </div>
 
                         <div class="link-box">

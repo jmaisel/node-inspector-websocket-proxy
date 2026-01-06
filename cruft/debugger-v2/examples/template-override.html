@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugger V2 - Template Override Example</title>
+
+    <!-- Use v1 styles (compatible) -->
+    <link rel="stylesheet" href="../../debugger/styles.css">
+</head>
+<body style="margin: 0; padding: 20px; font-family: 'Segoe UI', sans-serif; background: #1e1e1e; color: #d4d4d4;">
+    <h1>Debugger V2 - Template Override Example</h1>
+    <p>This example demonstrates how to override default templates using the TemplateRegistry.</p>
+    <p><strong>Customization:</strong> The console template has been overridden with a custom design.</p>
+
+    <!-- Debugger container -->
+    <div id="debugger-root" style="border: 1px solid #3e3e42; padding: 10px; margin-top: 20px;">
+        <div data-debugger-toolbar></div>
+        <div data-debugger-tabs></div>
+        <div data-debugger-console style="display: none;"></div>
+    </div>
+
+    <!-- jQuery and jQuery UI (required) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <!-- Inspector client dependencies -->
+    <script src="../../client/inspector-constants.js"></script>
+    <script src="../../client/regex-pubsub.js"></script>
+    <script src="../../client/inspector-browser-proxy.js"></script>
+    <script src="../../client/inspector-controllers.js"></script>
+
+    <!-- Main application (ES6 module) -->
+    <script type="module">
+        import { DebuggerApplication, TemplateRegistry } from '../index.js';
+
+        $(document).ready(async function() {
+            console.log('Initializing Debugger V2 with custom templates');
+
+            // Register a custom console template BEFORE creating the debugger
+            TemplateRegistry.register('console', (data, config, instanceId) => {
+                const { mode = 'tabbed', logEntries = [] } = data;
+
+                const logHtml = logEntries.length > 0
+                    ? logEntries.map(entry => {
+                        const type = entry.type || 'info';
+                        const timestamp = entry.timestamp || '';
+                        return `<div class="custom-log-entry custom-log-${type}">
+                            <span class="custom-timestamp">${timestamp}</span>
+                            <span class="custom-message">${entry.message}</span>
+                        </div>`;
+                    }).join('')
+                    : '<div class="empty-state">No console output (custom template)</div>';
+
+                return `
+                    <div id="${instanceId}" class="custom-console-container">
+                        <div class="custom-console-header">
+                            <h3 style="margin: 0; color: #4ec9b0;">Custom Console Design 🎨</h3>
+                            <p style="margin: 5px 0; font-size: 12px; color: #808080;">
+                                This console uses a custom template registered via TemplateRegistry
+                            </p>
+                        </div>
+                        <div id="${instanceId}-log" class="custom-console-log">
+                            ${logHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            console.log('Custom console template registered!');
+
+            // Create and initialize the debugger
+            const app = new DebuggerApplication({
+                container: '#debugger-root',
+                wsUrl: 'ws://localhost:8888'
+            });
+
+            await app.initialize();
+
+            window.debuggerApp = app;
+
+            console.log('Debugger V2 initialized with custom template!');
+            console.log('Check the Console tab to see the custom design');
+        });
+    </script>
+
+    <style>
+        body {
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        h1 {
+            color: #569cd6;
+        }
+        p {
+            color: #d4d4d4;
+        }
+
+        /* Custom console styles */
+        .custom-console-container {
+            padding: 10px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 8px;
+        }
+        .custom-console-header {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .custom-console-log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .custom-log-entry {
+            padding: 5px;
+            margin: 2px 0;
+            border-left: 3px solid #4ec9b0;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-log-info {
+            border-left-color: #569cd6;
+        }
+        .custom-log-warning {
+            border-left-color: #dcdcaa;
+        }
+        .custom-log-error {
+            border-left-color: #f48771;
+        }
+        .custom-timestamp {
+            color: #808080;
+            font-size: 11px;
+            margin-right: 10px;
+        }
+        .custom-message {
+            color: #d4d4d4;
+        }
+    </style>
+</body>
+</html>

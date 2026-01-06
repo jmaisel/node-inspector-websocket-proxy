@@ -7,9 +7,31 @@ const AuthMiddleware = require('./auth-middleware');
 const ZipHandler = require('./zip-handler');
 
 /**
+ * Recursively copy directory contents
+ * @param {string} src - Source directory
+ * @param {string} dest - Destination directory
+ */
+async function copyDirectory(src, dest) {
+    await fs.mkdir(dest, { recursive: true });
+    const entries = await fs.readdir(src, { withFileTypes: true });
+
+    for (const entry of entries) {
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+
+        if (entry.isDirectory()) {
+            await copyDirectory(srcPath, destPath);
+        } else {
+            await fs.copyFile(srcPath, destPath);
+        }
+    }
+}
+
+/**
  * Creates and configures the workspace API router
  * @param {Object} config - Configuration object
  * @param {string} config.workspaceRoot - Absolute path to workspace root
+ * @param {string} config.demoProjectPath - Relative path to demo project template
  * @param {string[]} config.apiKeys - Array of valid API keys for authentication
  * @returns {express.Router} Configured Express router
  */
@@ -50,6 +72,180 @@ function createWorkspaceApi(config = {}) {
             res.status(500).json({
                 error: 'Failed to get workspace info',
                 message: error.message
+            });
+        }
+    });
+
+
+
+
+    /**
+     * POST /active-project - Set the active project
+     * Body: { project: "project-name" }
+     */
+    router.post('/active-project', async (req, res) => {
+        try {
+            const project = req.body.projectPath;
+
+            if (!project) {
+                return res.status(400).json({
+                    error: 'Bad request',
+                    message: 'Missing required field: project'
+                });
+            }
+
+            // Validate that the project path exists within workspace
+            const projectPath = await security.validatePath(project);
+
+            // Check if it exists
+            try {
+                const stats = await fs.stat(projectPath);
+                if (!stats.isDirectory()) {
+                    return res.status(400).json({
+                        error: 'Bad request',
+                        message: 'Project must be a directory'
+                    });
+                }
+            } catch (err) {
+                if (err.code === 'ENOENT') {
+                    return res.status(404).json({
+                        error: 'Not found',
+                        message: 'Project directory does not exist',
+                        project
+                    });
+                }
+                throw err;
+            }
+
+            // Store active project in router state
+            router.activeProject = project;
+
+            res.json({
+                success: true,
+                project,
+                projectPath,
+                message: 'Active project set successfully'
+            });
+        } catch (err) {
+            console.error('Set active project error:', err);
+            if (err.message.includes('Path traversal')) {
+                return res.status(403).json({
+                    error: 'Forbidden',
+                    message: err.message
+                });
+            }
+            res.status(500).json({
+                error: 'Internal server error',
+                message: err.message
+            });
+        }
+    });
+
+    /**
+     * GET /active-project - Get the current active project
+     */
+    router.get('/active-project', (req, res) => {
+        if (!router.activeProject) {
+            return res.status(404).json({
+                error: 'No active project',
+                message: 'No project has been selected'
+            });
+        }
+
+        res.json({
+            project: router.activeProject
+        });
+    });
+
+    /**
+     * POST /demo-project - Copy demo project template to workspace
+     * Creates a new project from the configured demo template
+     */
+    router.post('/demo-project', async (req, res) => {
+        try {
+            if (!config.demoProjectPath) {
+                return res.status(500).json({
+                    error: 'Configuration error',
+                    message: 'Demo project path not configured'
+                });
+            }
+
+            // Resolve demo project path relative to project root
+            const projectRoot = path.resolve(__dirname, '..');
+            const demoPath = path.join(projectRoot, config.demoProjectPath);
+
+            // Verify demo project exists
+            try {
+                const stats = await fs.stat(demoPath);
+                if (!stats.isDirectory()) {
+                    return res.status(500).json({
+                        error: 'Configuration error',
+                        message: 'Demo project path is not a directory'
+                    });
+                }
+            } catch (err) {
+                if (err.code === 'ENOENT') {
+                    return res.status(500).json({
+                        error: 'Configuration error',
+                        message: `Demo project not found at ${config.demoProjectPath}`
+                    });
+                }
+                throw err;
+            }
+
+            // Get target path from request body or use default
+            const targetPath = req.body?.targetPath || 'demo-project';
+            const workspacePath = await security.validatePath(targetPath);
+
+            // Check if target already exists
+            try {
+                await fs.access(workspacePath);
+                return res.status(409).json({
+                    error: 'Conflict',
+                    message: `Target path already exists: ${targetPath}`,
+                    suggestion: 'Use a different target path or delete the existing directory'
+                });
+            } catch (err) {
+                // Target doesn't exist, which is what we want
+            }
+
+            // Copy demo project to workspace
+            await copyDirectory(demoPath, workspacePath);
+
+            // Count copied files
+            const countFiles = async (dir) => {
+                let count = 0;
+                const entries = await fs.readdir(dir, { withFileTypes: true });
+                for (const entry of entries) {
+                    if (entry.isDirectory()) {
+                        count += await countFiles(path.join(dir, entry.name));
+                    } else {
+                        count++;
+                    }
+                }
+                return count;
+            };
+
+            const fileCount = await countFiles(workspacePath);
+
+            res.status(201).json({
+                success: true,
+                message: 'Demo project created successfully',
+                projectPath: targetPath,
+                demoSource: config.demoProjectPath,
+                filesCreated: fileCount
+            });
+        } catch (err) {
+            console.error('Demo project creation error:', err);
+            if (err.message.includes('Path traversal')) {
+                return res.status(403).json({
+                    error: 'Forbidden',
+                    message: err.message
+                });
+            }
+            res.status(500).json({
+                error: 'Internal server error',
+                message: err.message
             });
         }
     });

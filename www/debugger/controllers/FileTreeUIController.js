@@ -68,31 +68,43 @@ export class FileTreeUIController extends BaseUIController {
      * Load package.json to categorize dependencies
      */
     async loadPackageJson() {
-        try {
-            // Try to fetch package.json from parent directory
-            const response = await fetch('../package.json');
-            if (response.ok) {
-                const pkg = await response.json();
+        // Try multiple possible paths for package.json
+        const possiblePaths = [
+            '/package.json',           // Absolute path from server root
+            '../../package.json',      // From www/debugger/ directory
+            '../package.json'          // From www/ directory
+        ];
 
-                // Store dependencies
-                if (pkg.dependencies) {
-                    Object.keys(pkg.dependencies).forEach(dep => {
-                        this.packageDependencies.add(dep);
-                    });
+        for (const path of possiblePaths) {
+            try {
+                const response = await fetch(path);
+                if (response.ok) {
+                    const pkg = await response.json();
+
+                    // Store dependencies
+                    if (pkg.dependencies) {
+                        Object.keys(pkg.dependencies).forEach(dep => {
+                            this.packageDependencies.add(dep);
+                        });
+                    }
+
+                    // Store devDependencies
+                    if (pkg.devDependencies) {
+                        Object.keys(pkg.devDependencies).forEach(dep => {
+                            this.packageDevDependencies.add(dep);
+                        });
+                    }
+
+                    log(`Loaded package.json from ${path}: ${this.packageDependencies.size} dependencies, ${this.packageDevDependencies.size} devDependencies`, 'info');
+                    return; // Success, exit early
                 }
-
-                // Store devDependencies
-                if (pkg.devDependencies) {
-                    Object.keys(pkg.devDependencies).forEach(dep => {
-                        this.packageDevDependencies.add(dep);
-                    });
-                }
-
-                log(`Loaded package.json: ${this.packageDependencies.size} dependencies, ${this.packageDevDependencies.size} devDependencies`, 'info');
+            } catch (error) {
+                // Continue to next path
             }
-        } catch (error) {
-            console.warn('Could not load package.json:', error);
         }
+
+        // If we get here, all paths failed
+        console.warn('Could not load package.json from any location. Dependency categorization will be limited.');
     }
 
     /**

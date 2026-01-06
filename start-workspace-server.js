@@ -151,6 +151,7 @@ class WorkspaceServer {
             const createWorkspaceApi = require('./server/workspace-api');
             const workspaceConfig = {
                 workspaceRoot: this.options.workspaceRoot,
+                demoProjectPath: this.options.demoProjectPath,
                 apiKeys: this.options.apiKeys
             };
             const workspaceRouter = createWorkspaceApi(workspaceConfig);
@@ -227,13 +228,13 @@ class WorkspaceServer {
                         <div class="link-box">
                             <h3>🎯 Full Lifecycle Demo (Recommended)</h3>
                             <p>Complete demo showing: Open Project → Browse Files → Debug Specific File</p>
-                            <a href="/examples/lifecycle-demo.html">Open Lifecycle Demo →</a>
+                            <a href="/cruft/examples/lifecycle-demo.html">Open Lifecycle Demo →</a>
                         </div>
 
                         <div class="link-box">
                             <h3>🗂️ Workspace Browser</h3>
                             <p>Browse workspace files, upload/download ZIPs</p>
-                            <a href="/examples/workspace-browser-demo.html">Open Workspace Browser →</a>
+                            <a href="/cruft/examples/workspace-browser-demo.html">Open Workspace Browser →</a>
                         </div>
 
                         <h2>API Endpoints</h2>
@@ -261,7 +262,7 @@ class WorkspaceServer {
 
                         <h2>Documentation</h2>
                         <ul>
-                            <li><a href="/docs/WORKSPACE_API.md">Workspace API Documentation</a></li>
+                            <li><a href="/cruft/docs/WORKSPACE_API.md">Workspace API Documentation</a></li>
                         </ul>
                     </body>
                     </html>

@@ -13,10 +13,11 @@ class Proxy{
      * @param {WebSocket} nws - WebSocket connection to Node debugger
      * @param {WebSocket} cws - WebSocket connection to browser client
      */
-    constructor(nws, cws){
+    constructor(nws, cws, logLevel){
         this.nodews = nws;
         this.clientws = cws;
-        this.logger = new Logger("Proxy");
+        this.logLevel = logLevel || 'debug';
+        this.logger = new Logger("Proxy", "info", this.logLevel);
     }
 
     /**
@@ -60,18 +61,20 @@ class RemoteDebuggerProxyServer {
      * @param {Object} [options={}] - Configuration options
      * @param {number} [options.inspectPort=9229] - Port for Node inspector
      * @param {number} [options.proxyPort=8888] - Port for proxy server
+     * @param {string} [options.logLevel='debug'] - Log level for WebSocket operations (debug, info, warn, error)
      */
     constructor(targetScript, options = {}) {
         this.targetScript = path.resolve(targetScript);
         this.inspectPort = options.inspectPort || 9229;
         this.proxyPort = options.proxyPort || 8888;
+        this.logLevel = options.logLevel || 'debug';
 
         this.debuggerURL = '';
         this.wsDebugger = null;
         this.server = null;
         this.appProcess = null;
         this.activeProxies = [];
-        this.logger = new Logger("RemoteDebuggerProxyServer");
+        this.logger = new Logger("RemoteDebuggerProxyServer", "info", this.logLevel);
     }
 
     /**
@@ -140,7 +143,7 @@ class RemoteDebuggerProxyServer {
         // Event-driven proxy setup (replaces busy-wait polling)
         const setupProxy = () => {
             // Create and patch proxy
-            const proxy = new Proxy(this.wsDebugger, wsClient);
+            const proxy = new Proxy(this.wsDebugger, wsClient, this.logLevel);
             this.activeProxies.push(proxy);
             proxy.patch();
             this.logger.info('Proxy created and patched');

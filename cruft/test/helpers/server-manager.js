@@ -10,7 +10,7 @@ const net = require('net');
 const { promisify } = require('util');
 const sleep = promisify(setTimeout);
 const path = require('path');
-const { UnifiedTestServer } = require('../../test-server');
+const { UnifiedTestServer } = require('../../../test-server');
 
 /**
  * Check if a port is in use

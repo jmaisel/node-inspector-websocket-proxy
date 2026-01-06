@@ -524,15 +524,15 @@ class SchemaController extends BaseDomainController {
 // ============================================================================
 
 // Attach to window for browser usage
-if (typeof window !== 'undefined') {
-    window.BaseDomainController = BaseDomainController;
-    window.RuntimeController = RuntimeController;
-    window.DebuggerController = DebuggerController;
-    window.ConsoleController = ConsoleController;
-    window.ProfilerController = ProfilerController;
-    window.HeapProfilerController = HeapProfilerController;
-    window.SchemaController = SchemaController;
-}
+// if (typeof window !== 'undefined') {
+//     window.BaseDomainController = BaseDomainController;
+//     window.RuntimeController = RuntimeController;
+//     window.DebuggerController = DebuggerController;
+//     window.ConsoleController = ConsoleController;
+//     window.ProfilerController = ProfilerController;
+//     window.HeapProfilerController = HeapProfilerController;
+//     window.SchemaController = SchemaController;
+// }
 
 // module.exports = {
 //     BaseDomainController,

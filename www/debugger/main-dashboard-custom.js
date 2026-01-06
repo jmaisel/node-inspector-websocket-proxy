@@ -1,20 +1,6 @@
-// Import TemplateRegistry
-import { TemplateRegistry, escapeHtml } from './TemplateRegistry.js';
-
-// Import default templates as fallbacks
-import { consoleTemplate } from './templates/console-template.js';
-import { callStackTemplate } from './templates/callstack-template.js';
-import { breakpointsTemplate } from './templates/breakpoints-template.js';
-
-// Import all controller classes
-import {
-    ToolbarUIController,
-    ConsoleUIController,
-    DebuggerUIController,
-    CallStackUIController,
-    FileTreeUIController,
-    BreakpointUIController
-} from './controllers.js';
+// Import DebuggerUIApplet and helper function
+import { DebuggerUIApplet, createDashboardConfig } from './DebuggerUIApplet.js';
+import { escapeHtml } from './TemplateRegistry.js';
 
 // =============================================================================
 // CUSTOM TEMPLATES
@@ -124,122 +110,30 @@ function customFileTreeTemplate(data = {}, instanceId = 'files') {
 }
 
 // =============================================================================
-// REGISTER CUSTOM TEMPLATES
+// DASHBOARD APPLICATION - CUSTOM + DEFAULT TEMPLATES
 // =============================================================================
 
-console.log('🎨 Registering CUSTOM templates...');
+console.log('🚀 Initializing Custom Dashboard with DebuggerUIApplet...');
+console.log('   🎨 Custom: toolbar, fileTree');
+console.log('   📦 Default: console, callStack, breakpoints (auto-applied)');
 
-// Register custom templates
-TemplateRegistry.register('toolbar', customToolbarTemplate);
-TemplateRegistry.register('filetree', customFileTreeTemplate);
+// Create configuration with ONLY custom templates
+// Default templates are automatically applied by the applet!
+const config = createDashboardConfig({
+    toolbar: customToolbarTemplate,
+    fileTree: customFileTreeTemplate
+    // No need to import/specify console, callStack, breakpoints - defaults are automatic!
+});
 
-// Use default templates for other components
-TemplateRegistry.register('console', consoleTemplate);
-TemplateRegistry.register('callstack', callStackTemplate);
-TemplateRegistry.register('breakpoints', breakpointsTemplate);
+// Create and initialize the applet
+const applet = new DebuggerUIApplet(config);
 
-console.log('✅ Templates registered:', Array.from(TemplateRegistry.templates.keys()));
-console.log('   🎨 Custom: toolbar, filetree');
-console.log('   📦 Default: console, callstack, breakpoints');
-
-// =============================================================================
-// DASHBOARD APPLICATION CLASS
-// =============================================================================
-
-class CustomDashboardDebuggerUI {
-    constructor() {
-        // Configuration: specify exactly where each component should render
-        const componentTargets = {
-            toolbar: '#toolbar-container',
-            toolbarSettings: '#settings-container',
-            console: '#console-container',
-            consoleDock: '#console-dock-container',
-            callStack: '#callstack-container',
-            fileTree: '#files-container',
-            breakpoints: '#breakpoints-container'
-        };
-
-        // UI Controllers - All use templates (custom or default) and render to specified containers
-        this.toolbarController = new ToolbarUIController({
-            debuggerUI: this,
-            instanceId: 'toolbar',
-            skipRender: false,
-            zoneSelector: '#toolbarDockZone'
-        });
-
-        this.consoleController = new ConsoleUIController({
-            debuggerUI: this,
-            instanceId: 'console',
-            skipRender: false
-        });
-
-        this.callStackController = new CallStackUIController({
-            debuggerUI: this,
-            instanceId: 'callstack',
-            skipRender: false
-        });
-
-        this.fileTreeController = new FileTreeUIController({
-            debuggerUI: this,
-            instanceId: 'files',
-            skipRender: false
-        });
-
-        this.breakpointController = new BreakpointUIController({
-            debuggerUI: this,
-            instanceId: 'breakpoints',
-            skipRender: false
-        });
-
-        this.debuggerController = new DebuggerUIController(this);
-
-        // Store targets for reference
-        this.targets = componentTargets;
-    }
-
-    /**
-     * Initialize all controllers
-     */
-    async initialize() {
-        console.log('🚀 Initializing Custom Dashboard with custom templates...');
-        console.log('📍 Component render targets:', this.targets);
-
-        // Mount toolbar to specified container (using CUSTOM template)
-        console.log(`  → 🎨 Mounting toolbar (CUSTOM TEMPLATE) to: ${this.targets.toolbar}`);
-        this.toolbarController.mount(this.targets.toolbar, this.targets.toolbarSettings);
-        this.toolbarController.initialize();
-
-        // Mount console to specified container (using default template)
-        console.log(`  → 📦 Mounting console (default template) to: ${this.targets.console}`);
-        this.consoleController.mount(this.targets.console, this.targets.consoleDock);
-        this.consoleController.initialize();
-
-        // Mount call stack to specified container (using default template)
-        console.log(`  → 📦 Mounting call stack (default template) to: ${this.targets.callStack}`);
-        this.callStackController.mount(this.targets.callStack);
-        this.callStackController.initialize();
-
-        // Mount file tree to specified container (using CUSTOM template)
-        console.log(`  → 🎨 Mounting file tree (CUSTOM TEMPLATE) to: ${this.targets.fileTree}`);
-        this.fileTreeController.mount(this.targets.fileTree);
-        await this.fileTreeController.initialize();
-
-        // Mount breakpoints to specified container (using default template)
-        console.log(`  → 📦 Mounting breakpoints (default template) to: ${this.targets.breakpoints}`);
-        this.breakpointController.mount(this.targets.breakpoints);
-        this.breakpointController.initialize();
-
-        // Initialize debugger controller
-        this.debuggerController.initialize();
-
-        console.log('✅ Custom Dashboard DebuggerUI initialized!');
-        console.log('   🎨 Custom templates active for: toolbar, file tree');
-        console.log('   📦 Default templates used for: console, call stack, breakpoints');
-    }
-}
-
-const ui = new CustomDashboardDebuggerUI();
+// Expose for debugging
+window.debuggerApplet = applet;
 
 $(document).ready(function() {
-    ui.initialize();
+    applet.initialize().then(() => {
+        console.log('✅ Custom Dashboard initialized!');
+        console.log('   Access applet via window.debuggerApplet');
+    });
 });

@@ -27,6 +27,7 @@ class DebuggerSessionManager {
         this.workspaceSecurity = new WorkspaceSecurity(config.workspaceRoot || process.cwd());
         this.proxyPort = config.proxyPort || 8888;
         this.inspectPort = config.inspectPort || 9229;
+        this.websocketLogLevel = config.websocketLogLevel || 'debug';
     }
 
     /**
@@ -47,7 +48,8 @@ class DebuggerSessionManager {
         // Create proxy server
         const proxy = new RemoteDebuggerProxyServer(absolutePath, {
             inspectPort: this.inspectPort,
-            proxyPort: this.proxyPort
+            proxyPort: this.proxyPort,
+            logLevel: this.websocketLogLevel
         });
 
         // Start the proxy (this spawns the Node process)

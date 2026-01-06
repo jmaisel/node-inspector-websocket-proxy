@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugger Architecture Comparison - v1 vs v2</title>
+    <link rel="stylesheet" href="../../debugger/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #2d2d30;
+            border-radius: 5px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            color: #4ec9b0;
+        }
+
+        .header p {
+            margin: 5px 0;
+            color: #9cdcfe;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: #252526;
+            border-radius: 5px;
+            padding: 20px;
+            border: 2px solid #3e3e42;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            color: #4ec9b0;
+            border-bottom: 2px solid #3e3e42;
+            padding-bottom: 10px;
+        }
+
+        .panel h3 {
+            color: #9cdcfe;
+            font-size: 16px;
+            margin: 20px 0 10px 0;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 3px;
+            padding: 15px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: #d4d4d4;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .check {
+            color: #4ec9b0;
+            margin-right: 8px;
+        }
+
+        .cross {
+            color: #f48771;
+            margin-right: 8px;
+        }
+
+        .demo-container {
+            background: #252526;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #3e3e42;
+        }
+
+        .demo-container h2 {
+            margin-top: 0;
+            color: #4ec9b0;
+        }
+
+        .console-demo {
+            min-height: 200px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #1177bb;
+        }
+
+        .btn:active {
+            background: #0d5a8f;
+        }
+
+        .info-box {
+            background: #1e3a5f;
+            border-left: 4px solid #4ec9b0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .info-box strong {
+            color: #4ec9b0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .comparison-table th {
+            background: #2d2d30;
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:hover {
+            background: #2d2d30;
+        }
+
+        @media (max-width: 1200px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Debugger Architecture Comparison</h1>
+        <p>Comparing the original hardcoded HTML approach (v1) with the new View-based architecture (v2)</p>
+    </div>
+
+    <div class="comparison-container">
+        <!-- V1 Panel -->
+        <div class="panel">
+            <h2>Version 1 (Original)</h2>
+
+            <h3>Architecture</h3>
+            <ul class="feature-list">
+                <li><span class="cross">✗</span> Hardcoded HTML in debugger.html</li>
+                <li><span class="cross">✗</span> Fixed IDs (e.g., #toolbar, #console)</li>
+                <li><span class="cross">✗</span> Controllers manipulate existing DOM</li>
+                <li><span class="cross">✗</span> Cannot embed independently</li>
+                <li><span class="cross">✗</span> No template customization</li>
+                <li><span class="cross">✗</span> Single instance only</li>
+            </ul>
+
+            <h3>HTML Example</h3>
+            <div class="code-block"><pre>&lt;!-- In debugger.html --&gt;
+&lt;div id="toolbar" class="toolbar"&gt;
+  &lt;input id="ws-url" type="text"&gt;
+  &lt;button id="connect-btn"&gt;Connect&lt;/button&gt;
+  &lt;button id="pause-btn"&gt;Pause&lt;/button&gt;
+&lt;/div&gt;</pre></div>
+
+            <h3>Controller Usage</h3>
+            <div class="code-block"><pre>// Controller finds existing elements
+class ToolbarController {
+  constructor() {
+    this.$toolbar = $('#toolbar');
+    this.$connectBtn = $('#connect-btn');
+  }
+}</pre></div>
+
+            <h3>Limitations</h3>
+            <ul class="feature-list">
+                <li>Must include full HTML page</li>
+                <li>Cannot create multiple instances</li>
+                <li>Cannot customize HTML structure</li>
+                <li>Hard to embed in other apps</li>
+            </ul>
+        </div>
+
+        <!-- V2 Panel -->
+        <div class="panel">
+            <h2>Version 2 (New)</h2>
+
+            <h3>Architecture</h3>
+            <ul class="feature-list">
+                <li><span class="check">✓</span> Views generate HTML dynamically</li>
+                <li><span class="check">✓</span> Unique IDs per instance</li>
+                <li><span class="check">✓</span> Controllers use Views for rendering</li>
+                <li><span class="check">✓</span> Embed anywhere with mount()</li>
+                <li><span class="check">✓</span> Template override system</li>
+                <li><span class="check">✓</span> Multiple instances supported</li>
+            </ul>
+
+            <h3>Template Example</h3>
+            <div class="code-block"><pre>// In toolbar-template.js
+export function toolbarTemplate(data, config, id) {
+  return `
+    &lt;div id="${id}" class="toolbar"&gt;
+      &lt;input id="${id}-ws-url" value="${data.wsUrl}"&gt;
+      &lt;button id="${id}-connect-btn"&gt;Connect&lt;/button&gt;
+      &lt;button id="${id}-pause-btn"&gt;Pause&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+}</pre></div>
+
+            <h3>Usage Example</h3>
+            <div class="code-block"><pre>// Import and mount anywhere
+import { ToolbarView } from './index.js';
+
+const toolbar = new ToolbarView({
+  container: '#my-container'
+});
+
+await toolbar.mount(); // HTML generated here!</pre></div>
+
+            <h3>Benefits</h3>
+            <ul class="feature-list">
+                <li>Mount in any container</li>
+                <li>Create multiple instances</li>
+                <li>Override templates globally</li>
+                <li>Easy third-party embedding</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Feature Comparison Table -->
+    <div class="panel">
+        <h2>Feature Comparison Matrix</h2>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>v1 (Original)</th>
+                    <th>v2 (New)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>HTML Generation</strong></td>
+                    <td>Hardcoded in HTML file</td>
+                    <td>Dynamic from templates</td>
+                </tr>
+                <tr>
+                    <td><strong>Element IDs</strong></td>
+                    <td>Fixed (#toolbar, #console)</td>
+                    <td>Unique per instance (#toolbar-abc123)</td>
+                </tr>
+                <tr>
+                    <td><strong>Embedding</strong></td>
+                    <td>Requires full HTML page</td>
+                    <td>Mount anywhere</td>
+                </tr>
+                <tr>
+                    <td><strong>Template Customization</strong></td>
+                    <td>Not possible</td>
+                    <td>Global TemplateRegistry</td>
+                </tr>
+                <tr>
+                    <td><strong>Multiple Instances</strong></td>
+                    <td>Not supported</td>
+                    <td>Fully supported</td>
+                </tr>
+                <tr>
+                    <td><strong>Element Access</strong></td>
+                    <td>Direct DOM queries</td>
+                    <td>Element map API</td>
+                </tr>
+                <tr>
+                    <td><strong>Third-party Use</strong></td>
+                    <td>Difficult</td>
+                    <td>Easy (import + mount)</td>
+                </tr>
+                <tr>
+                    <td><strong>CSS Compatibility</strong></td>
+                    <td>Inline styles</td>
+                    <td>Same classes as v1</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Live Demo -->
+    <div class="demo-container">
+        <h2>Live Demo: v2 Console Embedding</h2>
+
+        <div class="info-box">
+            <strong>This demonstrates the new v2 architecture:</strong><br>
+            The console below was created and mounted dynamically using just a few lines of JavaScript.
+            No hardcoded HTML required!
+        </div>
+
+        <div style="margin: 20px 0;">
+            <button class="btn" onclick="addTestLog()">Add Test Log</button>
+            <button class="btn" onclick="addErrorLog()">Add Error Log</button>
+            <button class="btn" onclick="addObjectLog()">Add Object Log</button>
+            <button class="btn" onclick="clearConsole()">Clear Console</button>
+            <button class="btn" onclick="createSecondConsole()">Create 2nd Instance</button>
+        </div>
+
+        <!-- Console will be mounted here -->
+        <div id="console-demo-1" class="console-demo"></div>
+        <div id="console-demo-2" class="console-demo" style="display: none;"></div>
+
+        <h3>Code Used:</h3>
+        <div class="code-block"><pre>import { ConsoleView } from './debugger-v2/index.js';
+
+const console = new ConsoleView({
+    container: '#console-demo-1',
+    initialState: { mode: 'standalone' }
+});
+
+await console.mount();
+console.addLogEntry({ message: 'Hello!', type: 'info' });</pre></div>
+    </div>
+
+    <!-- Key Advantages -->
+    <div class="panel">
+        <h2>Key Advantages of v2</h2>
+
+        <h3>1. Template Override System</h3>
+        <div class="code-block"><pre>import { TemplateRegistry } from './debugger-v2/index.js';
+
+// Register custom template globally
+TemplateRegistry.register('toolbar', (data, config, instanceId) => {
+    return `&lt;div id="${instanceId}" class="custom-toolbar"&gt;
+        &lt;!-- Your custom HTML --&gt;
+    &lt;/div&gt;`;
+});
+
+// All future ToolbarView instances use custom template
+const toolbar = new ToolbarView({ container: '#area' });
+await toolbar.mount(); // Uses your custom HTML!</pre></div>
+
+        <h3>2. Element Map API</h3>
+        <div class="code-block"><pre>const view = new ConsoleView({ container: '#console' });
+
+// Before mount: Get selectors for your custom template
+const selectors = view.getElementMap();
+// { container: '#console-abc123', searchInput: '#console-abc123-search-input' }
+
+// After mount: Get actual DOM elements
+await view.mount();
+const elements = view.getElementMap();
+// { container: &lt;div#console-abc123&gt;, searchInput: &lt;input#...&gt; }</pre></div>
+
+        <h3>3. Multiple Instances</h3>
+        <div class="code-block"><pre>// Create two independent consoles
+const console1 = new ConsoleView({ container: '#area-1' });
+const console2 = new ConsoleView({ container: '#area-2' });
+
+await Promise.all([console1.mount(), console2.mount()]);
+
+// Each has unique IDs - no conflicts!
+console.log(console1.getInstanceId()); // 'console-a3f9k2'
+console.log(console2.getInstanceId()); // 'console-x7m2n9'</pre></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module">
+        import { ConsoleView } from '../index.js';
+
+        let consoleView1 = null;
+        let consoleView2 = null;
+
+        // Initialize first console
+        async function initConsole() {
+            consoleView1 = new ConsoleView({
+                container: '#console-demo-1',
+                initialState: { mode: 'standalone' }
+            });
+
+            await consoleView1.mount();
+
+            // Add welcome message
+            consoleView1.addLogEntry({
+                message: 'Console v2 initialized! Click buttons above to test.',
+                type: 'info',
+                timestamp: new Date().toLocaleTimeString()
+            });
+        }
+
+        // Make functions globally available
+        window.addTestLog = function() {
+            if (consoleView1) {
+                consoleView1.addLogEntry({
+                    message: 'Test log entry at ' + new Date().toLocaleTimeString(),
+                    type: 'log',
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            }
+        };
+
+        window.addErrorLog = function() {
+            if (consoleView1) {
+                consoleView1.addLogEntry({
+                    message: 'Error: Something went wrong!',
+                    type: 'error',
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            }
+        };
+
+        window.addObjectLog = function() {
+            if (consoleView1) {
+                consoleView1.addLogEntry({
+                    message: JSON.stringify({
+                        user: 'John Doe',
+                        id: 12345,
+                        active: true,
+                        settings: { theme: 'dark', notifications: true }
+                    }, null, 2),
+                    type: 'object',
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            }
+        };
+
+        window.clearConsole = function() {
+            if (consoleView1) {
+                consoleView1.clearLogs();
+                consoleView1.addLogEntry({
+                    message: 'Console cleared',
+                    type: 'info',
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            }
+        };
+
+        window.createSecondConsole = async function() {
+            const demo2 = document.getElementById('console-demo-2');
+
+            if (!consoleView2) {
+                demo2.style.display = 'block';
+
+                consoleView2 = new ConsoleView({
+                    container: '#console-demo-2',
+                    initialState: { mode: 'standalone' }
+                });
+
+                await consoleView2.mount();
+
+                consoleView2.addLogEntry({
+                    message: 'Second console instance created! Notice unique IDs prevent conflicts.',
+                    type: 'event',
+                    timestamp: new Date().toLocaleTimeString()
+                });
+
+                consoleView1.addLogEntry({
+                    message: 'Created second console instance: ' + consoleView2.getInstanceId(),
+                    type: 'info',
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            }
+        };
+
+        // Initialize on load
+        $(document).ready(async function() {
+            try {
+                await initConsole();
+            } catch (error) {
+                console.error('Failed to initialize console:', error);
+            }
+        });
+    </script>
+</body>
+</html>

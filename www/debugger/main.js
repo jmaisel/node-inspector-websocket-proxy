@@ -21,7 +21,9 @@ class DebuggerUI {
             instanceId: 'toolbar',
             skipRender: true  // Use existing HTML in index.html
         });
-        this.tabNavController = new TabNavigationUIController(this);
+        this.tabNavController = new TabNavigationUIController({
+            debuggerUI: this
+        });
         this.consoleController = new ConsoleUIController({
             debuggerUI: this,
             instanceId: 'console',
@@ -32,7 +34,10 @@ class DebuggerUI {
             instanceId: 'callstack',
             skipRender: true  // Use existing HTML in index.html
         });
-        this.fileTreeController = new FileTreeUIController(this);
+        this.fileTreeController = new FileTreeUIController({
+            debuggerUI: this,
+            skipRender: true  // Use existing HTML in index.html
+        });
         this.breakpointController = new BreakpointUIController({
             debuggerUI: this,
             instanceId: 'breakpoints',
