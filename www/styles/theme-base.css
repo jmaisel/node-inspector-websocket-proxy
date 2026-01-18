@@ -1,0 +1,135 @@
+/**
+ * Base Theme System
+ *
+ * This file defines all the CSS variable names used throughout the application.
+ * Actual color values are set by theme files (theme-dark.css, theme-light.css, etc.)
+ *
+ * To add a new theme:
+ * 1. Create a new theme file (e.g., theme-custom.css)
+ * 2. Define all variables below with your custom colors
+ * 3. Import it in index.html or switch via JavaScript
+ */
+
+:root {
+  /* ================================
+     BRAND COLORS
+     Customize these for rebranding
+     ================================ */
+  --brand-primary: #00AEEF;
+  --brand-secondary: #FFD700;
+  --brand-accent: #007acc;
+
+  /* ================================
+     BACKGROUND COLORS
+     ================================ */
+  --color-bg-primary: #1e1e1e;
+  --color-bg-secondary: #252526;
+  --color-bg-tertiary: #2d2d30;
+  --color-bg-elevated: #333333;
+  --color-bg-hover: #3e3e42;
+  --color-bg-active: #094771;
+
+  /* ================================
+     TEXT COLORS
+     ================================ */
+  --color-text-primary: #d4d4d4;
+  --color-text-secondary: #cccccc;
+  --color-text-muted: #6e6e6e;
+  --color-text-link: var(--brand-accent);
+  --color-text-function: #dcdcaa;
+  --color-text-inverse: #1e1e1e;
+
+  /* ================================
+     BORDER COLORS
+     ================================ */
+  --color-border-default: #3e3e42;
+  --color-border-subtle: #2d2d30;
+  --color-border-focus: var(--brand-accent);
+
+  /* ================================
+     STATUS/SEMANTIC COLORS
+     ================================ */
+  --color-status-success: #28a745;
+  --color-status-warning: #ffc107;
+  --color-status-error: #dc3545;
+  --color-status-info: var(--brand-primary);
+
+  --color-status-connected: #28a745;
+  --color-status-disconnected: #dc3545;
+  --color-status-paused: #ffc107;
+
+  /* ================================
+     CONSOLE LOG LEVELS
+     ================================ */
+  --color-log-debug: #9cdcfe;
+  --color-log-info: #4ec9b0;
+  --color-log-warn: #ffc107;
+  --color-log-error: #f48771;
+  --color-log-event: #c586c0;
+
+  /* ================================
+     SPACING SYSTEM
+     ================================ */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 20px;
+  --space-xl: 32px;
+
+  /* ================================
+     TYPOGRAPHY
+     ================================ */
+  --font-size-xs: clamp(10px, 1.5vw, 11px);
+  --font-size-sm: clamp(11px, 2vw, 12px);
+  --font-size-md: clamp(12px, 2.5vw, 14px);
+  --font-size-lg: clamp(14px, 3vw, 16px);
+  --font-size-xl: clamp(16px, 3.5vw, 18px);
+
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'Courier New', Consolas, Monaco, 'Andale Mono', monospace;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* ================================
+     LAYOUT
+     ================================ */
+  --header-height: clamp(40px, 8vh, 60px);
+  --sidebar-width: 250px;
+  --gutter-size: 8px;
+
+  /* ================================
+     ANIMATION/TRANSITIONS
+     ================================ */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* ================================
+     BORDER RADIUS
+     ================================ */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+
+  /* ================================
+     SHADOWS
+     ================================ */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.16);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.2);
+
+  /* ================================
+     Z-INDEX LAYERS
+     ================================ */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+}

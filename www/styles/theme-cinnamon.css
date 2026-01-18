@@ -1,0 +1,59 @@
+/**
+ * Cinnamon Theme
+ *
+ * Warm, spicy brown tones inspired by Ubuntu's Cinnamon desktop
+ * Cozy and easy on the eyes with earthy colors
+ */
+
+[data-theme="cinnamon"] {
+  /* Brand Colors - warm cinnamon tones */
+  --brand-primary: #D97741;
+  --brand-secondary: #E0A458;
+  --brand-accent: #C94C23;
+
+  /* Background Colors - warm browns */
+  --color-bg-primary: #2C2420;
+  --color-bg-secondary: #3d3228;
+  --color-bg-tertiary: #4a3e32;
+  --color-bg-elevated: #55493c;
+  --color-bg-hover: #5f5345;
+  --color-bg-active: #7d5a3d;
+
+  /* Text Colors - cream and tan */
+  --color-text-primary: #f5e6d3;
+  --color-text-secondary: #e8d5bc;
+  --color-text-muted: #9c8976;
+  --color-text-link: #E0A458;
+  --color-text-function: #f5c56c;
+  --color-text-inverse: #2C2420;
+
+  /* Border Colors - subtle brown tones */
+  --color-border-default: #5f5345;
+  --color-border-subtle: #4a3e32;
+  --color-border-focus: #D97741;
+
+  /* Status Colors - warm versions */
+  --color-status-success: #79b865;
+  --color-status-warning: #e8a84d;
+  --color-status-error: #d4665f;
+  --color-status-info: #7da5c7;
+
+  --color-status-connected: #79b865;
+  --color-status-disconnected: #d4665f;
+  --color-status-paused: #e8a84d;
+
+  /* Console Log Levels - cinnamon themed */
+  --color-log-debug: #a2c4e0;
+  --color-log-info: #7dc9a8;
+  --color-log-warn: #e8a84d;
+  --color-log-error: #e88474;
+  --color-log-event: #d4a5c9;
+
+  /* Shadows - warmer shadows */
+  --shadow-sm: 0 1px 3px rgba(20, 12, 8, 0.3);
+  --shadow-md: 0 4px 6px rgba(20, 12, 8, 0.4);
+  --shadow-lg: 0 10px 20px rgba(20, 12, 8, 0.5);
+
+  /* Simulator Background */
+  --simulator-bg: #2C2420;
+}

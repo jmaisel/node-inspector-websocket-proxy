@@ -1,0 +1,59 @@
+/**
+ * Light Theme
+ *
+ * Clean, modern light theme for daytime use
+ * Easy on the eyes with good contrast
+ */
+
+[data-theme="light"] {
+  /* Brand Colors - more saturated for light backgrounds */
+  --brand-primary: #0095D9;
+  --brand-secondary: #E6B800;
+  --brand-accent: #0066A1;
+
+  /* Background Colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f5f5f5;
+  --color-bg-tertiary: #ececec;
+  --color-bg-elevated: #ffffff;
+  --color-bg-hover: #e0e0e0;
+  --color-bg-active: #d0e8f7;
+
+  /* Text Colors */
+  --color-text-primary: #1e1e1e;
+  --color-text-secondary: #424242;
+  --color-text-muted: #757575;
+  --color-text-link: #0066A1;
+  --color-text-function: #795E26;
+  --color-text-inverse: #ffffff;
+
+  /* Border Colors */
+  --color-border-default: #d0d0d0;
+  --color-border-subtle: #e8e8e8;
+  --color-border-focus: #0066A1;
+
+  /* Status Colors */
+  --color-status-success: #1e7e34;
+  --color-status-warning: #e69500;
+  --color-status-error: #c82333;
+  --color-status-info: #0095D9;
+
+  --color-status-connected: #1e7e34;
+  --color-status-disconnected: #c82333;
+  --color-status-paused: #e69500;
+
+  /* Console Log Levels - adjusted for light background */
+  --color-log-debug: #0066A1;
+  --color-log-info: #008577;
+  --color-log-warn: #9c6500;
+  --color-log-error: #c82333;
+  --color-log-event: #8e24aa;
+
+  /* Shadows (lighter for light theme) */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+
+  /* Simulator Background */
+  --simulator-bg: #ffffff;
+}

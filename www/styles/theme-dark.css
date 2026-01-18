@@ -1,0 +1,60 @@
+/**
+ * Dark Theme
+ *
+ * Professional dark theme based on VS Code Dark+ theme
+ * Default theme for the application
+ */
+
+[data-theme="dark"],
+:root {
+  /* Brand Colors */
+  --brand-primary: #00AEEF;
+  --brand-secondary: #FFD700;
+  --brand-accent: #007acc;
+
+  /* Background Colors */
+  --color-bg-primary: #1e1e1e;
+  --color-bg-secondary: #252526;
+  --color-bg-tertiary: #2d2d30;
+  --color-bg-elevated: #333333;
+  --color-bg-hover: #3e3e42;
+  --color-bg-active: #094771;
+
+  /* Text Colors */
+  --color-text-primary: #d4d4d4;
+  --color-text-secondary: #cccccc;
+  --color-text-muted: #6e6e6e;
+  --color-text-link: #9cdcfe;
+  --color-text-function: #dcdcaa;
+  --color-text-inverse: #1e1e1e;
+
+  /* Border Colors */
+  --color-border-default: #3e3e42;
+  --color-border-subtle: #2d2d30;
+  --color-border-focus: #007acc;
+
+  /* Status Colors */
+  --color-status-success: #28a745;
+  --color-status-warning: #ffc107;
+  --color-status-error: #dc3545;
+  --color-status-info: #00AEEF;
+
+  --color-status-connected: #28a745;
+  --color-status-disconnected: #dc3545;
+  --color-status-paused: #ffc107;
+
+  /* Console Log Levels */
+  --color-log-debug: #9cdcfe;
+  --color-log-info: #4ec9b0;
+  --color-log-warn: #ffc107;
+  --color-log-error: #f48771;
+  --color-log-event: #c586c0;
+
+  /* Shadows (darker for dark theme) */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5);
+
+  /* Simulator Background */
+  --simulator-bg: #1e1e1e;
+}

@@ -1,0 +1,59 @@
+/**
+ * Maple & Waffles Theme
+ *
+ * Delicious breakfast-inspired theme with golden waffles and rich maple syrup
+ * Perfect for morning coding sessions! 🧇🍁
+ */
+
+[data-theme="maple-waffles"] {
+  /* Brand Colors - maple syrup and waffle golden tones */
+  --brand-primary: #D4A017;        /* Golden waffle */
+  --brand-secondary: #8B4513;      /* Maple syrup brown */
+  --brand-accent: #CD853F;         /* Buttery highlight */
+
+  /* Background Colors - breakfast table vibes */
+  --color-bg-primary: #2b1d0e;     /* Dark roasted coffee */
+  --color-bg-secondary: #3a2817;   /* Milk chocolate */
+  --color-bg-tertiary: #4a3520;    /* Light chocolate */
+  --color-bg-elevated: #5a4329;    /* Caramel */
+  --color-bg-hover: #6b5132;       /* Toasted almond */
+  --color-bg-active: #9d6c35;      /* Golden brown */
+
+  /* Text Colors - cream and sugar */
+  --color-text-primary: #fff8e7;   /* Whipped cream */
+  --color-text-secondary: #f5e6c8; /* Vanilla custard */
+  --color-text-muted: #b89968;     /* Butterscotch */
+  --color-text-link: #FFD700;      /* Honey gold */
+  --color-text-function: #ffa94d;  /* Caramel drizzle */
+  --color-text-inverse: #2b1d0e;
+
+  /* Border Colors - crispy edges */
+  --color-border-default: #8B6F47;
+  --color-border-subtle: #5a4329;
+  --color-border-focus: #D4A017;
+
+  /* Status Colors - breakfast themed */
+  --color-status-success: #90C695;  /* Fresh mint garnish */
+  --color-status-warning: #FFB347;  /* Orange juice */
+  --color-status-error: #E67E73;    /* Strawberry jam */
+  --color-status-info: #87CEEB;     /* Morning sky blue */
+
+  --color-status-connected: #90C695;
+  --color-status-disconnected: #E67E73;
+  --color-status-paused: #FFB347;
+
+  /* Console Log Levels - breakfast beverage palette */
+  --color-log-debug: #B8D4E3;      /* Skim milk */
+  --color-log-info: #8FD9B6;       /* Mint tea */
+  --color-log-warn: #FFD966;       /* Lemon juice */
+  --color-log-error: #FF9B85;      /* Grapefruit */
+  --color-log-event: #DDA5D5;      /* Berry smoothie */
+
+  /* Shadows - warm syrupy shadows */
+  --shadow-sm: 0 1px 3px rgba(43, 29, 14, 0.4);
+  --shadow-md: 0 4px 6px rgba(43, 29, 14, 0.5);
+  --shadow-lg: 0 10px 20px rgba(43, 29, 14, 0.6);
+
+  /* Simulator Background */
+  --simulator-bg: #2b1d0e;
+}
