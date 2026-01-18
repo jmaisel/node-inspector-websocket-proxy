@@ -1,0 +1,998 @@
+body{
+    overflow: hidden;
+    background-color: #00AEEF;
+}
+
+iframe{
+    width: 100%;
+    height: 100%;
+}
+
+.gutter{
+    background-color: #00AEEF;
+    /*border: 2px solid darkslateblue;*/
+    /*z-index: 1000;*/
+}
+
+.header {
+    height: 0px;
+    background: transparent;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.pane {
+    flex-grow: 1;
+    /*border: 1px solid #000;*/
+    overflow: hidden; /* Changed from auto to hidden for Split.js sync */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* Editor menubar - same height as sim menubar */
+.editor-menubar {
+    height: 33px;
+    background: #2d2d2d;
+    border-bottom: 2px solid #444;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 10px;
+}
+
+/* Menubar buttons */
+.menubar-btn-group {
+    display: flex;
+    align-items: center;
+}
+
+.menubar-btn {
+    background-color: #444;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.menubar-btn:hover:not(:disabled) {
+    background-color: #555;
+}
+
+.menubar-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Compact menubar buttons - smaller, no labels */
+.menubar-btn-group-compact {
+    display: flex;
+    align-items: center;
+}
+
+.menubar-btn-compact {
+    background-color: #555;
+    color: white;
+    border: 1px solid #777;
+    border-radius: 3px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    min-width: 28px;
+    height: 28px;
+}
+
+.menubar-btn-compact:hover {
+    background-color: #666;
+}
+
+.menubar-separator {
+    width: 1px;
+    height: 24px;
+    background-color: #666;
+    align-self: center;
+}
+
+/* Toolbar container to hold both toolbars side by side */
+.toolbar-container {
+    display: flex;
+    flex-direction: row;
+    height: 40px;
+}
+
+/* Code editor toolbar */
+.editor-toolbar {
+    height: 40px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding: 5px 10px;
+    border-bottom: 1px solid #666;
+    gap: 8px;
+}
+
+/* Debug toolbar - more compact */
+.debug-toolbar {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 150px;
+    border-left: 1px solid #666;
+    justify-content: center;
+}
+
+.toolbar-btn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 10px;
+}
+
+/* Compact toolbar button group - no labels, just buttons */
+.toolbar-btn-group-compact {
+    display: flex;
+    align-items: center;
+}
+
+.toolbar-btn {
+    background-color: #555;
+    color: white;
+    border: 1px solid #777;
+    border-radius: 3px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    margin-bottom: 2px;
+}
+
+.toolbar-btn:hover {
+    background-color: #666;
+    margin: 2px;
+}
+
+/* Compact toolbar buttons - smaller, no labels */
+.toolbar-btn-compact {
+    background-color: #555;
+    color: white;
+    border: 1px solid #777;
+    border-radius: 3px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    min-width: 28px;
+    height: 28px;
+}
+
+.toolbar-btn-compact:hover {
+    background-color: #666;
+}
+
+.toolbar-btn-small {
+    padding: 3px 8px;
+    font-size: 14px;
+    min-width: 30px;
+}
+
+.toolbar-btn-label {
+    font-size: 9px;
+    text-align: center;
+    white-space: nowrap;
+    font-weight: bold;
+    font-family: "Arial", serif;
+    color: lightgreen;
+    /*background-color: black;*/
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 30px;
+    background-color: #666;
+    align-self: center;
+}
+
+.toolbar-label {
+    font-size: 14px;
+}
+
+/* Code workspace (contains editor + console) */
+#code-workspace {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative; /* Help Split.js with coordinate calculations */
+}
+
+/* Code editor container with file tree */
+#code-editor-container {
+    display: flex;
+    overflow: hidden;
+    height: auto; /* Let Split.js control height */
+    min-height: 0; /* Important for flex children with overflow */
+}
+
+/* File tree panel */
+.file-tree-panel {
+    width: 250px;
+    background-color: #2d2d2d;
+    color: #ccc;
+    border-right: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    overflow: hidden;
+}
+
+.file-tree-panel.collapsed {
+    margin-left: -250px;
+    width: 0;
+}
+
+.file-tree-header {
+    background-color: #252525;
+    color: #fff;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    border-bottom: 1px solid #444;
+    text-transform: uppercase;
+}
+
+.file-tree-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 5px;
+    font-size: 12px;
+}
+
+.file-tree-placeholder {
+    padding: 10px;
+    color: #888;
+    font-style: italic;
+}
+
+/* File tree items */
+.file-tree-item {
+    padding: 4px 8px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+}
+
+.file-tree-item:hover {
+    background-color: #3e3e3e;
+}
+
+.file-tree-item.selected {
+    background-color: #094771;
+}
+
+.file-tree-directory-contents {
+    display: none;
+}
+
+.file-tree-directory-contents.expanded {
+    display: block;
+}
+
+/* File action icons (like gear icon for package.json) */
+.file-action-icon {
+    margin-left: auto;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.file-action-icon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.file-action-icon:active {
+    transform: scale(0.95);
+}
+
+/* Editor tabs */
+.editor-tabs {
+    display: flex;
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #444;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 35px;
+    align-items: center;
+    scrollbar-width: thin;
+    scrollbar-color: #555 #2d2d2d;
+}
+
+.editor-tabs::-webkit-scrollbar {
+    height: 6px;
+}
+
+.editor-tabs::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+.editor-tabs::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 3px;
+}
+
+.editor-tab {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #2d2d2d;
+    border-right: 1px solid #444;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+    min-width: 100px;
+    max-width: 200px;
+    flex-shrink: 0;
+}
+
+.editor-tab:hover {
+    background-color: #3e3e3e;
+}
+
+.editor-tab.active {
+    background-color: #1e1e1e;
+    border-bottom: 2px solid #00AEEF;
+}
+
+.editor-tab-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    color: #ccc;
+    user-select: none;
+}
+
+.editor-tab.active .editor-tab-label {
+    color: #fff;
+}
+
+.editor-tab.dirty .editor-tab-label {
+    color: #00AEEF;
+}
+
+.editor-tab-close {
+    margin-left: 8px;
+    font-size: 18px;
+    color: #888;
+    line-height: 1;
+    padding: 0 4px;
+    border-radius: 3px;
+    user-select: none;
+}
+
+.editor-tab-close:hover {
+    background-color: #555;
+    color: #fff;
+}
+
+/* Ace editor iframe adjustment */
+#code-editor-container #code {
+    flex: 1;
+    border: none;
+    width: 100%;
+}
+
+#code-editor-container.panel-collapsed #code {
+    margin-left: 250px;
+}
+
+#logo-btn-container {
+    /*position: fixed;*/
+    z-index: 101;
+    left: 10px;
+    top: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+#logo-btn{
+    height: 35px;
+    width: 35px;
+    display: block;
+    margin: 0 auto 2px auto;
+    padding: 5px;
+    background: #FFD700;
+    border-radius: 50%;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    opacity: 75%;
+}
+
+#logo-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+#logo-arrow {
+    display: block;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    margin-top: -2px;
+}
+
+#breadboard-container{
+    /*position: relative;*/
+    /*display: inline-block;*/
+    /*height: 800px;*/
+    height: 350px;
+}
+
+#breadboard-pane{
+    width: 400px;
+    display: block;
+}
+
+#component-display{
+    display: table-cell;
+    border: 1px solid black;
+    width: 298px;
+    position: absolute;
+    height: calc(100vh - 442px);
+    border-left: 0px;
+    border-right: 0px;
+    right: 308px;
+}
+
+#step-controls{
+    display: table-cell;
+    border: 1px solid black;
+    width: 298px;
+    position: absolute;
+    height: calc(100vh - 442px);
+    background: #00AEEF;
+    vertical-align: bottom;
+    text-align: center;
+
+}
+
+#step-content{
+    /*height: 150px;*/
+    /*height: 100%;*/
+    opacity: 1;
+    overflow-y: auto;
+    font-size: 10pt;
+    font-weight: bold;
+    height: 75px;
+}
+
+#step-buttons{
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    border: 1px solid green;
+    height: 40px;
+}
+
+.gutter-btn{
+    border: 2px solid #00AEEF;
+    border-radius: 20px;
+}
+
+#dbts-menu{
+    display: none;
+    background-color: white;
+    position: fixed;
+    width: 200px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 12px;
+    border: 3px solid #FFD700;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    padding: 12px 0;
+    flex-direction: column;
+}
+
+.dbts-btn{
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 20px;
+    font-weight: bold;
+    font-size: 11pt;
+    color: #333;
+    border: none;
+    border-radius: 0;
+    background: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dbts-btn:hover {
+    background-color: #00AEEF;
+    color: white;
+}
+
+svg{
+    height: 350px;
+    /*background-color: none;*/
+}
+
+.pm-bom-item{
+    flex: 50%;
+    margin: 2px;
+    padding-left: 7px;
+    padding-right: 7px;
+    padding: 3px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    border: 1px solid black;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+#pm-mapping-tip{
+    height: 99%;
+    background-color: pink;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+    font-style: italic;
+    flex-direction: column;
+}
+
+#pm-bom-items {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.pm-bom-hdr{
+    background-color: #00AEEF;
+    color: white;
+    border: none;
+    font-style: italic;
+}
+
+.pm-bom-row, .pm-bom-hdr {
+    display: flex;
+    justify-content: space-between;
+    margin: 2px;
+    /*border-bottom: 1px solid #ccc; !* visual separation of items *!*/
+    /*padding: 2px;*/
+}
+
+.pm-bom-cell {
+    flex: 1;
+    text-align: center;
+    margin: 2px;
+    padding: 1px;
+    vertical-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    border: 0.5px solid lightgrey;
+}
+
+.pm-bom-selected {
+    font-size: 12px;
+    font-weight: bold;
+    background-color: #0F0040;
+    color: #00E060;
+}
+
+div.pm-bom-row:hover {
+    color: #00E060;
+    background-color: #0d3440;
+    cursor: pointer;
+    font-size: larger;
+}
+
+.inspector-title{
+    background-color: #00AEEF;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+#bom-inspector{
+    /*display: none;*/
+    position: absolute;
+    /*background: rgba(0, 0, 0, 0.5);*/
+    color: black;
+    font-size: 12px;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    top: 50px;
+    left: 50px;
+    width: 300px;
+    height: auto;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.bom-line-item{
+    display: block;
+    background: whitesmoke;
+    border-radius: 5px;
+    vertical-align: middle;
+    border: 1px solid #0F0040;
+    margin-top: 2px;
+    padding-left: 5px;
+    padding: 2px;
+}
+
+.draggable-window {
+    width: 300px;
+    height: 200px;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid black;
+    position: absolute;
+}
+.draggable-header {
+    background-color: #f1f1f1;
+    cursor: move;
+    padding: 10px;
+    border-bottom: 1px solid black;
+}
+
+.draggable-content{
+    background-color: #00E060;
+    height: auto;
+    overflow-y: auto;
+}
+
+.line-item-details{
+    border:1px solid darkgrey;
+}
+
+.line-item-components{
+    display: none;
+}
+.clickable-icon{
+    font-size: 20px;
+}
+/*.draggable-window {
+    width: 300px;
+    height: 200px;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid black;
+    position: absolute;
+}
+.draggable-header {
+    background-color: #f1f1f1;
+    cursor: move;
+    padding: 10px;
+    border-bottom: 1px solid black;
+}
+
+.draggable-content{
+    background-color: #00E060;
+    height: 100%;
+}*/
+
+/* Ace Editor Debug Markers */
+.ace_breakpoint {
+    background-color: #e74c3c !important;
+    position: absolute;
+}
+
+.ace_debug-line {
+    background-color: rgba(255, 255, 0, 0.2) !important;
+    position: absolute;
+}
+
+.ace_debug-gutter {
+    background-color: #f39c12 !important;
+    color: white;
+}
+
+/* Debug Panel */
+.debug-panel {
+    width: 350px;
+    height: 400px;
+    position: absolute;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.debug-panel-content {
+    background-color: #2b2b2b;
+    color: #cccccc;
+    height: calc(100% - 40px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Debug Tabs */
+.debug-tabs {
+    display: flex;
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #444;
+}
+
+.debug-tab {
+    padding: 8px 15px;
+    cursor: pointer;
+    border-right: 1px solid #444;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.debug-tab:hover:not(.disabled) {
+    background-color: #333;
+}
+
+.debug-tab.active {
+    background-color: #2b2b2b;
+    border-bottom: 2px solid #007acc;
+}
+
+.debug-tab.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Tab Content */
+.debug-tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* Breakpoints Toolbar */
+.breakpoints-toolbar {
+    padding: 8px;
+    border-bottom: 1px solid #444;
+    background-color: #1e1e1e;
+}
+
+.breakpoints-toggle-all {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.breakpoints-toggle-all:hover {
+    background-color: #45a049;
+}
+
+.breakpoints-toggle-all.inactive {
+    background-color: #666;
+}
+
+.breakpoints-toggle-all.inactive:hover {
+    background-color: #777;
+}
+
+.toggle-icon {
+    display: inline-block;
+    width: 14px;
+    text-align: center;
+}
+
+/* Breakpoints List */
+.breakpoints-empty {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-style: italic;
+}
+
+#breakpoints-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breakpoint-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.breakpoint-item:hover {
+    background-color: #333;
+}
+
+.breakpoint-item.disabled {
+    opacity: 0.5;
+}
+
+.breakpoint-item.disabled .breakpoint-icon {
+    color: #888;
+}
+
+.breakpoint-icon {
+    margin-right: 8px;
+    font-size: 12px;
+}
+
+.breakpoint-info {
+    flex: 1;
+    font-size: 13px;
+}
+
+.breakpoint-file {
+    font-weight: bold;
+}
+
+.breakpoint-line {
+    color: #888;
+}
+
+.breakpoint-toggle {
+    background: none;
+    border: 1px solid #666;
+    color: #4CAF50;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 2px 6px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: all 0.2s;
+    min-width: 60px;
+}
+
+.breakpoint-toggle:hover {
+    background-color: #333;
+    border-color: #4CAF50;
+}
+
+.breakpoint-toggle.disabled {
+    color: #888;
+    border-color: #555;
+}
+
+.breakpoint-toggle.disabled:hover {
+    border-color: #888;
+}
+
+.breakpoint-delete {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 5px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.breakpoint-delete:hover {
+    opacity: 1;
+}
+
+/* Close button */
+.close-btn {
+    float: right;
+    cursor: pointer;
+    font-size: 20px;
+    color: #888;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+/* ===== Project Toolbar Styles ===== */
+
+/* File tree header with toggle button */
+.file-tree-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: #2c2c2c;
+    border-bottom: 1px solid #444;
+}
+
+.file-tree-title {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.file-tree-toggle {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: all 0.2s;
+}
+
+.file-tree-toggle:hover {
+    color: #fff;
+    background: #3c3c3c;
+}
+
+.file-tree-panel.collapsed .file-tree-toggle {
+    transform: rotate(180deg);
+}
+
+/* Project toolbar */
+.project-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    background: #252525;
+    border-bottom: 1px solid #444;
+    gap: 4px;
+}
+
+.project-btn {
+    background: #3c3c3c;
+    border: 1px solid #555;
+    color: #ddd;
+    font-size: 11px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.project-btn:hover {
+    background: #4c4c4c;
+    border-color: #666;
+}
+
+.project-btn:active {
+    background: #2c2c2c;
+}
+
+.project-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.project-toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background: #444;
+    margin: 0 4px;
+}
+
+/* Hidden file input for import */
+#project-import-file {
+    display: none;
+}
+

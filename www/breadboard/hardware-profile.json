@@ -1,0 +1,4959 @@
+{
+  "ADC": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "ADC0804LCN",
+    "description": "8-Bit Analog-to-Digital Converter",
+    "notes": "Logical indices for 8-bit: Vin(8),D0-D7(0-7). Default bits=8",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "CS",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "RD",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "WR",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "CLK_IN",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "INTR",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 8,
+        "name": "Vin+",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "Vin-",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "AGND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "Vref/2",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "DGND",
+        "source": "power"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 0,
+        "name": "DB7",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 1,
+        "name": "DB6",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 2,
+        "name": "DB5",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 3,
+        "name": "DB4",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 4,
+        "name": "DB3",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": 5,
+        "name": "DB2",
+        "source": "simulator"
+      },
+      "17": {
+        "physical": 17,
+        "logical": 6,
+        "name": "DB1",
+        "source": "simulator"
+      },
+      "18": {
+        "physical": 18,
+        "logical": 7,
+        "name": "DB0",
+        "source": "simulator"
+      },
+      "19": {
+        "physical": 19,
+        "logical": -1,
+        "name": "CLK_R",
+        "source": "unused"
+      },
+      "20": {
+        "physical": 20,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "AnalogSwitch": {
+    "source": "Circuit",
+    "manufacturer": "Texas Instruments",
+    "sku": "CD4066BE",
+    "description": "Quad Bilateral Switch (using switch #1 only)",
+    "notes": "Logical indices: 0=Input, 1=Output, 2=Control. CMOS analog switch, can pass analog or digital signals",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "IN1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "OUT1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "OUT2",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "OUT2",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 2,
+        "name": "CTRL1",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "CTRL2",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "VSS",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "IN2",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "CTRL3",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "OUT3",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "IN3",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "IN4",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "CTRL4",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VDD",
+        "source": "power"
+      }
+    }
+  },
+  "AnalogSwitch2": {
+    "source": "Circuit",
+    "manufacturer": "Texas Instruments",
+    "sku": "CD4053BE",
+    "description": "Triple 2-Channel Analog Multiplexer/Demultiplexer (using MUX #1 only)",
+    "notes": "Logical indices: 0=Common, 1=Channel_A, 2=Channel_B, 3=Control. SPDT analog switch",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 1,
+        "name": "1Y",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 2,
+        "name": "1Z",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 0,
+        "name": "1X",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "2Y",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "2Z",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "2X",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "VEE",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "VSS",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 3,
+        "name": "CTRL_C",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "CTRL_B",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "CTRL_A",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "3X",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "3Y",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "3Z",
+        "source": "unused"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "INH",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VDD",
+        "source": "power"
+      }
+    }
+  },
+  "And Gate": {
+    "source": "Circuit",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC08N",
+    "description": "Quad 2-Input AND Gate (using gate #1 only)",
+    "notes": "Logical indices: 0=Input_A, 1=Input_B, 2=Output. Variable input count in simulator (default 2). DIP-14 package, using only first gate",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "1A",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "1B",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "1Y",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "2A",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "2B",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "2Y",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "3Y",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "3A",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "3B",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "4Y",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "4A",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "4B",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "CC2": {
+    "source": "Chip",
+    "manufacturer": "Custom",
+    "sku": "CMOS_CC2",
+    "description": "Custom Current Conveyor II (Analog Building Block)",
+    "notes": "Logical indices: X(0),Y(1),Z(2). Specialized analog circuit",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "X",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "Y",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "Z",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "ComparatorReal": {
+    "source": "Composite",
+    "manufacturer": "Texas Instruments",
+    "sku": "LM339N",
+    "description": "Quad Voltage Comparator (using comparator #1 only)",
+    "notes": "Logical indices: 0=IN+, 1=IN-, 2=OUT. CompositeElm models internal circuit behavior",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 2,
+        "name": "OUT1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "IN1-",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 0,
+        "name": "IN1+",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "IN2+",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "IN2-",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "OUT2",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "OUT3",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "IN3-",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "IN3+",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "IN4+",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "IN4-",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "OUT4",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Counter": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC193N",
+    "description": "Synchronous 4-Bit Binary Up/Down Counter",
+    "notes": "Logical indices for 4-bit: CLK(0),R(1),Q3(2),Q2(3),Q1(4),Q0(5),U/D(6 optional)",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 4,
+        "name": "B",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 5,
+        "name": "QB",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 4,
+        "name": "QA",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 0,
+        "name": "DOWN",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 0,
+        "name": "UP",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 3,
+        "name": "QC",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 2,
+        "name": "QD",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 2,
+        "name": "D",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 3,
+        "name": "C",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "LOAD",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "CO",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "BO",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 1,
+        "name": "CLR",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 1,
+        "name": "A",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Counter2": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "CD4029BE",
+    "description": "Presettable Up/Down Counter",
+    "notes": "Logical indices for 4-bit: Q0-Q3(0-3),CLK(4),PRESET(5),U/D(6),ENABLE(7),CARRY(8)",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 5,
+        "name": "PRESET_EN",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "Q0",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "Q1",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 4,
+        "name": "CLK",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 6,
+        "name": "UP/DOWN",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "Q2",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 8,
+        "name": "CARRY",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "B/D",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "P0",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "P1",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "P2",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "P3",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "Q3",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 7,
+        "name": "CLK_EN",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "CustomCompositeChip": {
+    "source": "Chip",
+    "manufacturer": "Custom",
+    "sku": "USER_DEFINED",
+    "description": "User-defined composite chip (subcircuit)",
+    "notes": "Variable configuration based on user subcircuit definition",
+    "pins": {}
+  },
+  "CustomCompositeReal": {
+    "source": "Composite",
+    "manufacturer": "Custom",
+    "sku": "USER_DEFINED",
+    "description": "User-defined composite component (subcircuit)",
+    "notes": "Variable pin count based on user subcircuit definition. Extends CompositeElm for custom circuits",
+    "pins": {}
+  },
+  "CustomLogic": {
+    "source": "Chip",
+    "manufacturer": "Atmel",
+    "sku": "ATF22V10C",
+    "description": "Programmable Logic Device for Custom Logic Functions",
+    "notes": "Variable pins based on configuration. Generic PLD mapping",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "CLK/I1",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "I2",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "I3",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "I4",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "I5",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "I6",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "I7",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "I8",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "I9",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "I10",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "I11",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "I12",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "IO1",
+        "source": "unused"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "IO2",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "IO3",
+        "source": "unused"
+      },
+      "17": {
+        "physical": 17,
+        "logical": -1,
+        "name": "IO4",
+        "source": "unused"
+      },
+      "18": {
+        "physical": 18,
+        "logical": -1,
+        "name": "IO5",
+        "source": "unused"
+      },
+      "19": {
+        "physical": 19,
+        "logical": -1,
+        "name": "IO6",
+        "source": "unused"
+      },
+      "20": {
+        "physical": 20,
+        "logical": -1,
+        "name": "IO7",
+        "source": "unused"
+      },
+      "21": {
+        "physical": 21,
+        "logical": -1,
+        "name": "IO8",
+        "source": "unused"
+      },
+      "22": {
+        "physical": 22,
+        "logical": -1,
+        "name": "IO9",
+        "source": "unused"
+      },
+      "23": {
+        "physical": 23,
+        "logical": -1,
+        "name": "IO10",
+        "source": "unused"
+      },
+      "24": {
+        "physical": 24,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "CustomTransformer": {
+    "source": "Circuit",
+    "manufacturer": "Custom",
+    "sku": "USER_DEFINED",
+    "description": "Custom Transformer with variable windings",
+    "notes": "Variable pin count based on number of windings/taps. Logical indices map to winding nodes sequentially",
+    "pins": {}
+  },
+  "DAC": {
+    "source": "Chip",
+    "manufacturer": "Analog Devices",
+    "sku": "DAC0808LCN",
+    "description": "8-Bit Digital-to-Analog Converter",
+    "notes": "Logical indices for 8-bit: D0-D7(0-7),Vout(8),V+(9). Default bits=8",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 8,
+        "name": "Iout",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 0,
+        "name": "D7",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 1,
+        "name": "D6",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 2,
+        "name": "D5",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": 3,
+        "name": "D4",
+        "source": "simulator"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 4,
+        "name": "D3",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 5,
+        "name": "D2",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 6,
+        "name": "D1",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 7,
+        "name": "D0",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 9,
+        "name": "Vref+",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "Vref-",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "Comp",
+        "source": "unused"
+      }
+    }
+  },
+  "D Flip Flop": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC74N",
+    "description": "Dual D-Type Flip-Flop with Set and Reset (using IC #1 only)",
+    "notes": "Logical indices: 0=D,1=Q,2=Q̄,3=CLK,4=R(optional),5=S(optional). Maps to first flip-flop only",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 4,
+        "name": "CLR1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "D1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 3,
+        "name": "CLK1",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 5,
+        "name": "PR1",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 1,
+        "name": "Q1",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 2,
+        "name": "Q̄1",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "Q̄2",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "Q2",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "PR2",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "CLK2",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "D2",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "CLR2",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "DarlingtonReal": {
+    "source": "Composite",
+    "manufacturer": "STMicroelectronics",
+    "sku": "TIP120",
+    "description": "NPN Darlington Transistor",
+    "notes": "Logical indices: 0=Base, 1=Collector, 2=Emitter. CompositeElm models two-transistor configuration",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "BASE",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "COLLECTOR",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "EMITTER",
+        "source": "simulator"
+      }
+    }
+  },
+  "DeMultiplexer": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC138N",
+    "description": "3-Line to 8-Line Decoder/Demultiplexer",
+    "notes": "Logical indices: Q0-Q7(0-7),INPUT(8),S0-S2(9-11). Default 2 select bits",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 9,
+        "name": "A",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 10,
+        "name": "B",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 11,
+        "name": "C",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "G2A",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "G2B",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 8,
+        "name": "G1",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 7,
+        "name": "Y7",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 6,
+        "name": "Y6",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 5,
+        "name": "Y5",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 4,
+        "name": "Y4",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 3,
+        "name": "Y3",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 2,
+        "name": "Y2",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 1,
+        "name": "Y1",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 0,
+        "name": "Y0",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "DecimalDisplay": {
+    "source": "Chip",
+    "manufacturer": "Kingbright",
+    "sku": "SC56-11EWA",
+    "description": "Common Cathode 7-Segment + DP LED Display",
+    "notes": "Logical indices for 4-bit BCD: I0-I3(0-3). Displays 0-9 based on BCD input",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "e",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "d",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "COM",
+        "source": "power"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "c",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "dp",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "b",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "a",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "COM",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "f",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "g",
+        "source": "unused"
+      }
+    }
+  },
+  "FullAdder": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC283N",
+    "description": "4-Bit Binary Full Adder with Fast Carry",
+    "notes": "Logical indices for 4-bit: A0-A3(0-3),B0-B3(4-7),S0-S3(8-11),Cin(12),Cout(13)",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 8,
+        "name": "Σ2",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 4,
+        "name": "B2",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 0,
+        "name": "A2",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 9,
+        "name": "Σ1",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 1,
+        "name": "A1",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 5,
+        "name": "B1",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 12,
+        "name": "C0",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 13,
+        "name": "C4",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 10,
+        "name": "Σ4",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 7,
+        "name": "B4",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 3,
+        "name": "A4",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 11,
+        "name": "Σ3",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 2,
+        "name": "A3",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 6,
+        "name": "B3",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "HalfAdder": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC86N",
+    "description": "Quad 2-Input XOR Gate (one gate for sum) + AND gate (separate IC needed for carry)",
+    "notes": "Logical indices: 0=S(sum output),1=C(carry output),2=A,3=B. Requires external AND gate for carry",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 2,
+        "name": "1A",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 3,
+        "name": "1B",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 0,
+        "name": "1Y",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "2A",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "2B",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "2Y",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "3Y",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "3A",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "3B",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "4Y",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "4A",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "4B",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "JKFlipFlop": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC73AN",
+    "description": "Dual JK Flip-Flop with Clear (using IC #1 only)",
+    "notes": "Logical indices: 0=J,1=CLK,2=K,3=Q,4=Q̄,5=R(optional). Maps to first flip-flop",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 3,
+        "name": "Q1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 4,
+        "name": "Q̄1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "CLK1",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 5,
+        "name": "CLR1",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "CLR2",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "CLK2",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "Q̄2",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "Q2",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "K2",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 2,
+        "name": "K1",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 0,
+        "name": "J1",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "J2",
+        "source": "unused"
+      }
+    }
+  },
+  "JfetN": {
+    "source": "Circuit",
+    "manufacturer": "Fairchild Semiconductor",
+    "sku": "2N5457",
+    "description": "N-Channel JFET (Depletion Mode)",
+    "notes": "Logical indices: 0=Gate, 1=Source, 2=Drain. Junction FET, TO-92 package. Used for high input impedance buffers. Also works: J201, MPF102",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 2,
+        "name": "DRAIN",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "SOURCE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 0,
+        "name": "GATE",
+        "source": "simulator"
+      }
+    }
+  },
+  "LEDArray": {
+    "source": "Chip",
+    "manufacturer": "Kingbright",
+    "sku": "TA20-11EWA",
+    "description": "8x8 LED Dot Matrix Display (Common Cathode)",
+    "notes": "Logical indices: Row0-7(0-7),Col0-7(8-15). Default 8x8 matrix",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 8,
+        "name": "COL1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "ROW1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 9,
+        "name": "COL2",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 1,
+        "name": "ROW2",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 10,
+        "name": "COL3",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 2,
+        "name": "ROW3",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 11,
+        "name": "COL4",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": 3,
+        "name": "ROW4",
+        "source": "simulator"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 12,
+        "name": "COL5",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 4,
+        "name": "ROW5",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 13,
+        "name": "COL6",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 5,
+        "name": "ROW6",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 14,
+        "name": "COL7",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 6,
+        "name": "ROW7",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 15,
+        "name": "COL8",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": 7,
+        "name": "ROW8",
+        "source": "simulator"
+      }
+    }
+  },
+  "Latch": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC573N",
+    "description": "Octal D-Type Transparent Latch (8-bit)",
+    "notes": "Logical indices for 8-bit: I0-I7(0-7),O0-O7(8-15),LE(16). Default bits=8",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "OE",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "D1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "D2",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 2,
+        "name": "D3",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 3,
+        "name": "D4",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 4,
+        "name": "D5",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 5,
+        "name": "D6",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": 6,
+        "name": "D7",
+        "source": "simulator"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 7,
+        "name": "D8",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 16,
+        "name": "LE",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 15,
+        "name": "Q8",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 14,
+        "name": "Q7",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 13,
+        "name": "Q6",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 12,
+        "name": "Q5",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": 11,
+        "name": "Q4",
+        "source": "simulator"
+      },
+      "17": {
+        "physical": 17,
+        "logical": 10,
+        "name": "Q3",
+        "source": "simulator"
+      },
+      "18": {
+        "physical": 18,
+        "logical": 9,
+        "name": "Q2",
+        "source": "simulator"
+      },
+      "19": {
+        "physical": 19,
+        "logical": 8,
+        "name": "Q1",
+        "source": "simulator"
+      },
+      "20": {
+        "physical": 20,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "MBBSwitch": {
+    "source": "Circuit",
+    "manufacturer": "C&K",
+    "sku": "OS102011MA1QN1",
+    "description": "SPDT Make-Before-Break Toggle Switch",
+    "notes": "Logical indices: 0=Common, 1=Terminal_A, 2=Terminal_B. Mechanical switch - not an IC",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "COMMON",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "TERM_A",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "TERM_B",
+        "source": "simulator"
+      }
+    }
+  },
+  "Mosfet": {
+    "source": "Circuit",
+    "type": "CircuitElm",
+    "manufacturer": "Onsemi",
+    "sku": "2N7000",
+    "description": "N-Channel MOSFET (Enhancement Mode)",
+    "notes": "Logical indices: 0=Gate, 1=Source, 2=Drain, (3=Body optional). Standard MOSFET component in simulator",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 1,
+        "name": "SOURCE",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "GATE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "DRAIN",
+        "source": "simulator"
+      }
+    }
+  },
+  "Monostable": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC123N",
+    "description": "Dual Retriggerable Monostable Multivibrator (using IC #1)",
+    "notes": "Logical indices: CLK(0),Q(1),Q̄(2). External R and C required",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "A1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "B1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "CLR1",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 1,
+        "name": "Q1",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 2,
+        "name": "Q̄1",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "C1ext",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "R1ext",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "A2",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "B2",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "CLR2",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "Q2",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "Q̄2",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "C2ext",
+        "source": "unused"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "R2ext",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "MosfetN": {
+    "source": "Circuit",
+    "manufacturer": "Onsemi",
+    "sku": "2N7000",
+    "description": "N-Channel MOSFET (Enhancement Mode)",
+    "notes": "Logical indices: 0=Gate, 1=Source, 2=Drain, (3=Body optional). Discrete 3-pin MOSFET, TO-92 package. Body terminal typically not brought out. Also works: BS170, IRF540N (power)",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 1,
+        "name": "SOURCE",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "GATE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "DRAIN",
+        "source": "simulator"
+      }
+    }
+  },
+  "MosfetP": {
+    "source": "Circuit",
+    "manufacturer": "Onsemi",
+    "sku": "BS250",
+    "description": "P-Channel MOSFET (Enhancement Mode)",
+    "notes": "Logical indices: 0=Gate, 1=Source, 2=Drain, (3=Body optional). Discrete 3-pin MOSFET, TO-92 package. Complementary to 2N7000. Also works: IRF9540N (power)",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 1,
+        "name": "SOURCE",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "GATE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "DRAIN",
+        "source": "simulator"
+      }
+    }
+  },
+  "Multiplexer": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC151N",
+    "description": "8-Line to 1-Line Data Selector/Multiplexer",
+    "notes": "Logical indices: I0-I7(0-7),S0-S2(8-10),Q(11). 3 select bits for 8:1 mux",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 3,
+        "name": "D3",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 2,
+        "name": "D2",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "D1",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 0,
+        "name": "D0",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 11,
+        "name": "Y",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "W",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "E",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 10,
+        "name": "S2",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 9,
+        "name": "S1",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 8,
+        "name": "S0",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 7,
+        "name": "D7",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 6,
+        "name": "D6",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 5,
+        "name": "D5",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 4,
+        "name": "D4",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Nand Gate": {
+    "source": "Circuit",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC00N",
+    "description": "Quad 2-Input NAND Gate (using gate #1 only)",
+    "notes": "Logical indices: 0=Input_A, 1=Input_B, 2=Output. Variable input count in simulator (default 2). DIP-14 package, using only first gate",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "1A",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "1B",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "1Y",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "2A",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "2B",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "2Y",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "3Y",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "3A",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "3B",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "4Y",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "4A",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "4B",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Nor Gate": {
+    "source": "Circuit",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC02N",
+    "description": "Quad 2-Input NOR Gate (using gate #1 only)",
+    "notes": "Logical indices: 0=Input_A, 1=Input_B, 2=Output. Variable input count in simulator (default 2). DIP-14 package, using only first gate",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 2,
+        "name": "1Y",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "1A",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "1B",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "2Y",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "2A",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "2B",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "3A",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "3B",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "3Y",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "4A",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "4B",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "4Y",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "OTAReal": {
+    "source": "Composite",
+    "manufacturer": "Texas Instruments",
+    "sku": "LM13700N",
+    "description": "Dual Operational Transconductance Amplifier (using OTA #1 only)",
+    "notes": "Logical indices: 0=IN-, 1=IN+, 2=OUT, 3=AMP_BIAS, 4=IABC. Uses first OTA only",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 3,
+        "name": "AMP_BIAS1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "IN1-",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "IN1+",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 2,
+        "name": "OUT1",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 4,
+        "name": "IABC1",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "IABC2",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "OUT2",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "DIODE_BIAS",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "IN2+",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "IN2-",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "BUFFER_IN",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "BUFFER_OUT",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "AMP_BIAS2",
+        "source": "unused"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "BUFFER_BIAS",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "OpAmpReal": {
+    "source": "Composite",
+    "manufacturer": "Texas Instruments",
+    "sku": "UA741CP",
+    "description": "General Purpose Op-Amp with internal transistor-level model",
+    "notes": "Logical indices: 0=IN-, 1=IN+, 2=OUT, 3=V+, 4=V-. CompositeElm models 741 internal circuit",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "OFFSET_N1",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "IN-",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "IN+",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 4,
+        "name": "V-",
+        "source": "power"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "OFFSET_N2",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 2,
+        "name": "OUT",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 3,
+        "name": "V+",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      }
+    }
+  },
+  "OptocouplerReal": {
+    "source": "Composite",
+    "manufacturer": "Vishay",
+    "sku": "4N35",
+    "description": "Optocoupler with Phototransistor Output",
+    "notes": "Logical indices: 0=LED_Anode, 1=LED_Cathode, 2=Collector, 3=Emitter. Isolates input from output",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "ANODE",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "CATHODE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 3,
+        "name": "EMITTER",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 2,
+        "name": "COLLECTOR",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "BASE",
+        "source": "unused"
+      }
+    }
+  },
+  "Or Gate": {
+    "source": "Circuit",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC32N",
+    "description": "Quad 2-Input OR Gate (using gate #1 only)",
+    "notes": "Logical indices: 0=Input_A, 1=Input_B, 2=Output. Variable input count in simulator (default 2). DIP-14 package, using only first gate",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "1A",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "1B",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "1Y",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "2A",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "2B",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "2Y",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "3Y",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "3A",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "3B",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "4Y",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "4A",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "4B",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "PhaseComp": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "CD4046BE",
+    "description": "Phase-Locked Loop (PLL) with VCO - Phase Comparator Section",
+    "notes": "Logical indices: I1(0),I2(1),O(2). Uses phase comparator portion",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "PC1_OUT",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 2,
+        "name": "PC2_OUT",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 0,
+        "name": "SIG_IN",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 1,
+        "name": "COMP_IN",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "VCO_OUT",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "R1",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "R2",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "VSS",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "VCO_IN",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "DEMOD_OUT",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "C1A",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "C1B",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "INH",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "ZENER",
+        "source": "unused"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "PC_PULSE",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VDD",
+        "source": "power"
+      }
+    }
+  },
+  "PisoShift": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC165N",
+    "description": "8-Bit Parallel-In Serial-Out Shift Register",
+    "notes": "Logical indices for 8-bit: LD(0),CLK(1),Q(2),SER(3 optional),D0-D7(4-11). Default bits=8",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "SH/LD",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "CLK",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 7,
+        "name": "E",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 6,
+        "name": "F",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 5,
+        "name": "G",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 4,
+        "name": "H",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "QH̄",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 2,
+        "name": "QH",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 3,
+        "name": "SER",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 11,
+        "name": "A",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 10,
+        "name": "B",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 9,
+        "name": "C",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 8,
+        "name": "D",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "CLK_INH",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Potentiometer": {
+    "source": "Circuit",
+    "manufacturer": "Bourns",
+    "sku": "3386P-1-103LF",
+    "description": "10K Ohm Trimpot Potentiometer (3-pin variable resistor)",
+    "notes": "Logical indices: 0=Terminal_1, 1=Terminal_2, 2=Wiper. Not an IC - discrete resistive component",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "TERM1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 2,
+        "name": "WIPER",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "TERM2",
+        "source": "simulator"
+      }
+    }
+  },
+  "RelaySPDT": {
+    "source": "Circuit",
+    "manufacturer": "Omron",
+    "sku": "G5V-2-H1-DC5",
+    "description": "DPDT Signal Relay (using SPDT configuration - 1 pole)",
+    "notes": "Logical indices: 0-1=Coil, 2-4=Switch (Common, NO, NC). Electromechanical relay - coil actuates switch",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "COIL1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "COIL2",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "COM1",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "COM2",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 3,
+        "name": "NO1",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "NO2",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 4,
+        "name": "NC1",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "NC2",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 1,
+        "name": "COIL1_RTN",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "COIL2_RTN",
+        "source": "unused"
+      }
+    }
+  },
+  "RingCounter": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "CD4017BE",
+    "description": "Decade Counter/Divider with 10 Decoded Outputs",
+    "notes": "Logical indices for default: CLK(0),R(1),Q0-Q9(2-11). Default bits=10",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 7,
+        "name": "Q5",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 3,
+        "name": "Q1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "Q0",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 4,
+        "name": "Q2",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 8,
+        "name": "Q6",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 9,
+        "name": "Q7",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 6,
+        "name": "Q3",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 10,
+        "name": "Q8",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 5,
+        "name": "Q4",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 11,
+        "name": "Q9",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "CO",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "CE_INH",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 0,
+        "name": "CLK",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 1,
+        "name": "RESET",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "SCR": {
+    "source": "Circuit",
+    "manufacturer": "Littelfuse",
+    "sku": "C106D",
+    "description": "Silicon Controlled Rectifier (Thyristor)",
+    "notes": "Logical indices: 0=Anode, 1=Cathode, 2=Gate. 3-pin thyristor, TO-225AA package. Latches on when gate triggered. Also works: 2N5064, TYN612",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "ANODE",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 2,
+        "name": "GATE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "CATHODE",
+        "source": "simulator"
+      }
+    }
+  },
+  "SRAM": {
+    "source": "Chip",
+    "manufacturer": "Alliance Memory",
+    "sku": "AS6C62256",
+    "description": "32K x 8 SRAM (using lower addresses)",
+    "notes": "Logical indices: WE(0),OE(1),A0-A14(2-16),D0-D7(17-24). Default 8 addr, 8 data bits",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 9,
+        "name": "A14",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "A12",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 8,
+        "name": "A7",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 7,
+        "name": "A6",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 6,
+        "name": "A5",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 5,
+        "name": "A4",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": 4,
+        "name": "A3",
+        "source": "simulator"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 3,
+        "name": "A2",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 2,
+        "name": "A1",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 10,
+        "name": "A0",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 17,
+        "name": "D0",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 18,
+        "name": "D1",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 19,
+        "name": "D2",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "16": {
+        "physical": 16,
+        "logical": 20,
+        "name": "D3",
+        "source": "simulator"
+      },
+      "17": {
+        "physical": 17,
+        "logical": 21,
+        "name": "D4",
+        "source": "simulator"
+      },
+      "18": {
+        "physical": 18,
+        "logical": 22,
+        "name": "D5",
+        "source": "simulator"
+      },
+      "19": {
+        "physical": 19,
+        "logical": 23,
+        "name": "D6",
+        "source": "simulator"
+      },
+      "20": {
+        "physical": 20,
+        "logical": 24,
+        "name": "D7",
+        "source": "simulator"
+      },
+      "21": {
+        "physical": 21,
+        "logical": -1,
+        "name": "CS1",
+        "source": "unused"
+      },
+      "22": {
+        "physical": 22,
+        "logical": -1,
+        "name": "A10",
+        "source": "unused"
+      },
+      "23": {
+        "physical": 23,
+        "logical": 1,
+        "name": "OE",
+        "source": "simulator"
+      },
+      "24": {
+        "physical": 24,
+        "logical": -1,
+        "name": "A11",
+        "source": "unused"
+      },
+      "25": {
+        "physical": 25,
+        "logical": -1,
+        "name": "A9",
+        "source": "unused"
+      },
+      "26": {
+        "physical": 26,
+        "logical": -1,
+        "name": "A8",
+        "source": "unused"
+      },
+      "27": {
+        "physical": 27,
+        "logical": 0,
+        "name": "WE",
+        "source": "simulator"
+      },
+      "28": {
+        "physical": 28,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "SeqGen": {
+    "source": "Chip",
+    "manufacturer": "Atmel",
+    "sku": "ATF16V8B",
+    "description": "Simple Programmable Logic Device for Sequence Generation",
+    "notes": "Logical indices: CLK(0),Q(1),R(2 optional). Custom programmed for sequences",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "CLK",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 2,
+        "name": "I1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "I2",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "I3",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "I4",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "I5",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "I6",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "I7",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "I8",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "I9",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 1,
+        "name": "IO1",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "IO2",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "IO3",
+        "source": "unused"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "IO4",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "IO5",
+        "source": "unused"
+      },
+      "17": {
+        "physical": 17,
+        "logical": -1,
+        "name": "IO6",
+        "source": "unused"
+      },
+      "18": {
+        "physical": 18,
+        "logical": -1,
+        "name": "IO7",
+        "source": "unused"
+      },
+      "19": {
+        "physical": 19,
+        "logical": -1,
+        "name": "IO8",
+        "source": "unused"
+      },
+      "20": {
+        "physical": 20,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "SevenSeg": {
+    "source": "Chip",
+    "manufacturer": "Kingbright",
+    "sku": "SA52-11EWA",
+    "description": "Common Anode 7-Segment LED Display",
+    "notes": "Logical indices: a-g(0-6) segments. Common anode at pin 3,8",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 4,
+        "name": "e",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 3,
+        "name": "d",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "COM",
+        "source": "power"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 2,
+        "name": "c",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 6,
+        "name": "dp",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 1,
+        "name": "b",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 0,
+        "name": "a",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "COM",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 5,
+        "name": "f",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 6,
+        "name": "g",
+        "source": "simulator"
+      }
+    }
+  },
+  "SevenSegDecoder": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC47N",
+    "description": "BCD to 7-Segment Decoder/Driver",
+    "notes": "Logical indices: a-g outputs(0-6),I3-I0 inputs(7-10),BI(11 optional)",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 4,
+        "name": "B",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 5,
+        "name": "C",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "LT",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 11,
+        "name": "BI/RBO",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "RBI",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 3,
+        "name": "D",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 7,
+        "name": "A",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 4,
+        "name": "e",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 3,
+        "name": "d",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 2,
+        "name": "c",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 1,
+        "name": "b",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 0,
+        "name": "a",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": 6,
+        "name": "g",
+        "source": "simulator"
+      },
+      "15": {
+        "physical": 15,
+        "logical": 5,
+        "name": "f",
+        "source": "simulator"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "SipoShift": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC164N",
+    "description": "8-Bit Serial-In Parallel-Out Shift Register",
+    "notes": "Logical indices for 8-bit: D(0),CLK(1),Q0-Q7(2-9). Default bits=8",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "A",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "B",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "QA",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 3,
+        "name": "QB",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 4,
+        "name": "QC",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 5,
+        "name": "QD",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": 1,
+        "name": "CLK",
+        "source": "simulator"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "CLR",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 6,
+        "name": "QE",
+        "source": "simulator"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 7,
+        "name": "QF",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 8,
+        "name": "QG",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 9,
+        "name": "QH",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Switch2Throw": {
+    "source": "Circuit",
+    "manufacturer": "C&K",
+    "sku": "OS202011MS2QN1",
+    "description": "SPDT Toggle Switch (2-throw configuration)",
+    "notes": "Logical indices: 0=Common, 1=Throw_1, 2=Throw_2. Variable throw count - default 2. Mechanical switch",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "COMMON",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "THROW1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "THROW2",
+        "source": "simulator"
+      }
+    }
+  },
+  "TFlipFlop": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC73AN",
+    "description": "Dual JK Flip-Flop configured as T Flip-Flop (using IC #1, J and K tied together)",
+    "notes": "Logical indices: 0=T,1=Q,2=Q̄,3=CLK,4=R(optional),5=S(optional). T input connects to both J1 and K1",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 1,
+        "name": "Q1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 2,
+        "name": "Q̄1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 3,
+        "name": "CLK1",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 4,
+        "name": "CLR1",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "CLR2",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "CLK2",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "Q̄2",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "Q2",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "K2",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 0,
+        "name": "K1",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 0,
+        "name": "J1",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "J2",
+        "source": "unused"
+      }
+    }
+  },
+  "TappedTransformer": {
+    "source": "Circuit",
+    "manufacturer": "Signal Transformer",
+    "sku": "DST-4-16CT",
+    "description": "Center-Tapped Audio Transformer",
+    "notes": "Logical indices: 0-2=Primary (start, tap, end), 3-4=Secondary. Common for push-pull amplifiers",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "PRI_START",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "PRI_TAP",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "PRI_END",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 3,
+        "name": "SEC_START",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 4,
+        "name": "SEC_END",
+        "source": "simulator"
+      }
+    }
+  },
+  "TimeDelayRelay": {
+    "source": "Chip",
+    "manufacturer": "Panasonic",
+    "sku": "ALD112",
+    "description": "Optocoupler-based Time Delay Relay Module",
+    "notes": "Logical indices: Vin(0),Gnd(1),in(2),out(3). Simulates time delay relay",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "Vin",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "Gnd",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "Trigger",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 3,
+        "name": "Output",
+        "source": "simulator"
+      }
+    }
+  },
+  "Timer": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "NE555P",
+    "description": "555 Timer IC in DIP-8 package",
+    "notes": "Logical indices: 0=DISCH,1=TRIG,2=THRES,3=VCC,4=CONT,5=OUT,6=RESET,7=GND",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 7,
+        "name": "GND",
+        "source": "power"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "TRIG",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 5,
+        "name": "OUT",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 6,
+        "name": "RESET",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 4,
+        "name": "CONT",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 2,
+        "name": "THRES",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 0,
+        "name": "DISCH",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": 3,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Transformer": {
+    "source": "Circuit",
+    "manufacturer": "Signal Transformer",
+    "sku": "DST-4-8",
+    "description": "Audio Transformer 1:1 ratio (600 ohm to 600 ohm)",
+    "notes": "Logical indices: 0-1=Primary, 2-3=Secondary. Magnetic component - not an IC. Provides isolation",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "PRI_START",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "PRI_END",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "SEC_START",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 3,
+        "name": "SEC_END",
+        "source": "simulator"
+      }
+    }
+  },
+  "TransistorNPN": {
+    "source": "Circuit",
+    "manufacturer": "Fairchild Semiconductor",
+    "sku": "2N3904",
+    "description": "NPN General Purpose Transistor",
+    "notes": "Logical indices: 0=Base, 1=Collector, 2=Emitter. Discrete 3-pin transistor, TO-92 package. Also works: BC547, 2N2222",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 2,
+        "name": "EMITTER",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "BASE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "COLLECTOR",
+        "source": "simulator"
+      }
+    }
+  },
+  "TransistorPNP": {
+    "source": "Circuit",
+    "manufacturer": "Fairchild Semiconductor",
+    "sku": "2N3906",
+    "description": "PNP General Purpose Transistor",
+    "notes": "Logical indices: 0=Base, 1=Collector, 2=Emitter. Discrete 3-pin transistor, TO-92 package. Complementary to 2N3904. Also works: BC557, 2N2907",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 2,
+        "name": "EMITTER",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "BASE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "COLLECTOR",
+        "source": "simulator"
+      }
+    }
+  },
+  "TransmissionLine": {
+    "source": "Circuit",
+    "manufacturer": "Theoretical",
+    "sku": "TRANSMISSION_LINE_MODEL",
+    "description": "Transmission Line (Distributed LC Model)",
+    "notes": "Logical indices: 0=Input+, 1=Input-, 2=Output+, 3=Output-. 4-pin theoretical component for RF/high-speed signal modeling. Not a purchasable IC - represents physical traces/cables with characteristic impedance",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "IN+",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "IN-",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "OUT+",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 3,
+        "name": "OUT-",
+        "source": "simulator"
+      }
+    }
+  },
+  "TriStateBuffer": {
+    "source": "Circuit",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC125N",
+    "description": "Quad 3-State Buffer (using buffer #1 only)",
+    "notes": "Logical indices: 0=Input, 1=Output, 2=Enable (active low). Digital buffer with high-impedance output when disabled. DIP-14 package, using only first buffer",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 2,
+        "name": "1OE",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "1A",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "1Y",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "2OE",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "2A",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "2Y",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "3Y",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "3A",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "3OE",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "4Y",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "4A",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "4OE",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Triac": {
+    "source": "Circuit",
+    "manufacturer": "NXP",
+    "sku": "BT136-600E",
+    "description": "TRIAC (Bidirectional Thyristor)",
+    "notes": "Logical indices: 0=MT1 (Main Terminal 1), 1=MT2 (Main Terminal 2), 2=Gate. 3-pin AC switch, TO-220 package. Also works: MAC97A8, BTA16",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "MT1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "MT2",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "GATE",
+        "source": "simulator"
+      }
+    }
+  },
+  "Triode": {
+    "source": "Circuit",
+    "manufacturer": "Various",
+    "sku": "12AX7",
+    "description": "Vacuum Tube Triode",
+    "notes": "Logical indices: 0=Plate (Anode), 1=Grid, 2=Cathode. Vacuum tube with heater (not modeled in simulator). 9-pin miniature base. Also works: 12AU7, 12AT7, 6L6 (power triode)",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 1,
+        "name": "GRID",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "CATHODE_TAP",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "CATHODE",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "HEATER1",
+        "source": "power"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "HEATER2",
+        "source": "power"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 0,
+        "name": "PLATE",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "CENTER_TAP",
+        "source": "unused"
+      }
+    }
+  },
+  "UnijunctionReal": {
+    "source": "Composite",
+    "manufacturer": "ON Semiconductor",
+    "sku": "2N2646",
+    "description": "Unijunction Transistor (UJT)",
+    "notes": "Logical indices: 0=Emitter, 1=Base1, 2=Base2. Used for relaxation oscillators",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 1,
+        "name": "BASE1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "EMITTER",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "BASE2",
+        "source": "simulator"
+      }
+    }
+  },
+  "VCCS": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "OPA860",
+    "description": "Voltage-Controlled Current Source (Transconductance Amplifier)",
+    "notes": "Logical indices: A,B inputs(0,1 for 2 inputs),C+(2),C-(3). Default 2 inputs",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "IN_A",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "IN_B",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "VEE",
+        "source": "power"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 2,
+        "name": "OUT+",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 3,
+        "name": "OUT-",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "VCO": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "CD4046BE",
+    "description": "Phase-Locked Loop with VCO - VCO Section",
+    "notes": "Logical indices: Vi(0),Vo(1),C(2),C(3),R1(4),R2(5)",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "PC1_OUT",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "PC2_OUT",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "SIG_IN",
+        "source": "unused"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 1,
+        "name": "COMP_IN",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 1,
+        "name": "VCO_OUT",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 4,
+        "name": "R1",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 5,
+        "name": "R2",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "VSS",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 0,
+        "name": "VCO_IN",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "DEMOD_OUT",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 2,
+        "name": "C1A",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": 3,
+        "name": "C1B",
+        "source": "simulator"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "INH",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "ZENER",
+        "source": "unused"
+      },
+      "15": {
+        "physical": 15,
+        "logical": -1,
+        "name": "PC_PULSE",
+        "source": "unused"
+      },
+      "16": {
+        "physical": 16,
+        "logical": -1,
+        "name": "VDD",
+        "source": "power"
+      }
+    }
+  },
+  "Wattmeter": {
+    "source": "Circuit",
+    "manufacturer": "Measurement",
+    "sku": "POWER_METER",
+    "description": "Power Measurement Device (Wattmeter)",
+    "notes": "Logical indices: 0=V+, 1=V-, 2=I+, 3=I-. 4-pin measurement device. Not a component to build - represents measurement instrument. Measures voltage across pins 0-1 and current through pins 2-3",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "V+",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "V-",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "I+",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 3,
+        "name": "I-",
+        "source": "simulator"
+      }
+    }
+  },
+  "Xor Gate": {
+    "source": "Circuit",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC86N",
+    "description": "Quad 2-Input XOR Gate (using gate #1 only)",
+    "notes": "Logical indices: 0=Input_A, 1=Input_B, 2=Output. Variable input count in simulator (default 2). DIP-14 package, using only first gate. Same IC as HalfAdder",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "1A",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 1,
+        "name": "1B",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "1Y",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "2A",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "2B",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "2Y",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "3Y",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "3A",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "3B",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": -1,
+        "name": "4Y",
+        "source": "unused"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "4A",
+        "source": "unused"
+      },
+      "13": {
+        "physical": 13,
+        "logical": -1,
+        "name": "4B",
+        "source": "unused"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      }
+    }
+  },
+  "Seven Seg": {
+    "source": "Chip",
+    "manufacturer": "Kingbright",
+    "sku": "SA52-11EWA",
+    "description": "Common Anode 7-Segment LED Display",
+    "notes": "Logical indices: a-g(0-6) segments. Common anode at pin 3,8",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 4,
+        "name": "e",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 3,
+        "name": "d",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "COM",
+        "source": "power"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 2,
+        "name": "c",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 6,
+        "name": "dp",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 1,
+        "name": "b",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 0,
+        "name": "a",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "COM",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 5,
+        "name": "f",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": 6,
+        "name": "g",
+        "source": "simulator"
+      }
+    }
+  },
+  "J K Flip Flop": {
+    "source": "Chip",
+    "manufacturer": "Texas Instruments",
+    "sku": "SN74HC73AN",
+    "description": "Dual JK Flip-Flop with Clear (using IC #1 only)",
+    "notes": "Logical indices: 0=J,1=CLK,2=K,3=Q,4=Q̄,5=R(optional). Maps to first flip-flop",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 3,
+        "name": "Q1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 4,
+        "name": "Q̄1",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "CLK1",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 5,
+        "name": "CLR1",
+        "source": "simulator"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "VCC",
+        "source": "power"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "CLR2",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "CLK2",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "Q̄2",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "Q2",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "K2",
+        "source": "unused"
+      },
+      "11": {
+        "physical": 11,
+        "logical": 2,
+        "name": "K1",
+        "source": "simulator"
+      },
+      "12": {
+        "physical": 12,
+        "logical": -1,
+        "name": "GND",
+        "source": "power"
+      },
+      "13": {
+        "physical": 13,
+        "logical": 0,
+        "name": "J1",
+        "source": "simulator"
+      },
+      "14": {
+        "physical": 14,
+        "logical": -1,
+        "name": "J2",
+        "source": "unused"
+      }
+    }
+  },
+  "Op Amp": {
+    "source": "Composite",
+    "manufacturer": "Texas Instruments",
+    "sku": "UA741CP",
+    "description": "General Purpose Op-Amp with internal transistor-level model",
+    "notes": "Logical indices: 0=IN-, 1=IN+, 2=OUT, 3=V+, 4=V-. CompositeElm models 741 internal circuit",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "OFFSET_N1",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "IN-",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "IN+",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": 4,
+        "name": "V-",
+        "source": "power"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "OFFSET_N2",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": 2,
+        "name": "OUT",
+        "source": "simulator"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 3,
+        "name": "V+",
+        "source": "power"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "NC",
+        "source": "unused"
+      }
+    }
+  },
+  "Transistor": {
+    "source": "Circuit",
+    "manufacturer": "Fairchild Semiconductor",
+    "sku": "2N3904",
+    "description": "NPN General Purpose Transistor",
+    "notes": "Logical indices: 0=Base, 1=Collector, 2=Emitter. Discrete 3-pin transistor, TO-92 package. Also works: BC547, 2N2222",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 2,
+        "name": "EMITTER",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": 0,
+        "name": "BASE",
+        "source": "simulator"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 1,
+        "name": "COLLECTOR",
+        "source": "simulator"
+      }
+    }
+  },
+  "Relay": {
+    "source": "Circuit",
+    "manufacturer": "Omron",
+    "sku": "G5V-2-H1-DC5",
+    "description": "DPDT Signal Relay (using SPDT configuration - 1 pole)",
+    "notes": "Logical indices: 0-1=Coil, 2-4=Switch (Common, NO, NC). Electromechanical relay - coil actuates switch",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": 0,
+        "name": "COIL1",
+        "source": "simulator"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "COIL2",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": 2,
+        "name": "COM1",
+        "source": "simulator"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "COM2",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": 3,
+        "name": "NO1",
+        "source": "simulator"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "NO2",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": 4,
+        "name": "NC1",
+        "source": "simulator"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "NC2",
+        "source": "unused"
+      },
+      "9": {
+        "physical": 9,
+        "logical": 1,
+        "name": "COIL1_RTN",
+        "source": "simulator"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "COIL2_RTN",
+        "source": "unused"
+      }
+    }
+  },
+  "Decimal Display": {
+    "source": "Chip",
+    "manufacturer": "Kingbright",
+    "sku": "SC56-11EWA",
+    "description": "Common Cathode 7-Segment + DP LED Display",
+    "notes": "Logical indices for 4-bit BCD: I0-I3(0-3). Displays 0-9 based on BCD input",
+    "pins": {
+      "1": {
+        "physical": 1,
+        "logical": -1,
+        "name": "e",
+        "source": "unused"
+      },
+      "2": {
+        "physical": 2,
+        "logical": -1,
+        "name": "d",
+        "source": "unused"
+      },
+      "3": {
+        "physical": 3,
+        "logical": -1,
+        "name": "COM",
+        "source": "power"
+      },
+      "4": {
+        "physical": 4,
+        "logical": -1,
+        "name": "c",
+        "source": "unused"
+      },
+      "5": {
+        "physical": 5,
+        "logical": -1,
+        "name": "dp",
+        "source": "unused"
+      },
+      "6": {
+        "physical": 6,
+        "logical": -1,
+        "name": "b",
+        "source": "unused"
+      },
+      "7": {
+        "physical": 7,
+        "logical": -1,
+        "name": "a",
+        "source": "unused"
+      },
+      "8": {
+        "physical": 8,
+        "logical": -1,
+        "name": "COM",
+        "source": "power"
+      },
+      "9": {
+        "physical": 9,
+        "logical": -1,
+        "name": "f",
+        "source": "unused"
+      },
+      "10": {
+        "physical": 10,
+        "logical": -1,
+        "name": "g",
+        "source": "unused"
+      }
+    }
+  }
+}

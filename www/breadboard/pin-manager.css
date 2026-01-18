@@ -1,0 +1,170 @@
+#pin-manager {
+    display: none;
+}
+
+#pin-manager-view {
+    vertical-align: bottom;
+    display: inline;
+}
+
+#pm-logical {
+    height: 50px;
+    text-align: center;
+}
+
+.pm-draggable-pin {
+    margin-top: 5px;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 5px;
+    width: 40px;
+    height: 40px;
+}
+
+.pm-droppable-pin {
+    min-height: 20px;
+}
+
+.pm-pin {
+    width: 40px;
+    height: 35px;
+    margin-right: 5px;
+    display: inline-block;
+    color: white;
+    font-weight: bold;
+    vertical-align: text-top;
+    border-right: none;
+}
+
+.pm-left-pin {
+    border: none;
+    margin-right: 0;
+}
+
+.pm-right-pin {
+    border: none;
+    margin-right: 0;
+}
+
+.pm-label {
+    width: 60%;
+    background: lightgrey;
+    text-align: left;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 4px;
+    white-space: nowrap;
+    display: block;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.pm-tip {
+    font-size: 10px;
+    font-style: italic;
+    text-align: center;
+    background: lightgrey;
+    padding: 5px;
+}
+
+.pm-container {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid black;
+    min-height: 40px;
+}
+
+.pm-center, .pm-rail {
+    text-align: center;
+    display: table-cell;
+    width: 40px;
+}
+
+.pm-center{
+    width: 90px;
+    background: lightgrey;
+    border: 1px solid black;
+    border-radius: 10px;
+    vertical-align: middle;
+    position: relative;
+    z-index: -10;
+    height: 90px;
+    padding: 10px;
+    font-family: "courier new", courier;
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.pm-chip-name{
+    font-style: italic;
+}
+
+#left-rail, #right-rail {
+    border-radius: 10px;
+}
+
+#left-pins {
+    width: 20px;
+    position: relative;
+    left: -2px;
+    border: none;
+    overflow: hidden;
+    height: 32px;
+}
+
+.pm-physical-pin {
+    margin-top:5px;
+    visibility: hidden;
+    display: inline-block;
+    text-align: center;
+    height: 20px;
+    position: relative;
+    width: 20px;
+    border-radius: 5px;
+    top: -20px;
+}
+
+.pm-logical-pin {
+    margin-top: 5px;
+    display: inline-block;
+    text-align: center;
+    position: relative;
+    left: 13px;
+    color: green;
+}
+
+.pm-left-logical-pin{
+    top: 1px;
+    left: -10px;
+    width: 20px;
+    background: white;
+    border-radius: 10px;
+    visibility: hidden;
+}
+
+.pm-left-physical-pin {
+    color: black;
+    left: 20px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 10px;
+    top: -25px;
+}
+
+.pm-right-logical-pin{
+    left: 5px;
+    width: 20px;
+    background: white;
+    border-radius: 10px;
+    visibility: hidden;
+}
+
+.pm-right-physical-pin{
+    color:black;
+    left: -20px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 10px;
+    top: -25px;
+}

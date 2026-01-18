@@ -1,0 +1,465 @@
+/* Console Panel */
+#console-panel {
+    display: flex;
+    flex-direction: column;
+    background-color: #1e1e1e;
+    border-top: 1px solid #444;
+    overflow: hidden;
+    flex: 1 1 auto; /* Allow it to flex for Split.js */
+    min-height: 0; /* Important for flex children */
+}
+
+#console-panel.console-collapsed {
+    flex: 0 0 24px !important; /* Fixed height when collapsed */
+}
+
+#console-panel.console-collapsed #console-content {
+    display: none;
+}
+
+#console-panel.console-collapsed .console-tabs {
+    display: none !important;
+}
+
+#console-panel.console-collapsed .console-tab-content {
+    display: none !important;
+}
+
+/* Console Toolbar */
+#console-toolbar {
+    height: 24px;
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #444;
+    display: flex;
+    align-items: center;
+    padding: 2px 5px;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.console-btn-group {
+    display: flex;
+    gap: 2px;
+}
+
+.console-level-btn {
+    background-color: #3e3e3e;
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 2px;
+    padding: 1px 4px;
+    cursor: pointer;
+    font-size: 8px !important;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.console-level-btn:hover {
+    background-color: #4e4e4e;
+}
+
+.console-level-btn.active {
+    background-color: #0099ff;
+    color: white;
+    border-color: #0099ff;
+}
+
+.console-search-group {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+#console-search {
+    flex-grow: 1;
+    max-width: 200px;
+    background-color: #1e1e1e;
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 2px;
+    padding: 2px 5px;
+    font-size: 9px;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+#console-search:focus {
+    outline: none;
+    border-color: #0099ff;
+}
+
+.console-action-group {
+    display: flex;
+    gap: 2px;
+}
+
+#console-clear-btn,
+#console-detach-btn {
+    background-color: #3e3e3e;
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 2px;
+    padding: 1px 5px;
+    cursor: pointer;
+    font-size: 8px;
+    transition: background-color 0.2s;
+}
+
+#console-clear-btn:hover,
+#console-detach-btn:hover {
+    background-color: #4e4e4e;
+}
+
+#console-collapse-btn {
+    background-color: #3e3e3e;
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 2px;
+    padding: 1px 4px;
+    cursor: pointer;
+    font-size: 10px;
+    transition: background-color 0.2s;
+    margin-left: auto;
+}
+
+#console-collapse-btn:hover {
+    background-color: #4e4e4e;
+}
+
+/* Console Content Area */
+#console-content {
+    flex: 1 1 0; /* Allow shrinking and set base to 0 */
+    min-height: 0; /* Allow flex child to shrink below content size */
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #1e1e1e;
+    padding: 5px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    color: #ccc;
+}
+
+/* Console Messages */
+.console-message {
+    padding: 2px 5px;
+    margin: 1px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    border-left: 2px solid transparent;
+}
+
+.console-message:hover {
+    background-color: #2a2a2a;
+}
+
+.console-message.has-details {
+    cursor: pointer;
+}
+
+.console-message.has-details:hover {
+    border-left-color: #0099ff;
+}
+
+.console-timestamp {
+    color: #777;
+    font-size: 10px;
+    min-width: 90px;
+    flex-shrink: 0;
+}
+
+.console-level-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: bold;
+    color: white;
+    min-width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.console-source-badge {
+    color: #999;
+    font-size: 10px;
+    padding: 2px 6px;
+    background-color: #2a2a2a;
+    border-radius: 3px;
+    min-width: 70px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.console-message-text {
+    color: #ccc;
+    word-break: break-word;
+    flex-grow: 1;
+}
+
+/* Message Details */
+.console-message-details {
+    background-color: #252525;
+    padding: 10px;
+    margin: 2px 0 5px 105px;
+    border-left: 3px solid #0099ff;
+    border-radius: 3px;
+}
+
+.console-json {
+    margin: 0;
+    padding: 8px;
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 3px;
+    color: #f8f8f2;
+    font-size: 11px;
+    overflow-x: auto;
+}
+
+/* Scrollbar Styling */
+#console-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+#console-content::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+#console-content::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 5px;
+}
+
+#console-content::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* Console Placeholder (when detached) */
+.console-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #777;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.console-placeholder a {
+    color: #0099ff;
+    text-decoration: none;
+    margin-left: 5px;
+}
+
+.console-placeholder a:hover {
+    text-decoration: underline;
+}
+
+/* Detached Console Window */
+.console-window {
+    z-index: 10000 !important;
+    position: fixed !important;
+    background-color: #2d2d2d !important;
+    border: 1px solid #555 !important;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.console-window .draggable-header {
+    background-color: #3e3e3e !important;
+    color: #ccc !important;
+    cursor: move !important;
+    padding: 5px 10px !important;
+    border-bottom: 1px solid #555 !important;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.console-window .close-btn {
+    cursor: pointer;
+    color: #ccc;
+    font-size: 18px;
+    padding: 0 5px;
+    line-height: 1;
+}
+
+.console-window .close-btn:hover {
+    color: #f44336;
+}
+
+.console-detached-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    background-color: #2d2d2d;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.console-detached-content #console-toolbar {
+    border-bottom: 1px solid #444;
+    flex-shrink: 0;
+}
+
+.console-detached-content #console-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Detached Toolbar Window */
+.toolbar-window {
+    z-index: 10000 !important;
+    position: fixed !important;
+    background-color: #333 !important;
+    border: 1px solid #555 !important;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    padding: 0 !important;
+}
+
+.toolbar-window .draggable-header {
+    background-color: #3e3e3e !important;
+    color: #ccc !important;
+    cursor: move !important;
+    padding: 5px 10px !important;
+    border-bottom: 1px solid #555 !important;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toolbar-window .close-btn {
+    cursor: pointer;
+    color: #ccc;
+    font-size: 18px;
+    padding: 0 5px;
+    line-height: 1;
+}
+
+.toolbar-window .close-btn:hover {
+    color: #f44336;
+}
+
+.toolbar-detached-content {
+    background-color: #333;
+    padding: 5px;
+}
+
+.toolbar-detached-content #code-toolbar {
+    border: none;
+    height: auto;
+}
+
+/* Split Gutter for Console Split */
+.gutter.gutter-vertical {
+    background-color: #333;
+    cursor: row-resize;
+}
+
+.gutter.gutter-vertical:hover {
+    background-color: #444;
+}
+
+/* Console Tabs (for both docked and detached window) */
+.console-tabs {
+    display: flex;
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #444;
+    flex-shrink: 0; /* Don't shrink tabs */
+    flex-grow: 0; /* Don't grow tabs */
+    min-height: 28px; /* Fixed height for tabs */
+}
+
+.console-tab {
+    padding: 6px 12px;
+    cursor: pointer;
+    border-right: 1px solid #444;
+    font-size: 11px;
+    color: #999;
+    transition: all 0.2s;
+    background-color: #2d2d2d;
+    user-select: none;
+}
+
+.console-tab:hover {
+    background-color: #333;
+    color: #ccc;
+}
+
+.console-tab.active {
+    background-color: #3e3e3e;
+    color: #fff;
+    border-bottom: 2px solid #007acc;
+    font-weight: 500;
+}
+
+/* Console Tab Content - for docked view */
+#console-panel .console-tab-content {
+    display: none;
+    flex: 1 1 auto; /* Take remaining space */
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #1e1e1e;
+    min-height: 0; /* Allow shrinking below content size */
+}
+
+#console-panel .console-tab-content.active {
+    display: flex;
+}
+
+/* Console Tab Content - for detached window */
+.console-window .console-tab-content {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #1e1e1e;
+}
+
+.console-window .console-tab-content.active {
+    display: flex;
+}
+
+.tab-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #777;
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* Breakpoints tab specific styling */
+#breakpoints-tab-content {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.breakpoints-toolbar {
+    flex-shrink: 0;
+}
+
+.breakpoints-empty {
+    flex-shrink: 0;
+}
+
+#breakpoints-tab-content #breakpoints-list {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+}
