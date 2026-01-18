@@ -109,9 +109,12 @@ class ThemeSwitcher {
      */
     applyAceTheme() {
         try {
-            // Get the Ace theme from CSS variable
+            // Get the Ace theme and background color from CSS variables
             const aceTheme = getComputedStyle(document.documentElement)
                 .getPropertyValue('--ace-theme')
+                .trim();
+            const bgColor = getComputedStyle(document.documentElement)
+                .getPropertyValue('--simulator-bg')
                 .trim();
 
             if (!aceTheme) {
@@ -119,7 +122,7 @@ class ThemeSwitcher {
                 return;
             }
 
-            this.logger.info(`Applying Ace theme: ${aceTheme}`);
+            this.logger.info(`Applying Ace theme: ${aceTheme} with background: ${bgColor}`);
 
             // Find Ace editor iframe
             const codeFrame = document.getElementById('code');
@@ -132,9 +135,35 @@ class ThemeSwitcher {
             const applyTheme = () => {
                 try {
                     const codeWindow = codeFrame.contentWindow;
+                    const codeDoc = codeFrame.contentDocument || codeWindow.document;
+
                     if (codeWindow && codeWindow.editor && codeWindow.editor.setTheme) {
+                        // Apply the base Ace theme
                         codeWindow.editor.setTheme(`ace/theme/${aceTheme}`);
-                        this.logger.info(`✓ Ace theme set to: ${aceTheme}`);
+
+                        // Override the background color to match simulator
+                        if (bgColor) {
+                            // Remove existing override style if present
+                            const existingStyle = codeDoc.getElementById('theme-bg-override');
+                            if (existingStyle) {
+                                existingStyle.remove();
+                            }
+
+                            // Inject CSS to override background
+                            const style = codeDoc.createElement('style');
+                            style.id = 'theme-bg-override';
+                            style.textContent = `
+                                .ace_editor,
+                                .ace_gutter {
+                                    background-color: ${bgColor} !important;
+                                }
+                            `;
+                            codeDoc.head.appendChild(style);
+
+                            this.logger.info(`✓ Ace theme set to: ${aceTheme} with background: ${bgColor}`);
+                        } else {
+                            this.logger.info(`✓ Ace theme set to: ${aceTheme}`);
+                        }
                     } else {
                         this.logger.warn('Ace editor not available yet');
                     }
