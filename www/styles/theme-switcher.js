@@ -117,12 +117,16 @@ class ThemeSwitcher {
 
                 this.logger.info(`Applying simulator background: ${bgColor}`);
 
-                // Find simulator iframe
-                const simFrame = document.getElementById('simFrame');
+                // Find simulator iframe - try both common IDs
+                const simFrame = document.getElementById('simFrame') ||
+                                 document.getElementById('circuitFrame');
+
                 if (!simFrame) {
-                    this.logger.warn('Simulator iframe not found');
+                    this.logger.warn('Simulator iframe not found (tried #simFrame and #circuitFrame)');
                     return;
                 }
+
+                this.logger.info(`Found simulator iframe: ${simFrame.id}`);
 
                 // Wait for iframe to be ready
                 const applyColor = () => {
