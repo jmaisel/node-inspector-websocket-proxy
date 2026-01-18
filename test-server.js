@@ -222,7 +222,29 @@ class UnifiedTestServer {
             // Store reference to debug router for status queries
             this.debugRouter = debugRouter;
 
-            // Project management endpoints
+            // GPIO WebSocket API - bridge between CircuitJS1 and GPIO client code
+            const { createGPIOWebSocketApi } = require('./server/gpio-websocket-api');
+            const gpioConfig = {
+                gpioPort: this.options.gpioPort || 8081,
+                logLevel: this.options.logLevels.websocket
+            };
+            const gpioRouter = createGPIOWebSocketApi(gpioConfig);
+            app.use('/gpio', gpioRouter);
+            this.logger.info('* GPIO WebSocket API mounted at /gpio');
+
+            // Store reference to GPIO manager
+            this.gpioManager = gpioRouter.gpioManager;
+
+            // Project Management API (save/load/export/import projects)
+            const { createProjectApi } = require('./server/project-api');
+            const projectConfig = {
+                workspaceRoot: this.options.workspaceRoot || process.cwd()
+            };
+            const projectRouter = createProjectApi(projectConfig);
+            app.use('/api/project', projectRouter);
+            this.logger.info('* Project Management API mounted at /api/project');
+
+            // Legacy project management endpoints (kept for compatibility)
             app.post('/api/projects/create', express.json(), async (req, res) => {
                 try {
                     const { projectName } = req.body;
@@ -749,6 +771,12 @@ class UnifiedTestServer {
                     });
                 })
             );
+        }
+
+        // Stop GPIO WebSocket server
+        if (this.gpioManager) {
+            this.gpioManager.stop();
+            this.logger.info('* GPIO WebSocket server stopped');
         }
 
         // Proxy server is now managed by session API

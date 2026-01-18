@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const fsSync = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 const WorkspaceSecurity = require('./workspace-security');
 const AuthMiddleware = require('./auth-middleware');
 const ZipHandler = require('./zip-handler');
@@ -251,6 +252,125 @@ function createWorkspaceApi(config = {}) {
     });
 
     /**
+     * POST /*npm-install - Run npm install in a project directory
+     * This must come before the generic GET handler
+     */
+    router.post(/(.*)\/npm-install$/, async (req, res) => {
+        try {
+            // Extract project path from the URL (everything before /npm-install)
+            const projectPath = req.params[0] || '/';
+            const absolutePath = await security.validatePath(projectPath);
+
+            // Verify the path exists and is a directory
+            let stats;
+            try {
+                stats = await fs.stat(absolutePath);
+            } catch (err) {
+                if (err.code === 'ENOENT') {
+                    return res.status(404).json({
+                        success: false,
+                        error: 'Not found',
+                        message: 'Project directory does not exist',
+                        path: projectPath
+                    });
+                }
+                throw err;
+            }
+
+            if (!stats.isDirectory()) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Bad request',
+                    message: 'Path must be a directory',
+                    path: projectPath
+                });
+            }
+
+            // Check if package.json exists
+            const packageJsonPath = path.join(absolutePath, 'package.json');
+            try {
+                await fs.access(packageJsonPath);
+            } catch (err) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Not found',
+                    message: 'package.json not found in directory',
+                    path: projectPath
+                });
+            }
+
+            console.log(`Running npm install in: ${absolutePath}`);
+
+            // Run npm install as a child process
+            const npmProcess = spawn('npm', ['install'], {
+                cwd: absolutePath,
+                shell: true
+            });
+
+            let stdout = '';
+            let stderr = '';
+
+            npmProcess.stdout.on('data', (data) => {
+                stdout += data.toString();
+            });
+
+            npmProcess.stderr.on('data', (data) => {
+                stderr += data.toString();
+            });
+
+            npmProcess.on('close', (code) => {
+                if (code === 0) {
+                    console.log(`npm install completed successfully in ${absolutePath}`);
+                    res.json({
+                        success: true,
+                        message: 'npm install completed successfully',
+                        path: projectPath,
+                        output: stdout,
+                        exitCode: code
+                    });
+                } else {
+                    console.error(`npm install failed with code ${code} in ${absolutePath}`);
+                    console.error('stderr:', stderr);
+                    res.status(500).json({
+                        success: false,
+                        error: 'npm install failed',
+                        message: `npm install exited with code ${code}`,
+                        path: projectPath,
+                        output: stdout,
+                        errorOutput: stderr,
+                        exitCode: code
+                    });
+                }
+            });
+
+            npmProcess.on('error', (err) => {
+                console.error('Failed to start npm install:', err);
+                res.status(500).json({
+                    success: false,
+                    error: 'Failed to start npm install',
+                    message: err.message,
+                    path: projectPath
+                });
+            });
+
+        } catch (err) {
+            console.error('npm install error:', err);
+            if (err.message.includes('Path traversal')) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Forbidden',
+                    message: err.message
+                });
+            }
+            res.status(500).json({
+                success: false,
+                error: 'Internal server error',
+                message: err.message
+            });
+        }
+    });
+
+    /**
      * GET handler - List directory or download file/directory
      */
     router.get('/*', async (req, res) => {
@@ -359,29 +479,86 @@ function createWorkspaceApi(config = {}) {
     });
 
     /**
-     * PUT/POST/PATCH handlers - Upload and extract ZIP
+     * PUT/POST/PATCH handlers - Upload and extract ZIP, save file content, or create directory
      */
     const uploadHandler = async (req, res) => {
         try {
             const requestedPath = req.params[0] || '/';
             const absolutePath = await security.validatePath(requestedPath);
 
-            // Verify content type
-            if (!ZipHandler.isZipRequest(req)) {
-                return res.status(415).json({
-                    error: 'Unsupported media type',
-                    message: 'Expected Content-Type: application/zip'
+            // Check if this is a directory creation request (POST with JSON body { type: 'directory' })
+            if (req.method === 'POST' && req.is('application/json') && req.body && req.body.type === 'directory') {
+                // Create directory
+                await fs.mkdir(absolutePath, { recursive: true });
+                console.log(`Directory created: ${absolutePath}`);
+
+                res.status(201).json({
+                    success: true,
+                    message: 'Directory created successfully',
+                    path: requestedPath
                 });
+                return;
             }
 
-            // Extract ZIP to target path
-            const result = await ZipHandler.extractZipToDirectory(req, absolutePath);
+            // Check if this is a ZIP upload
+            if (ZipHandler.isZipRequest(req)) {
+                // Extract ZIP to target path
+                const result = await ZipHandler.extractZipToDirectory(req, absolutePath);
 
-            res.status(201).json({
-                success: true,
-                message: 'ZIP extracted successfully',
-                ...result
-            });
+                res.status(201).json({
+                    success: true,
+                    message: 'ZIP extracted successfully',
+                    ...result
+                });
+            }
+            // Handle plain text/file content save
+            else if (req.is('text/*') || req.is('application/javascript') || req.is('application/json') || req.is('text/json')) {
+                // Check if target is a directory
+                try {
+                    const stats = await fs.stat(absolutePath);
+                    if (stats.isDirectory()) {
+                        return res.status(400).json({
+                            error: 'Bad request',
+                            message: 'Cannot write content to a directory'
+                        });
+                    }
+                } catch (err) {
+                    // File doesn't exist yet, which is fine
+                    if (err.code !== 'ENOENT') {
+                        throw err;
+                    }
+                }
+
+                // Ensure parent directory exists
+                const parentDir = path.dirname(absolutePath);
+                await fs.mkdir(parentDir, { recursive: true });
+
+                // Handle content - if body was already parsed as JSON (by express.json()), stringify it back
+                let content = req.body;
+                if (typeof content === 'object' && content !== null) {
+                    // Body was parsed as JSON object, stringify it back with formatting
+                    content = JSON.stringify(content, null, 2);
+                }
+
+                // Write file content
+                await fs.writeFile(absolutePath, content, 'utf8');
+
+                const stats = await fs.stat(absolutePath);
+
+                res.json({
+                    success: true,
+                    message: 'File saved successfully',
+                    path: requestedPath,
+                    size: stats.size,
+                    modified: stats.mtime.toISOString()
+                });
+            }
+            else {
+                return res.status(415).json({
+                    error: 'Unsupported media type',
+                    message: 'Expected Content-Type: application/zip, text/*, application/javascript, or application/json'
+                });
+            }
         } catch (err) {
             console.error('Upload error:', err);
             if (err.message.includes('Path traversal')) {
@@ -397,11 +574,17 @@ function createWorkspaceApi(config = {}) {
         }
     };
 
+    // Text body parser middleware for file content uploads
+    const textBodyParser = express.text({
+        type: ['text/*', 'application/javascript', 'application/json', 'text/json'],
+        limit: '50mb'
+    });
+
     // Apply authentication to write operations
     // Using noAuth for now - authentication middleware in place but not enforcing
-    router.put('/*', auth.noAuth, uploadHandler);
-    router.post('/*', auth.noAuth, uploadHandler);
-    router.patch('/*', auth.noAuth, uploadHandler);
+    router.put('/*', textBodyParser, auth.noAuth, uploadHandler);
+    router.post('/*', textBodyParser, auth.noAuth, uploadHandler);
+    router.patch('/*', textBodyParser, auth.noAuth, uploadHandler);
 
     return router;
 }

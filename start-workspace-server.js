@@ -172,6 +172,15 @@ class WorkspaceServer {
             app.use('/debug', debugRouter);
             this.logger.info('✓ Debugger Session API mounted at /debug');
 
+            // Project Management API (save/load/export/import projects)
+            const { createProjectApi } = require('./server/project-api');
+            const projectConfig = {
+                workspaceRoot: this.options.workspaceRoot
+            };
+            const projectRouter = createProjectApi(projectConfig);
+            app.use('/api/project', projectRouter);
+            this.logger.info('✓ Project Management API mounted at /api/project');
+
             // Helpful index page
             app.get('/', (req, res) => {
                 res.send(`
