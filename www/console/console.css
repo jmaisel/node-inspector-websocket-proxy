@@ -2,8 +2,8 @@
 #console-panel {
     display: flex;
     flex-direction: column;
-    background-color: #1e1e1e;
-    border-top: 1px solid #444;
+    background-color: var(--color-bg-primary);
+    border-top: 1px solid var(--color-border-default);
     overflow: hidden;
     flex: 1 1 auto; /* Allow it to flex for Split.js */
     min-height: 0; /* Important for flex children */
@@ -28,8 +28,8 @@
 /* Console Toolbar */
 #console-toolbar {
     height: 24px;
-    background-color: #2d2d2d;
-    border-bottom: 1px solid #444;
+    background-color: var(--color-bg-tertiary);
+    border-bottom: 1px solid var(--color-border-default);
     display: flex;
     align-items: center;
     padding: 2px 5px;
@@ -43,25 +43,25 @@
 }
 
 .console-level-btn {
-    background-color: #3e3e3e;
-    color: #ccc;
-    border: 1px solid #555;
-    border-radius: 2px;
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
     padding: 1px 4px;
     cursor: pointer;
     font-size: 8px !important;
     font-weight: bold;
-    transition: background-color 0.2s;
+    transition: background-color var(--transition-fast);
 }
 
 .console-level-btn:hover {
-    background-color: #4e4e4e;
+    background-color: var(--color-bg-elevated);
 }
 
 .console-level-btn.active {
-    background-color: #0099ff;
+    background-color: var(--brand-accent);
     color: white;
-    border-color: #0099ff;
+    border-color: var(--brand-accent);
 }
 
 .console-search-group {
@@ -73,18 +73,18 @@
 #console-search {
     flex-grow: 1;
     max-width: 200px;
-    background-color: #1e1e1e;
-    color: #ccc;
-    border: 1px solid #555;
-    border-radius: 2px;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
     padding: 2px 5px;
     font-size: 9px;
-    font-family: 'Consolas', 'Monaco', monospace;
+    font-family: var(--font-family-mono);
 }
 
 #console-search:focus {
     outline: none;
-    border-color: #0099ff;
+    border-color: var(--color-border-focus);
 }
 
 .console-action-group {
@@ -94,35 +94,35 @@
 
 #console-clear-btn,
 #console-detach-btn {
-    background-color: #3e3e3e;
-    color: #ccc;
-    border: 1px solid #555;
-    border-radius: 2px;
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
     padding: 1px 5px;
     cursor: pointer;
     font-size: 8px;
-    transition: background-color 0.2s;
+    transition: background-color var(--transition-fast);
 }
 
 #console-clear-btn:hover,
 #console-detach-btn:hover {
-    background-color: #4e4e4e;
+    background-color: var(--color-bg-elevated);
 }
 
 #console-collapse-btn {
-    background-color: #3e3e3e;
-    color: #ccc;
-    border: 1px solid #555;
-    border-radius: 2px;
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
     padding: 1px 4px;
     cursor: pointer;
     font-size: 10px;
-    transition: background-color 0.2s;
+    transition: background-color var(--transition-fast);
     margin-left: auto;
 }
 
 #console-collapse-btn:hover {
-    background-color: #4e4e4e;
+    background-color: var(--color-bg-elevated);
 }
 
 /* Console Content Area */
@@ -131,11 +131,11 @@
     min-height: 0; /* Allow flex child to shrink below content size */
     overflow-y: auto;
     overflow-x: hidden;
-    background-color: #1e1e1e;
+    background-color: var(--color-bg-primary);
     padding: 5px;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-family: var(--font-family-mono);
     font-size: 12px;
-    color: #ccc;
+    color: var(--color-text-secondary);
 }
 
 /* Console Messages */
@@ -149,7 +149,7 @@
 }
 
 .console-message:hover {
-    background-color: #2a2a2a;
+    background-color: var(--color-bg-secondary);
 }
 
 .console-message.has-details {
@@ -157,11 +157,11 @@
 }
 
 .console-message.has-details:hover {
-    border-left-color: #0099ff;
+    border-left-color: var(--brand-accent);
 }
 
 .console-timestamp {
-    color: #777;
+    color: var(--color-text-muted);
     font-size: 10px;
     min-width: 90px;
     flex-shrink: 0;
@@ -170,7 +170,7 @@
 .console-level-badge {
     display: inline-block;
     padding: 2px 6px;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     font-size: 9px;
     font-weight: bold;
     color: white;
@@ -180,38 +180,38 @@
 }
 
 .console-source-badge {
-    color: #999;
+    color: var(--color-text-muted);
     font-size: 10px;
     padding: 2px 6px;
-    background-color: #2a2a2a;
-    border-radius: 3px;
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-sm);
     min-width: 70px;
     text-align: center;
     flex-shrink: 0;
 }
 
 .console-message-text {
-    color: #ccc;
+    color: var(--color-text-secondary);
     word-break: break-word;
     flex-grow: 1;
 }
 
 /* Message Details */
 .console-message-details {
-    background-color: #252525;
+    background-color: var(--color-bg-secondary);
     padding: 10px;
     margin: 2px 0 5px 105px;
-    border-left: 3px solid #0099ff;
-    border-radius: 3px;
+    border-left: 3px solid var(--brand-accent);
+    border-radius: var(--radius-sm);
 }
 
 .console-json {
     margin: 0;
     padding: 8px;
-    background-color: #1e1e1e;
-    border: 1px solid #333;
-    border-radius: 3px;
-    color: #f8f8f2;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
     font-size: 11px;
     overflow-x: auto;
 }
@@ -222,16 +222,16 @@
 }
 
 #console-content::-webkit-scrollbar-track {
-    background: #1e1e1e;
+    background: var(--color-bg-primary);
 }
 
 #console-content::-webkit-scrollbar-thumb {
-    background: #555;
+    background: var(--color-border-default);
     border-radius: 5px;
 }
 
 #console-content::-webkit-scrollbar-thumb:hover {
-    background: #666;
+    background: var(--color-bg-elevated);
 }
 
 /* Console Placeholder (when detached) */
@@ -240,13 +240,13 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #777;
+    color: var(--color-text-muted);
     font-size: 14px;
     font-style: italic;
 }
 
 .console-placeholder a {
-    color: #0099ff;
+    color: var(--brand-accent);
     text-decoration: none;
     margin-left: 5px;
 }
@@ -259,10 +259,10 @@
 .console-window {
     z-index: 10000 !important;
     position: fixed !important;
-    background-color: #2d2d2d !important;
-    border: 1px solid #555 !important;
-    border-radius: 4px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    background-color: var(--color-bg-tertiary) !important;
+    border: 1px solid var(--color-border-default) !important;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
     padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -270,11 +270,11 @@
 }
 
 .console-window .draggable-header {
-    background-color: #3e3e3e !important;
-    color: #ccc !important;
+    background-color: var(--color-bg-hover) !important;
+    color: var(--color-text-secondary) !important;
     cursor: move !important;
     padding: 5px 10px !important;
-    border-bottom: 1px solid #555 !important;
+    border-bottom: 1px solid var(--color-border-default) !important;
     font-size: 12px;
     font-weight: bold;
     display: flex;
@@ -284,14 +284,14 @@
 
 .console-window .close-btn {
     cursor: pointer;
-    color: #ccc;
+    color: var(--color-text-secondary);
     font-size: 18px;
     padding: 0 5px;
     line-height: 1;
 }
 
 .console-window .close-btn:hover {
-    color: #f44336;
+    color: var(--color-status-error);
 }
 
 .console-detached-content {
@@ -300,13 +300,13 @@
     flex: 1 1 auto;
     min-height: 0;
     width: 100%;
-    background-color: #2d2d2d;
+    background-color: var(--color-bg-tertiary);
     box-sizing: border-box;
     overflow: hidden;
 }
 
 .console-detached-content #console-toolbar {
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid var(--color-border-default);
     flex-shrink: 0;
 }
 
@@ -321,19 +321,19 @@
 .toolbar-window {
     z-index: 10000 !important;
     position: fixed !important;
-    background-color: #333 !important;
-    border: 1px solid #555 !important;
-    border-radius: 4px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    background-color: var(--color-bg-elevated) !important;
+    border: 1px solid var(--color-border-default) !important;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
     padding: 0 !important;
 }
 
 .toolbar-window .draggable-header {
-    background-color: #3e3e3e !important;
-    color: #ccc !important;
+    background-color: var(--color-bg-hover) !important;
+    color: var(--color-text-secondary) !important;
     cursor: move !important;
     padding: 5px 10px !important;
-    border-bottom: 1px solid #555 !important;
+    border-bottom: 1px solid var(--color-border-default) !important;
     font-size: 12px;
     font-weight: bold;
     display: flex;
@@ -343,18 +343,18 @@
 
 .toolbar-window .close-btn {
     cursor: pointer;
-    color: #ccc;
+    color: var(--color-text-secondary);
     font-size: 18px;
     padding: 0 5px;
     line-height: 1;
 }
 
 .toolbar-window .close-btn:hover {
-    color: #f44336;
+    color: var(--color-status-error);
 }
 
 .toolbar-detached-content {
-    background-color: #333;
+    background-color: var(--color-bg-elevated);
     padding: 5px;
 }
 
@@ -365,19 +365,19 @@
 
 /* Split Gutter for Console Split */
 .gutter.gutter-vertical {
-    background-color: #333;
+    background-color: var(--color-bg-elevated);
     cursor: row-resize;
 }
 
 .gutter.gutter-vertical:hover {
-    background-color: #444;
+    background-color: var(--color-border-default);
 }
 
 /* Console Tabs (for both docked and detached window) */
 .console-tabs {
     display: flex;
-    background-color: #2d2d2d;
-    border-bottom: 1px solid #444;
+    background-color: var(--color-bg-tertiary);
+    border-bottom: 1px solid var(--color-border-default);
     flex-shrink: 0; /* Don't shrink tabs */
     flex-grow: 0; /* Don't grow tabs */
     min-height: 28px; /* Fixed height for tabs */
@@ -386,24 +386,24 @@
 .console-tab {
     padding: 6px 12px;
     cursor: pointer;
-    border-right: 1px solid #444;
+    border-right: 1px solid var(--color-border-default);
     font-size: 11px;
-    color: #999;
-    transition: all 0.2s;
-    background-color: #2d2d2d;
+    color: var(--color-text-muted);
+    transition: all var(--transition-fast);
+    background-color: var(--color-bg-tertiary);
     user-select: none;
 }
 
 .console-tab:hover {
-    background-color: #333;
-    color: #ccc;
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text-secondary);
 }
 
 .console-tab.active {
-    background-color: #3e3e3e;
-    color: #fff;
-    border-bottom: 2px solid #007acc;
-    font-weight: 500;
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
+    border-bottom: 2px solid var(--brand-accent);
+    font-weight: var(--font-weight-medium);
 }
 
 /* Console Tab Content - for docked view */
@@ -412,7 +412,7 @@
     flex: 1 1 auto; /* Take remaining space */
     flex-direction: column;
     overflow: hidden;
-    background-color: #1e1e1e;
+    background-color: var(--color-bg-primary);
     min-height: 0; /* Allow shrinking below content size */
 }
 
@@ -426,7 +426,7 @@
     flex: 1;
     flex-direction: column;
     overflow: hidden;
-    background-color: #1e1e1e;
+    background-color: var(--color-bg-primary);
 }
 
 .console-window .console-tab-content.active {
@@ -438,7 +438,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #777;
+    color: var(--color-text-muted);
     font-size: 13px;
     font-style: italic;
 }
