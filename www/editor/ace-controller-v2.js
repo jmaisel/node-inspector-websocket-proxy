@@ -58,6 +58,7 @@ class AceController {
         this.currentFile = null;
         this.currentDebugLine = null;
         this.debuggerClientLoaded = false;
+        this.boundSuccessfully = false;
 
         // Debugger API client for communicating with node-inspector-websocket-proxy server
         this.debuggerApiClient = new DebuggerApiClient('http://localhost:8080');
@@ -207,6 +208,12 @@ class AceController {
     }
 
     bind() {
+        // Prevent multiple bindings
+        if (this.boundSuccessfully) {
+            this.logger.debug("Already bound, skipping");
+            return;
+        }
+
         this.logger.info("bind()");
 
         // Get reference to the iframe
@@ -232,18 +239,23 @@ class AceController {
                     // Setup breakpoint gutter clicks
                     this.editorHelper.setupBreakpoints(this.debugToolbarHelper);
                 }
+                // Bind Connect button (Debug button)
+                this.bindConnectButton();
+
+                // Bind debug control buttons
+                this.bindDebugControls();
+
+                this.logger.info("Debug controls bound");
+
+                // Mark as successfully bound
+                this.boundSuccessfully = true;
             } else {
                 this.logger.warn("Ace editor not yet available, will retry");
                 // Retry after a short delay
                 setTimeout(() => this.bind(), 100);
+                return; // Don't bind controls until editor is ready
             }
         }
-
-        // Bind Connect button (Debug button)
-        this.bindConnectButton();
-
-        // Bind debug control buttons
-        this.bindDebugControls();
 
         // Note: Console initialization happens in setCtx() when application context is available
     }
