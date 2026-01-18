@@ -15,7 +15,7 @@ After refactoring the controllers to separate HTML templates from controller log
 
 ### 1. Start the server:
 ```bash
-cd /home/badger/Code/debugger-wrapper
+cd /home/badger/Code/node-inspector-websocket-proxy
 npm start
 ```
 

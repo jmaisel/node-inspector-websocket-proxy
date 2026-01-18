@@ -1,29 +1,18 @@
 {
-  "name": "debugger-wrapper",
+  "name": "node-inspector-websocket-proxy",
   "version": "1.0.0",
-  "description": "Simple wrapper for Node.js Inspector API with browser support",
-  "main": "inspector-wrapper.js",
+  "description": "Node.js Inspector WebSocket proxy with GPIO simulation support",
+  "main": "server.js",
   "scripts": {
-    "test": "echo 'Use npm run test:all to run all tests, or npm run test:ui:e2e for E2E tests'",
-    "test:ui:e2e": "node cruft/test/run-ui-tests.js e2e",
-    "test:ui:e2e:headed": "node cruft/test/run-ui-tests.js e2e --headed",
-    "test:ui:e2e:report": "node cruft/test/run-ui-tests.js e2e --report",
-    "test:ui:e2e:headed:report": "node cruft/test/run-ui-tests.js e2e --headed --report",
-    "test:ui:unit": "echo 'Open cruft/test/debugger-ui-unit.html in a browser to run unit tests'",
-    "test:protocol:race": "node cruft/test/protocol/test-event-queue-race-conditions.js",
-    "test:smoke": "echo 'Open http://localhost:8080/test/websocket-protocol-event-queue-smoke.html in a browser (server must be running: npm start)'",
-    "test:all": "node cruft/test/run-ui-tests.js e2e --report",
-    "start": "node start-server.js",
-    "dev": "node start-server.js",
-    "server": "node test-server.js",
-    "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp cruft/client/*.js ../pithagoras/war/debugger-client/"
+    "start": "node server.js",
+    "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp www/client/*.js ../pithagoras/war/debugger-client/"
   },
   "keywords": [
     "inspector",
     "debugger",
-    "wrapper",
-    "browser",
-    "api"
+    "websocket",
+    "proxy",
+    "gpio"
   ],
   "author": "",
   "license": "ISC",
@@ -34,23 +23,16 @@
     "unzipper": "^0.12.3",
     "ws": "^8.18.3"
   },
-  "devDependencies": {
-    "chai": "^6.2.1",
-    "chromedriver": "^143.0.3",
-    "mocha": "^10.8.2",
-    "mocha-headless-chrome": "^5.1.0",
-    "mochawesome": "^7.1.4",
-    "mochawesome-merge": "^5.1.0",
-    "mochawesome-report-generator": "^6.3.2",
-    "selenium-webdriver": "^4.39.0"
-  },
   "server.config": {
     "httpPort": 8080,
     "proxyPort": 8888,
+    "gpioPort": 8081,
     "inspectPort": 9229,
-    "workspaceRoot": "/tmp/debugger-workspace",
-    "demoProjectPath": "www/test",
-    "staticDirs": ["~/Code/debugger-wrapper/www", "~/Code/pithagoras/war"],
+    "workspaceRoot": "/tmp/node-inspector-websocket-proxy",
+    "staticDirs": [
+      "~/Code/node-inspector-websocket-proxy/www",
+      "~/Code/pithagoras/war"
+    ],
     "logLevels": {
       "http": "debug",
       "static": "debug",

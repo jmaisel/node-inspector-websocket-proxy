@@ -15,7 +15,7 @@ GPIO library for the Pithagoras platform - control CircuitJS1 simulator or real 
                │ WebSocket
                ▼
 ┌─────────────────────────────────────┐
-│  debugger-wrapper (Node.js Server)  │
+│  node-inspector-websocket-proxy (Node.js Server)  │
 │  - HTTP API (port 8080)             │
 │  - Debugger WebSocket (port 8888)   │
 │  - GPIO WebSocket (port 8081)       │
@@ -34,7 +34,7 @@ GPIO library for the Pithagoras platform - control CircuitJS1 simulator or real 
 ## Components
 
 ### 1. GPIO WebSocket Server
-**Location:** `debugger-wrapper/server/gpio-websocket-api.js`
+**Location:** `node-inspector-websocket-proxy/server/gpio-websocket-api.js`
 
 - Runs on port 8081
 - Routes messages between simulator and GPIO clients
@@ -51,7 +51,7 @@ GPIO library for the Pithagoras platform - control CircuitJS1 simulator or real 
 - Routes GPIO commands to `window.CircuitJS1` API
 
 ### 3. GPIO Library (User-side)
-**Location:** `debugger-wrapper/pithagoras-gpio/index.js`
+**Location:** `node-inspector-websocket-proxy/pithagoras-gpio/index.js`
 
 - Node.js library for user code
 - Provides clean API: `gpio.pin(17).input()`, `gpio.pin(22).high()`, etc.
@@ -68,9 +68,9 @@ GPIO library for the Pithagoras platform - control CircuitJS1 simulator or real 
 
 ### Prerequisites
 
-1. **Start debugger-wrapper server:**
+1. **Start node-inspector-websocket-proxy server:**
    ```bash
-   cd ../debugger-wrapper
+   cd ../node-inspector-websocket-proxy
    node start-server.js
    ```
 
@@ -182,7 +182,7 @@ This ensures GPIO is only active when there's a debug session with user code run
 
 When working without a physical Raspberry Pi:
 
-1. Run debugger-wrapper locally (already doing this)
+1. Run node-inspector-websocket-proxy locally (already doing this)
 2. User code connects to localhost:8081
 3. Simulator connects to localhost:8081
 4. Everything routes through local server
@@ -191,7 +191,7 @@ When working without a physical Raspberry Pi:
 
 When deploying to actual Raspberry Pi:
 
-1. debugger-wrapper runs on Pi
+1. node-inspector-websocket-proxy runs on Pi
 2. User code runs on Pi (same as simulator mode)
 3. GPIO library switches to `mode: 'hardware'`
 4. Uses `pigpio` or similar for real GPIO control
@@ -199,7 +199,7 @@ When deploying to actual Raspberry Pi:
 ## Troubleshooting
 
 **GPIO client can't connect:**
-- Ensure debugger-wrapper is running
+- Ensure node-inspector-websocket-proxy is running
 - Ensure you started a debug session in Pithagoras
 - Check browser console for GPIO WebSocket connection logs
 
@@ -219,7 +219,7 @@ When deploying to actual Raspberry Pi:
 - `war/lib/gpio-websocket-client.js` - NEW: Simulator-side client
 - `src/.../CirSim.java` - Already has GPIO API methods
 
-### In debugger-wrapper:
+### In node-inspector-websocket-proxy:
 - `test-server.js` - Added GPIO WebSocket API mounting
 - `server/gpio-websocket-api.js` - NEW: WebSocket routing server
 - `pithagoras-gpio/` - NEW: Node.js GPIO library

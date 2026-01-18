@@ -37,7 +37,7 @@ The debugger session is explicitly started for a specific file from the workspac
 ### Step 1: Server Start
 
 ```bash
-node start-workspace-server.js
+node server.js
 ```
 
 Server starts but **NO debugger is running yet**. This is intentional.
@@ -322,7 +322,7 @@ See it in action:
 
 ```bash
 # Start server
-node start-workspace-server.js
+node server.js
 
 # Open in browser
 http://localhost:8080/examples/lifecycle-demo.html

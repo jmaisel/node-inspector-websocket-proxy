@@ -1,0 +1,9 @@
+{
+  "name": "gpio-read",
+  "version": "1.0.0",
+  "description": "Read GPIO pin state changes from the circuit simulator",
+  "main": "example.js",
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}

@@ -2,10 +2,10 @@
  * Example: Pithagoras GPIO Usage
  *
  * This demonstrates how to control GPIO pins in the CircuitJS1 simulator
- * Run this while debugger-wrapper is running and Pithagoras is connected
+ * Run this while node-inspector-websocket-proxy is running and Pithagoras is connected
  */
 
-const GPIO = require('./index.js');
+const GPIO = require('./gpio-driver.js');
 
 async function main() {
     console.log('Starting GPIO example...');
