@@ -385,7 +385,7 @@ class Server {
     </div>
 
     <h2>Tools</h2>
-    <div class="link-box"><h3>Pithagoras</h3><a href="/pithagoras-v2.html">Open Pithagoras</a></div>
+    <div class="link-box"><h3>Pithagoras</h3><a href="/app/index.html">Open Pithagoras</a></div>
     <div class="link-box"><h3>Health Check</h3><a href="/health">View Health (JSON)</a></div>
 
     <script>
