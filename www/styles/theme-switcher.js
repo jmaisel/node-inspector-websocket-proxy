@@ -41,8 +41,11 @@ class ThemeSwitcher {
         // Create UI
         this.createUI();
 
-        // Apply simulator background after a delay to ensure iframe is loaded
-        setTimeout(() => this.applySimulatorBackground(), 1000);
+        // Apply simulator background and Ace theme after a delay to ensure iframes are loaded
+        setTimeout(() => {
+            this.applySimulatorBackground();
+            this.applyAceTheme();
+        }, 1000);
 
         this.logger.info(`Theme initialized: ${this.currentTheme}`);
         console.log('🎨 Theme Switcher: UI created successfully');
@@ -92,9 +95,59 @@ class ThemeSwitcher {
         // Apply simulator background color
         this.applySimulatorBackground();
 
+        // Apply Ace editor theme
+        this.applyAceTheme();
+
         // Publish theme change event
         if (window.application && application.pub) {
             application.pub('theme:changed', { theme: themeId });
+        }
+    }
+
+    /**
+     * Apply theme to Ace editor
+     */
+    applyAceTheme() {
+        try {
+            // Get the Ace theme from CSS variable
+            const aceTheme = getComputedStyle(document.documentElement)
+                .getPropertyValue('--ace-theme')
+                .trim();
+
+            if (!aceTheme) {
+                this.logger.warn('No --ace-theme CSS variable found');
+                return;
+            }
+
+            this.logger.info(`Applying Ace theme: ${aceTheme}`);
+
+            // Find Ace editor iframe
+            const codeFrame = document.getElementById('code');
+            if (!codeFrame) {
+                this.logger.warn('Ace editor iframe not found');
+                return;
+            }
+
+            // Wait for iframe to be ready
+            const applyTheme = () => {
+                try {
+                    const codeWindow = codeFrame.contentWindow;
+                    if (codeWindow && codeWindow.editor && codeWindow.editor.setTheme) {
+                        codeWindow.editor.setTheme(`ace/theme/${aceTheme}`);
+                        this.logger.info(`✓ Ace theme set to: ${aceTheme}`);
+                    } else {
+                        this.logger.warn('Ace editor not available yet');
+                    }
+                } catch (e) {
+                    this.logger.warn('Could not access Ace editor iframe', e);
+                }
+            };
+
+            // Try immediately and also after a short delay
+            applyTheme();
+            setTimeout(applyTheme, 500);
+        } catch (e) {
+            this.logger.error('Error applying Ace theme', e);
         }
     }
 

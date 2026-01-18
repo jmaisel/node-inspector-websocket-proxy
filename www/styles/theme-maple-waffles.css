@@ -56,4 +56,7 @@
 
   /* Simulator Background */
   --simulator-bg: #2b1d0e;
+
+  /* Ace Editor Theme */
+  --ace-theme: monokai;
 }

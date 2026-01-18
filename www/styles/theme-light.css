@@ -56,4 +56,7 @@
 
   /* Simulator Background */
   --simulator-bg: #ffffff;
+
+  /* Ace Editor Theme */
+  --ace-theme: chrome;
 }
