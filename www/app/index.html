@@ -70,6 +70,9 @@
     <!-- ace editor controller - NEW VERSION -->
     <script type="module" src="/editor/ace-controller-v2.js"></script>
 
+    <!-- file tree controller -->
+    <script src="/editor/file-tree-controller.js"></script>
+
     <!-- project manager -->
     <script src="/project-ui/project-manager.js"></script>
     <script src="/project-ui/project-ui-controller.js"></script>
@@ -90,6 +93,7 @@
     <script src="/app/observable-map.js"></script>
     <script src="/app/gutter-controller.js"></script>
     <script src="/app/mode-controller.js"></script>
+    <script src="/app/toolbar-controller.js"></script>
     <script src="/app/app-bootstrap.js"></script>
 </head>
 
@@ -337,11 +341,11 @@
     </div>
 
     <script>
-        // $(function() {
         $(document).ready(function(){
             const logger = new Logger("pithagoras-v2.html");
-            $.fn.once = function (type, fn, uid) {
 
+            // jQuery utility for one-time event binding
+            $.fn.once = function (type, fn, uid) {
                 if(uid === undefined) {
                     logger.error("Called $.once without uid\n", this, "\n", fn);
                 }
@@ -354,216 +358,15 @@
                 }
             };
 
-            // File tree toggle functionality
+            // Helper function to resize Ace editor (used by console split)
             function resizeAceEditor() {
-                const codeFrame = document.getElementById('code');
-                if (codeFrame && codeFrame.contentWindow) {
-                    try {
-                        // Try multiple methods to trigger resize
-                        if (codeFrame.contentWindow.editor && typeof codeFrame.contentWindow.editor.resize === 'function') {
-                            codeFrame.contentWindow.editor.resize();
-                            logger.log('Ace editor resized directly');
-                        }
-                    } catch (e) {
-                        logger.log('Could not resize ace editor:', e);
-                    }
+                if (window.application && window.application.fileTreeController) {
+                    window.application.fileTreeController.resizeAceEditor();
                 }
             }
 
-            // Use event delegation since the button is rendered dynamically by DebuggerUIApplet
-            $(document).on('click', '#toggle-filetree', function() {
-                const panel = $('#file-tree-panel');
-                const container = $('#code-editor-container');
-
-                // Toggle classes on both elements for synchronized animation
-                panel.toggleClass('collapsed');
-                container.toggleClass('panel-collapsed');
-
-                // Use transitionend event to know exactly when animation completes
-                panel.one('transitionend', function() {
-                    resizeAceEditor();
-                });
-
-                // Fallback timeout in case transitionend doesn't fire
-                setTimeout(resizeAceEditor, 400);
-            });
-
-            // File tree filter functionality
-            $(document).on('input', '#file-tree-search', function() {
-                const searchTerm = $(this).val().toLowerCase();
-                const clearBtn = $('#clear-file-search');
-
-                // Show/hide clear button
-                if (searchTerm) {
-                    clearBtn.addClass('visible');
-                } else {
-                    clearBtn.removeClass('visible');
-                }
-
-                // Filter file tree items
-                $('#file-tree .file-tree-item, #file-tree .tree-file').each(function() {
-                    const fileName = $(this).text().toLowerCase();
-                    if (fileName.includes(searchTerm)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-
-                // Handle tree nodes - show parent nodes if any child matches
-                $('#file-tree .tree-node').each(function() {
-                    const $node = $(this);
-                    const $children = $node.find('.tree-file:visible, .file-tree-item:visible');
-                    if ($children.length > 0 || searchTerm === '') {
-                        $node.show();
-                    } else {
-                        $node.hide();
-                    }
-                });
-            });
-
-            // Clear button functionality
-            $(document).on('click', '#clear-file-search', function() {
-                const searchInput = $('#file-tree-search');
-                searchInput.val('').trigger('input');
-                searchInput.focus();
-            });
-
-            // Mode dropdown handler
-            $(document).on('click', '#mode-menu-btn', function(e) {
-                e.stopPropagation();
-                const dropdown = $('#mode-dropdown-content');
-
-                // Toggle dropdown
-                const isVisible = dropdown.hasClass('show');
-                $('.toolbar-dropdown-content').removeClass('show');
-
-                if (!isVisible) {
-                    dropdown.addClass('show');
-
-                    // Position dropdown below button
-                    const rect = this.getBoundingClientRect();
-                    dropdown.css({
-                        top: (rect.bottom + 2) + 'px',
-                        left: rect.left + 'px'
-                    });
-                }
-            });
-
-            // Mode menu item handlers
-            $(document).on('click', '#mode-design-btn', function(e) {
-                e.stopPropagation();
-                if (window.application && window.application.dbtsMenuController) {
-                    window.application.dbtsMenuController.designMode();
-                    $('#mode-dropdown-content').removeClass('show');
-                }
-            });
-
-            $(document).on('click', '#mode-build-btn', function(e) {
-                e.stopPropagation();
-                if (window.application && window.application.dbtsMenuController) {
-                    window.application.dbtsMenuController.buildMode();
-                    $('#mode-dropdown-content').removeClass('show');
-                }
-            });
-
-            // Theme dropdown handler
-            $(document).on('click', '#theme-menu-btn', function(e) {
-                e.stopPropagation();
-                const dropdown = $('#theme-dropdown-content');
-
-                // Populate dropdown if empty
-                if (dropdown.children().length === 0 && window.themeSwitcher && window.themeSwitcher.themes) {
-                    window.themeSwitcher.themes.forEach(theme => {
-                        const option = $('<div>')
-                            .addClass('menu-item')
-                            .attr('data-theme', theme.id)
-                            .html(`${theme.icon} ${theme.name}`)
-                            .attr('title', `Switch to ${theme.name} theme`);
-
-                        if (theme.id === window.themeSwitcher.currentTheme) {
-                            option.css('font-weight', 'bold');
-                        }
-
-                        option.on('click', function(e) {
-                            e.stopPropagation();
-                            window.themeSwitcher.applyTheme(theme.id);
-                            dropdown.removeClass('show');
-
-                            // Update active indicator
-                            dropdown.find('.menu-item').css('font-weight', 'normal');
-                            $(this).css('font-weight', 'bold');
-                        });
-
-                        dropdown.append(option);
-                    });
-                }
-
-                // Toggle dropdown
-                const isVisible = dropdown.hasClass('show');
-                $('.toolbar-dropdown-content').removeClass('show');
-
-                if (!isVisible) {
-                    dropdown.addClass('show');
-
-                    // Position dropdown below button
-                    const rect = this.getBoundingClientRect();
-                    dropdown.css({
-                        top: (rect.bottom + 2) + 'px',
-                        left: rect.left + 'px'
-                    });
-                }
-            });
-
-            // Close dropdowns when clicking outside
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('.toolbar-dropdown').length) {
-                    $('.toolbar-dropdown-content').removeClass('show');
-                }
-            });
-
-            // Fullscreen button handler
-            $(document).on('click', '#fullscreen-btn', function() {
-                const elem = document.documentElement;
-                const icon = $('#fullscreen-icon');
-
-                if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
-                    // Enter fullscreen
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                    } else if (elem.webkitRequestFullscreen) {
-                        elem.webkitRequestFullscreen();
-                    } else if (elem.mozRequestFullScreen) {
-                        elem.mozRequestFullScreen();
-                    } else if (elem.msRequestFullscreen) {
-                        elem.msRequestFullscreen();
-                    }
-                } else {
-                    // Exit fullscreen
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    } else if (document.mozCancelFullScreen) {
-                        document.mozCancelFullScreen();
-                    } else if (document.msExitFullscreen) {
-                        document.msExitFullscreen();
-                    }
-                }
-            });
-
-            // Update fullscreen icon when fullscreen state changes
-            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
-                const icon = $('#fullscreen-icon');
-                if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
-                    icon.text('⛶'); // Exit fullscreen icon
-                } else {
-                    icon.text('⛶'); // Enter fullscreen icon (using same icon for now)
-                }
-            });
-
-            // this is a hack
-            setTimeout(()=>{
+            // Initialize application after delay (ensures iframes are loaded)
+            setTimeout(() => {
                 logger.log("================= INITIALIZING PITHAGORAS V2 ==================");
 
                 // Clear any collapsed state

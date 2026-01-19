@@ -216,6 +216,14 @@ class Pithagoras {
         ctx.projectUIController = new ProjectUIController(ctx.projectManager);
         ctx.projectUIController.initialize();
 
+        // Initialize file tree controller
+        ctx.fileTreeController.setCtx(ctx);
+        ctx.fileTreeController.initialize();
+
+        // Initialize toolbar controller
+        ctx.toolbarController.setCtx(ctx);
+        ctx.toolbarController.initialize();
+
         ctx.dbtsMenuController.designMode();
         ctx.gutter.controls.adjust();
 
@@ -278,6 +286,9 @@ class Pithagoras {
 
             projectManager: new ProjectManager(ctx),
             projectUIController: null, // Will be initialized after projectManager
+
+            fileTreeController: new FileTreeController(),
+            toolbarController: new ToolbarController(),
 
             stepContentView: $('#step-content'),
             stepControls: $('#step-controls')
