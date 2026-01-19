@@ -8,21 +8,10 @@ class CircuitModel{
         this.logger = new Logger('CircuitModel');
         CircuitModel.logger = this.logger;
 
-        // Start loading the profile asynchronously and store the promise
-        this._profilePromise = CircuitModel.setProfile('/breadboard/hardware-profile.json');
-        this._profilePromise.then(() => {
-            this.profile = CircuitModel.profile;
-        }).catch(err => {
-            this.logger.error('Failed to load hardware profile:', err);
-        });
+        CircuitModel.setProfile('/breadboard/hardware-profile.json');
+        this.profile = CircuitModel.profile;
 
         // this.application.simulator.oncircuitread()
-    }
-
-    // Wait for profile to be loaded
-    async ready() {
-        await this._profilePromise;
-        return this;
     }
 
     static setProfile(uri){
@@ -30,29 +19,25 @@ class CircuitModel{
         // this.logger.debug("fetching hardware profile");
         let that = CircuitModel;
 
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: uri,
-                type: 'GET',
-                success: function(data) {
-                    that.logger.debug('hardware profile loaded', uri, data);
+        $.ajax({
+            url: uri,
+            type: 'GET',
+            async: false,  // MUST be synchronous - profile needed immediately
+            success: function(data) {
+                that.logger.debug('hardware profile loaded', uri, data);
 
-                    try {
-                        if(typeof(data) === 'string'){
-                            data = JSON.parse(data);
-                        }
-                        that.profile = data;
-                        resolve(data);
-                    } catch (parseError) {
-                        that.logger.error('Failed to parse hardware profile', uri, parseError);
-                        reject(parseError);
+                try {
+                    if(typeof(data) === 'string'){
+                        data = JSON.parse(data);
                     }
-                },
-                error: function(xhr, status, error) {
-                    that.logger.error('Failed to load hardware profile', uri, error);
-                    reject(error);
+                    that.profile = data;
+                } catch (parseError) {
+                    that.logger.error('Failed to parse hardware profile', uri, parseError);
                 }
-            });
+            },
+            error: function(xhr, status, error) {
+                that.logger.error('Failed to load hardware profile', uri, error);
+            }
         });
     }
 

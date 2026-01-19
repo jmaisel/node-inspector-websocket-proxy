@@ -55,6 +55,9 @@
     <script src="/debugger/api/debugger-api-client.js"></script>
 
     <!-- ace editor helpers -->
+    <script src="/editor/project-api.js"></script>
+    <script src="/editor/project-ui.js"></script>
+    <script src="/editor/project-file-tree.js"></script>
     <script src="/editor/project-helper.js"></script>
     <script src="/debugger/api/debugger-connection-helper.js"></script>
     <script src="/debugger/api/debugger-event-helper.js"></script>
@@ -83,7 +86,11 @@
     <!-- Circuit Menu Builder -->
     <script src="/app/circuit-menu-builder.js"></script>
 
-    <script src="/app/main.js"></script>
+    <!-- Application modules (extracted from main.js) -->
+    <script src="/app/observable-map.js"></script>
+    <script src="/app/gutter-controller.js"></script>
+    <script src="/app/mode-controller.js"></script>
+    <script src="/app/app-bootstrap.js"></script>
 </head>
 
 <body>
@@ -208,6 +215,17 @@
             </button>
         </div>
 
+        <!-- Spacer to push fullscreen button to the right -->
+        <div style="flex: 1;"></div>
+
+        <!-- Fullscreen button -->
+        <div class="toolbar-section">
+            <button id="fullscreen-btn" class="toolbar-btn toolbar-btn-vertical" title="Toggle Fullscreen">
+                <span class="btn-icon" id="fullscreen-icon">⛶</span>
+                <span class="btn-label">Fullscreen</span>
+            </button>
+        </div>
+
     </div>
 
     <!-- Hidden project buttons for maintaining existing functionality -->
@@ -313,7 +331,6 @@
                     <input type="button"      id="resetBtn"   value="Reset" style="position: relative; bottom: 13px"/>
                     <img class="gutter-btn" id="nextBtn" src="/img/left-chevrons.png" height="35" style="transform: rotate(90deg)"/>
                 </div>
-
             </div>
         </div>
 
@@ -505,6 +522,46 @@
                 }
             });
 
+            // Fullscreen button handler
+            $(document).on('click', '#fullscreen-btn', function() {
+                const elem = document.documentElement;
+                const icon = $('#fullscreen-icon');
+
+                if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+                    // Enter fullscreen
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                    } else if (elem.mozRequestFullScreen) {
+                        elem.mozRequestFullScreen();
+                    } else if (elem.msRequestFullscreen) {
+                        elem.msRequestFullscreen();
+                    }
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            });
+
+            // Update fullscreen icon when fullscreen state changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
+                const icon = $('#fullscreen-icon');
+                if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+                    icon.text('⛶'); // Exit fullscreen icon
+                } else {
+                    icon.text('⛶'); // Enter fullscreen icon (using same icon for now)
+                }
+            });
+
             // this is a hack
             setTimeout(()=>{
                 logger.log("================= INITIALIZING PITHAGORAS V2 ==================");
@@ -519,7 +576,7 @@
                 const consoleSplit = Split(['#code-editor-container', '#console-panel'], {
                     direction: 'vertical',
                     sizes: [70, 30],
-                    minSize: [200, 150],
+                    minSize: [50, 28],
                     gutterSize: 8,
                     cursor: 'row-resize',
                     snapOffset: 0,  // Disable snapping
