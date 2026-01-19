@@ -325,14 +325,13 @@ iframe{
     border-right: 1px solid var(--color-border-default);
     display: flex;
     flex-direction: column;
-    transition: margin-left var(--transition-slow), width var(--transition-slow);
+    transition: width var(--transition-slow);
     overflow: hidden;
     position: relative;
 }
 
 .file-tree-panel.collapsed {
-    margin-left: -250px;
-    width: 30px; /* Wide enough for toggle button */
+    width: 30px;
     min-width: 30px;
 }
 
@@ -342,6 +341,13 @@ iframe{
     overflow-x: hidden;
     padding: 5px;
     font-size: 12px;
+    transition: width var(--transition-slow);
+}
+
+.file-tree-panel.collapsed .file-tree-content {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 .file-tree-placeholder {
@@ -484,10 +490,6 @@ iframe{
     flex: 1;
     border: none;
     width: 100%;
-}
-
-#code-editor-container.panel-collapsed #code {
-    margin-left: 250px;
 }
 
 #logo-btn-container {
@@ -1066,8 +1068,11 @@ div.pm-bom-row:hover {
     font-size: 16px;
     cursor: pointer;
     padding: 4px 8px;
-    transition: all var(--transition-fast);
-    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+    position: absolute;
+    right: 4px;
+    top: 6px;
+    z-index: 10;
 }
 
 .file-tree-toggle:hover {
