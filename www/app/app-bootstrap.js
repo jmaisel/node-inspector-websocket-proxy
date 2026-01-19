@@ -443,10 +443,20 @@ class Pithagoras {
     }
 
     /**
+     * Get application version from splash screen
+     * @returns {string} Version string
+     */
+    getVersion() {
+        const versionEl = document.getElementById('splash-version');
+        return versionEl ? versionEl.textContent : 'unknown';
+    }
+
+    /**
      * Emit initialization started event and log
      */
     initializing() {
-        this.logger.log("================= INITIALIZING PITHAGORAS V2 ==================");
+        const version = this.getVersion();
+        this.logger.log(`================= INITIALIZING PITHAGORAS ${version} ==================`);
 
         // Show splash screen
         this.showSplashScreen();
@@ -455,7 +465,7 @@ class Pithagoras {
         if (this.pub) {
             this.pub('application:initializing', {
                 timestamp: Date.now(),
-                version: 'v2'
+                version: version
             });
         }
     }
@@ -464,7 +474,8 @@ class Pithagoras {
      * Emit initialization completed event and log
      */
     initialized() {
-        this.logger.log("================= DONE INITIALIZING PITHAGORAS V2 ==================");
+        const version = this.getVersion();
+        this.logger.log(`================= DONE INITIALIZING PITHAGORAS ${version} ==================`);
 
         // Hide splash screen
         this.hideSplashScreen();
@@ -473,7 +484,7 @@ class Pithagoras {
         if (this.pub) {
             this.pub('application:initialized', {
                 timestamp: Date.now(),
-                version: 'v2'
+                version: version
             });
         }
     }
