@@ -8,7 +8,7 @@ class CircuitModel{
         this.logger = new Logger("CircuitModel");
         CircuitModel.logger = this.logger;
 
-        CircuitModel.setProfile("/lib/breadboard/hardware-profile.json");
+        CircuitModel.setProfile("/breadboard/hardware-profile.json");
         this.profile = CircuitModel.profile;
 
         // this.application.simulator.oncircuitread()
