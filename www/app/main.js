@@ -573,7 +573,16 @@ class Pithagoras{
                 menuBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     logger.info("Circuits menu button clicked, toggling dropdown");
-                    dropdown.classList.toggle('show');
+
+                    const isShowing = dropdown.classList.toggle('show');
+
+                    if (isShowing) {
+                        // Position dropdown below the button using fixed positioning
+                        const rect = menuBtn.getBoundingClientRect();
+                        dropdown.style.top = (rect.bottom + 4) + 'px';
+                        dropdown.style.left = rect.left + 'px';
+                        logger.info("Positioned dropdown at top:", dropdown.style.top, "left:", dropdown.style.left);
+                    }
                 });
             } else {
                 logger.error("Circuits menu button not found");

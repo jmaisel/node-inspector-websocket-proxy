@@ -1009,7 +1009,7 @@ div.pm-bom-row:hover {
     gap: 8px;
     flex-wrap: wrap;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
 }
 
 .toolbar-group {
@@ -1058,9 +1058,7 @@ div.pm-bom-row:hover {
 
 .circuits-dropdown-content {
     display: none;
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
+    position: fixed;
     background: var(--color-bg-elevated);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
