@@ -367,58 +367,17 @@ class Pithagoras {
 
         // Subscribe to all events to show initialization progress
         this.splashEventSubscription = this.sub(/.*/, (eventName, data) => {
-            // Map event names to user-friendly messages
-            const statusMessages = {
-                'application:initializing': 'Starting application...',
-                'application:init:simulator': 'Connecting to simulator...',
-                'application:init:breadboard': 'Rendering breadboard...',
-                'application:init:controllers': 'Initializing controllers...',
-                'application:init:editor': 'Loading code editor...',
-                'application:init:project': 'Loading project...',
-                'application:init:filetree': 'Setting up file tree...',
-                'application:init:toolbar': 'Configuring toolbar...',
-                'application:init:layout': 'Adjusting layout...',
-                'application:init:circuits': 'Loading circuits menu...',
-                'application:init:menus': 'Setting up menus...',
-                'application:init:splits': 'Configuring split views...',
-                'circuit:loaded': 'Circuit loaded',
-                'circuit:cleared': 'Circuit cleared',
-                'mode:design:entered': 'Design mode ready',
-                'mode:build:entered': 'Build mode ready',
-                'debugger:connected': 'Debugger connected',
-                'debugger:disconnected': 'Debugger disconnected',
-                'project:loaded': 'Project loaded',
-                'project:saved': 'Project saved',
-                'theme:changed': 'Theme applied'
-            };
+            // Filter out events we don't want to show
+            const skipPatterns = [
+                /^circuit:(view|elements):/,  // Skip view/drag events during runtime
+                /:(debug|trace|error|warn)$/  // Skip non-info log levels
+            ];
 
-            // Check for logger events (from Logger class)
-            if (eventName.includes(':info') || eventName.includes(':log')) {
-                // Extract component name and show relevant initialization messages
-                const loggerMatch = eventName.match(/^(.+?):(info|log)$/);
-                if (loggerMatch) {
-                    const component = loggerMatch[1];
-                    const componentMessages = {
-                        'Pithagoras': 'Initializing core...',
-                        'ProjectManager': 'Loading project manager...',
-                        'AceControllerV2': 'Setting up code editor...',
-                        'ConsoleUIController': 'Initializing console...',
-                        'FileTreeController': 'Loading file tree...',
-                        'ToolbarController': 'Setting up toolbar...',
-                        'initCircuitMenu': 'Loading circuits menu...',
-                        'ThemeSwitcher': 'Applying theme...'
-                    };
+            const shouldSkip = skipPatterns.some(pattern => pattern.test(eventName));
+            if (shouldSkip) return;
 
-                    if (componentMessages[component]) {
-                        this.updateSplashStatus(componentMessages[component]);
-                    }
-                }
-            }
-
-            // Show mapped status messages
-            if (statusMessages[eventName]) {
-                this.updateSplashStatus(statusMessages[eventName]);
-            }
+            // Show ALL events - display the raw event name
+            this.updateSplashStatus(eventName);
         });
     }
 
@@ -439,8 +398,8 @@ class Pithagoras {
         }
 
         // Calculate how long since version was loaded (or splash was shown if version never loaded)
-        const MIN_DISPLAY_TIME = 2000; // 2 seconds minimum after version loads
-        const FADE_DURATION = 1500; // 1.5 seconds fade
+        const MIN_DISPLAY_TIME = 3000; // 2 seconds minimum after version loads
+        const FADE_DURATION = 3500; // 1.5 seconds fade
 
         // Use version loaded time if available, otherwise fall back to splash shown time
         const referenceTime = this.versionLoadedTime || this.splashShownTime || Date.now();

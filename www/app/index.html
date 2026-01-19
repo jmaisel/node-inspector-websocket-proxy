@@ -48,11 +48,11 @@
         .splash-content {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             padding: 60px 80px;
-            border-radius: 20px;
+            border-radius: 250px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             text-align: center;
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 5px solid rgb(192, 157, 73);
             max-width: 500px;
             animation: modalFadeIn 0.3s ease-out;
         }
@@ -72,11 +72,54 @@
             font-size: 48px;
             font-weight: bold;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(
+                90deg,
+                #ff0000,
+                #ff4500,
+                #ff8c00,
+                #ffa500,
+                #ffd700,
+                #ffff00,
+                #ffd700,
+                #ffa500,
+                #ff8c00,
+                #ff4500,
+                #ff0000,
+                #ff4500,
+                #ff8c00,
+                #ffa500,
+                #ffd700,
+                #ffff00
+            );
+            background-size: 200% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: 2px;
+            animation: fireGradientShift 6s ease-in-out infinite;
+        }
+
+        @keyframes fireGradientShift {
+            0% {
+                background-position: 0% 50%;
+                filter: hue-rotate(0deg);
+            }
+            25% {
+                background-position: 50% 50%;
+                filter: hue-rotate(15deg);
+            }
+            50% {
+                background-position: 100% 50%;
+                filter: hue-rotate(0deg);
+            }
+            75% {
+                background-position: 150% 50%;
+                filter: hue-rotate(-15deg);
+            }
+            100% {
+                background-position: 200% 50%;
+                filter: hue-rotate(0deg);
+            }
         }
 
         .splash-subtitle {
@@ -238,10 +281,11 @@
     <!-- Splash Screen -->
     <div id="splash-screen">
         <div class="splash-content">
+            <div>Joebotics Presents</div>
             <div class="splash-logo">Brometheus</div>
+            <div class="splash-subtitle">AR - Integrated Development Environment</div>
             <div class="splash-version" id="splash-version">Loading version...</div>
             <div class="splash-logo-container">
-                <div class="splash-subtitle">Interactive Electronics Learning Platform</div>
                 <img src="/img/jb-logo.png" alt="Pithagoras Logo" style="padding-left: -2px; margin-top: -11px; filter: invert(100%)" width="220">
                 <div class="splash-spinner"></div>
             </div>
