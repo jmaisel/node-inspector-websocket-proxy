@@ -8,22 +8,22 @@ class Logger{
      * @type {Object.<string, string>}
      */
     static LEVEL = {
-        DEBUG: "debug",
-        INFO:  "info",
-        WARN:  "warn",
-        ERROR: "error"
-    }
+        DEBUG: 'debug',
+        INFO:  'info',
+        WARN:  'warn',
+        ERROR: 'error'
+    };
 
     /**
      * Log level priorities (lower number = more verbose)
      * @type {Object.<string, number>}
      */
     static LEVEL_PRIORITY = {
-        "debug": 0,
-        "info": 1,
-        "warn": 2,
-        "error": 3
-    }
+        'debug': 0,
+        'info': 1,
+        'warn': 2,
+        'error': 3
+    };
 
     /**
      * Creates a new Logger instance
@@ -32,8 +32,8 @@ class Logger{
      * @param {string} [minLogLevel="debug"] - Minimum log level to output (debug, info, warn, error)
      */
     constructor(label, defaultLogLevel, minLogLevel) {
-        this.defaultLogLevel = defaultLogLevel || "info";
-        this.minLogLevel = minLogLevel || "debug";
+        this.defaultLogLevel = defaultLogLevel || 'info';
+        this.minLogLevel = minLogLevel || 'debug';
         this.label = label;
     }
 

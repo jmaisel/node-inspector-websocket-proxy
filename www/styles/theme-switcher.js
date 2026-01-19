@@ -98,9 +98,32 @@ class ThemeSwitcher {
         // Apply Ace editor theme
         this.applyAceTheme();
 
+        // Notify simulator iframe of theme change
+        this.notifySimulatorIframe(themeId);
+
         // Publish theme change event
         if (window.application && application.pub) {
             application.pub('theme:changed', { theme: themeId });
+        }
+    }
+
+    /**
+     * Notify simulator iframe of theme change
+     */
+    notifySimulatorIframe(themeId) {
+        try {
+            const simFrame = document.getElementById('simFrame') ||
+                             document.getElementById('circuitFrame');
+
+            if (simFrame && simFrame.contentWindow) {
+                simFrame.contentWindow.postMessage({
+                    type: 'theme-change',
+                    theme: themeId
+                }, '*');
+                this.logger.info(`✓ Notified simulator iframe of theme change: ${themeId}`);
+            }
+        } catch (e) {
+            this.logger.warn('Could not notify simulator iframe', e);
         }
     }
 

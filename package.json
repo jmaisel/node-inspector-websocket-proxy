@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp www/client/*.js ../pithagoras/war/debugger-client/"
+    "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp www/client/*.js ../pithagoras/war/debugger-client/",
+    "lint": "eslint www/**/*.js server/**/*.js util/**/*.js *.js",
+    "lint:fix": "eslint --fix www/**/*.js server/**/*.js util/**/*.js *.js"
   },
   "keywords": [
     "inspector",
@@ -38,5 +40,8 @@
       "static": "debug",
       "websocket": "debug"
     }
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
   }
 }

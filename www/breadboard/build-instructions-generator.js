@@ -1,10 +1,10 @@
 class BuildStep{
 
     static TYPE = {
-        INFORMATIONAL: "informational",
-        PLACE_COMPONENT: "place_component",
-        CONNECT_COMPONENT: "connect_component"
-    }
+        INFORMATIONAL: 'informational',
+        PLACE_COMPONENT: 'place_component',
+        CONNECT_COMPONENT: 'connect_component'
+    };
 
     constructor(text, type = BuildStep.TYPE.INFORMATIONAL, src, dest){
         this.text = text;
@@ -19,7 +19,7 @@ class BomBasedBuildInstructions{
         this.logger = new Logger(this.constructor.name);
         this.application = application;
 
-        this.logger.debug("new BomBasedBuildInstructions", {application});
+        this.logger.debug('new BomBasedBuildInstructions', {application});
     }
 
     // Helper to get user-friendly labels for power/ground/GPIO components
@@ -133,7 +133,7 @@ class BomBasedBuildInstructions{
     // }
 
     generate(){
-        this.logger.info("generate");
+        this.logger.info('generate');
 
         let instructions = [
             new BuildStep('First, we will place the components on the breadboard.'),
@@ -142,7 +142,7 @@ class BomBasedBuildInstructions{
         let trackit = new Set();
         let bom = this.application.circuitModel.asBOM();
         let wiring = this.application.circuitModel.simplify();
-        let wiringSteps = [new BuildStep('Now we will connect the components with wires.')]
+        let wiringSteps = [new BuildStep('Now we will connect the components with wires.')];
 
         // Track connected components to create a minimal spanning tree
         // unionFind maps each pin to its root pin
@@ -170,20 +170,20 @@ class BomBasedBuildInstructions{
             return false; // Already connected
         };
 
-        this.logger.info("BOM has", bom.lineItems.size, "line items");
-        this.logger.info("Wiring has", wiring.size, "connections");
+        this.logger.info('BOM has', bom.lineItems.size, 'line items');
+        this.logger.info('Wiring has', wiring.size, 'connections');
 
         // first place all the components on the breadboard
         // Iterate over the BOM data model, not DOM elements
         for (let [fullLabel, lineItem] of bom.lineItems) {
-            this.logger.debug("Processing line item:", fullLabel, lineItem);
+            this.logger.debug('Processing line item:', fullLabel, lineItem);
 
             let compMsg = `Place each ${lineItem.label} on the breadboard`;
             instructions.push(new BuildStep(compMsg));
 
             // Iterate over each component instance in this line item
             lineItem.jsids.forEach(jsid => {
-                this.logger.debug("Processing component:", jsid);
+                this.logger.debug('Processing component:', jsid);
 
                 compMsg = `Place the ${lineItem.fullLabel} ${CircuitModel.getCharacteristics(jsid)} on the breadboard`;
                 instructions.push(new BuildStep(compMsg, BuildStep.TYPE.PLACE_COMPONENT, {comp: jsid}));
@@ -203,7 +203,7 @@ class BomBasedBuildInstructions{
                     }
                 }
 
-                this.logger.debug("Component has", pins.length, "pins");
+                this.logger.debug('Component has', pins.length, 'pins');
 
                 pins.forEach(pin => {
                     let criteria = {comp: jsid, pin: pin.physicalPin-1};
@@ -305,8 +305,8 @@ class BomBasedBuildInstructions{
         // then connect all the components with wires
         instructions.push(...wiringSteps);
 
-        this.logger.info("Generated", instructions.length, "total instructions");
-        console.log("instructions", instructions.length, "steps generated");
+        this.logger.info('Generated', instructions.length, 'total instructions');
+        console.log('instructions', instructions.length, 'steps generated');
 
         return instructions;
     }

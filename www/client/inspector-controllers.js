@@ -98,7 +98,7 @@ class BaseDomainController extends EventEmitter {
      */
     send(method, params = {}) {
 
-        console.log("send:", method, params);
+        console.log('send:', method, params);
 
         const queue = BaseDomainController.getEventQueue();
         const fullMethod = `${this.domain}.${method}`;

@@ -2,7 +2,7 @@ const { spawn } = require('child_process');
 const WebSocket = require('ws');
 const http = require('http');
 const path = require('path');
-const Logger = require("./util/logger")
+const Logger = require('./util/logger');
 
 /**
  * Bidirectional message proxy between client and Node debugger WebSockets
@@ -17,7 +17,7 @@ class Proxy{
         this.nodews = nws;
         this.clientws = cws;
         this.logLevel = logLevel || 'debug';
-        this.logger = new Logger("Proxy", "info", this.logLevel);
+        this.logger = new Logger('Proxy', 'info', this.logLevel);
     }
 
     /**
@@ -25,13 +25,13 @@ class Proxy{
      */
     patch(){
 
-        this.clientws.addEventListener("message", message =>{
+        this.clientws.addEventListener('message', message =>{
             // Logging disabled - causes CPU pegging with high message volume
             // this.logger.info("clientws onmessage", message.data);
             this.nodews.send(message.data);
         });
 
-        this.nodews.on("message", message =>{
+        this.nodews.on('message', message =>{
             // Logging disabled - causes CPU pegging with high message volume
             // this.logger.info("nodews onmessage", message.toString());
             this.clientws.send(message.toString());
@@ -74,7 +74,7 @@ class RemoteDebuggerProxyServer {
         this.server = null;
         this.appProcess = null;
         this.activeProxies = [];
-        this.logger = new Logger("RemoteDebuggerProxyServer", "info", this.logLevel);
+        this.logger = new Logger('RemoteDebuggerProxyServer', 'info', this.logLevel);
     }
 
     /**
@@ -213,8 +213,8 @@ class RemoteDebuggerProxyServer {
 
             if (match && !this.debuggerURL) {
                 this.debuggerURL = match[0];
-                const uri = this.debuggerURL.replaceAll("ws://", "");
-                let spec = uri.split("/")[0].split(":");
+                const uri = this.debuggerURL.replaceAll('ws://', '');
+                let spec = uri.split('/')[0].split(':');
                 let host = spec[0];
                 let port = spec[1];
                 let guid = uri.split('/')[1];
@@ -245,7 +245,7 @@ class RemoteDebuggerProxyServer {
      * @private
      */
     connectToDebugger() {
-        this.logger.info("attempting to connect to debugger at:", this.debuggerURL);
+        this.logger.info('attempting to connect to debugger at:', this.debuggerURL);
         this.wsDebugger = new WebSocket(this.debuggerURL);
 
         this.wsDebugger.on('open', () => {

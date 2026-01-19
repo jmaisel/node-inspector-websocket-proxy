@@ -14,8 +14,8 @@ class Inspector {
         this.$element.append(`<div class="inspector-content"></div>`);
 
         // make the window draggable with a collapsing title bar
-        this.draggable = this.$element.draggable({handle: ".inspector-title"});
-        $(".inspector-title").once("click", ()=>$(".inspector-content").toggle(), Math.random());
+        this.draggable = this.$element.draggable({handle: '.inspector-title'});
+        $('.inspector-title').once('click', ()=>$('.inspector-content').toggle(), Math.random());
 
         this.#initDraggable();
 
@@ -33,67 +33,67 @@ class Inspector {
 
                 this.logger.info(`notify(${op}, ${jsid}`);
                 const c =  this.application.simulator.findByJsid(jsid);
-                const bm = this.application.store.get("bomMapping");
+                const bm = this.application.store.get('bomMapping');
 
                 if(!bm){
-                    this.logger.warn("notify: no bom mapping found for " + op + " on jsid " + jsid);
+                    this.logger.warn('notify: no bom mapping found for ' + op + ' on jsid ' + jsid);
                     return;
                 }
 
-                if(op === "add"){
+                if(op === 'add'){
 
                     if(!CircuitModel.isSimpleComponent(c) && !bm.isMapped(jsid)){
-                        this.logger.info("mapping new complex component");
+                        this.logger.info('mapping new complex component');
                         // this.application.buildStrategy.launchPinManager(c);
                     }
 
                     bm.add(new LineItem(c));
                 }
 
-                if(op === "remove")
+                if(op === 'remove')
                     bm.remove(jsid);
 
-                if(op === "removeAll")
+                if(op === 'removeAll')
                     bm.clear();
 
-            }})
+            }});
     }
 
     syncToModel(bom){
 
-        this.logger.info("syncToModel", {bom});
+        this.logger.info('syncToModel', {bom});
 
         const lineItemClickHandler = (e)=>{
-            const label = $(e.currentTarget).attr("component-label");
+            const label = $(e.currentTarget).attr('component-label');
             $(`.line-item-components[component-label='${label}']`).toggle();
-        }
+        };
 
         const componentClickHandler = (e)=>{
             // const label = $(e.currentTarget).attr("component-label");
-            const jsid = $(e.currentTarget.parentNode).attr("jsid");
+            const jsid = $(e.currentTarget.parentNode).attr('jsid');
             const label = CircuitModel.fullLabelForJsid(jsid);
 
-            this.logger.info("componentClickHandler", {jsid, label, e});
+            this.logger.info('componentClickHandler', {jsid, label, e});
 
             // set the view state
             this.application.breadboard.unhighlightMapped();
             this.application.overlayController.hideAll();
             this.application.overlayController.overlays.get(jsid).fadeComponentIn();
-            this.application.breadboard.highlightByAttr(["jsid", jsid]);
+            this.application.breadboard.highlightByAttr(['jsid', jsid]);
 
-            if(label === "Voltage"){
+            if(label === 'Voltage'){
                 let v = this.application.circuitModel.getComponent(jsid).maxVoltage();
-                this.application.breadboard.highlightByAttr(["voltage", v]);
+                this.application.breadboard.highlightByAttr(['voltage', v]);
             }
 
-            if(label === "Ground"){
-                this.application.breadboard.highlightByAttr(["voltage", 0]);
+            if(label === 'Ground'){
+                this.application.breadboard.highlightByAttr(['voltage', 0]);
             }
-        }
+        };
 
         const linkClickHandler = (e) =>{
-            let jsid = $(e.currentTarget).attr("jsid");
-            this.logger.info("linkClickHandler", jsid, this.application.circuitModel.simplify());
+            let jsid = $(e.currentTarget).attr('jsid');
+            this.logger.info('linkClickHandler', jsid, this.application.circuitModel.simplify());
 
             let comp = this.application.circuitModel.getComponent(jsid);
             let connections = this.application.circuitModel.simplify();
@@ -104,14 +104,14 @@ class Inspector {
                 [...connections.entries()]
                     .filter(([k, v])=> k.comp === jsid && k.pin === i)
                     .forEach(e=>{
-                        console.log("======>", e);
-                    })
+                        console.log('======>', e);
+                    });
             }
-        }
+        };
 
         const typeClickHandler = (e) =>{
-            let fullLabel = $(e.currentTarget).attr("component-label");
-            this.logger.info("typeClickHandler", fullLabel);
+            let fullLabel = $(e.currentTarget).attr('component-label');
+            this.logger.info('typeClickHandler', fullLabel);
 
             // Extract base label (without sublabel like " (3 pin)") for breadboard highlighting
             // The breadboard busses are tagged with component.label, not fullLabel
@@ -119,28 +119,28 @@ class Inspector {
 
             this.application.breadboard.reset();
             this.application.overlayController.reset();
-            this.application.breadboard.highlightByAttr(["label", baseLabel]);
+            this.application.breadboard.highlightByAttr(['label', baseLabel]);
             this.application.overlayController.fadeInByType(baseLabel);
 
             // veto event propagation so the component list doesn't expand / contract
             return false;
-        }
+        };
 
-        $(".inspector-content").html("");
+        $('.inspector-content').html('');
 
         [...bom.lineItems.entries()]
             .sort(([k, v], [k1, v1]) => v.simple? 1 : -1)
             .sort(([k, v], [k1, v1]) => k.localeCompare(k1))
             .forEach(([k, v], i) => {
-                $(".inspector-content").append(
+                $('.inspector-content').append(
                     Inspector.templates.bomItem(k, v, i)
                 );
             });
 
-        $(".line-item-details").once("click", lineItemClickHandler,      Math.random());
-        $(".show-component").once("click", componentClickHandler,        Math.random());
-        $(".show-component-links").once("click", linkClickHandler,       Math.random());
-        $(".show-all-of-type").once("click", typeClickHandler,           Math.random());
+        $('.line-item-details').once('click', lineItemClickHandler,      Math.random());
+        $('.show-component').once('click', componentClickHandler,        Math.random());
+        $('.show-component-links').once('click', linkClickHandler,       Math.random());
+        $('.show-all-of-type').once('click', typeClickHandler,           Math.random());
     }
 
     static templates = {
@@ -159,7 +159,7 @@ class Inspector {
 
         bomItemComponents: (lineItem, row)=>`
             ${(() => {
-            let result = "";
+            let result = '';
 
             lineItem.jsids.forEach((jsid, i)=>{
                 result += `
@@ -169,11 +169,11 @@ class Inspector {
                         <div class="clickable-icon show-component-links" jsid="${jsid}" style="display: table-cell;">&#x1F517;</div>
                         <div class="clickable-icon show-component" style="display: table-cell; padding-left: 10px; padding-right: 10px;">&#x1F50D;</div>
                     </div>
-                    `
-            })
+                    `;
+            });
 
             return result;
         })()}`
-    }
+    };
 
 }

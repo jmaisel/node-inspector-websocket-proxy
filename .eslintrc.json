@@ -1,0 +1,74 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jquery": true,
+    "node": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "script"
+  },
+  "globals": {
+    "$": "readonly",
+    "jQuery": "readonly",
+    "CircuitJS1": "readonly",
+    "io": "readonly",
+    "Logger": "readonly",
+    "DebuggerApiClient": "readonly",
+    "ConsoleUIModel": "readonly",
+    "ConsoleUIController": "readonly",
+    "ConsoleUIView": "readonly",
+    "ProjectHelper": "readonly",
+    "DebuggerConnectionHelper": "readonly",
+    "DebuggerEventHelper": "readonly",
+    "EditorHelper": "readonly",
+    "ToolbarHelper": "readonly",
+    "DebugToolbarHelper": "readonly",
+    "AceTabManager": "readonly",
+    "application": "readonly",
+    "CircuitModel": "readonly",
+    "LineItem": "readonly",
+    "Inspector": "readonly"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { "args": "none", "varsIgnorePattern": "^_" }],
+    "no-console": "off",
+    "semi": ["error", "always"],
+    "quotes": ["warn", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
+    "no-undef": "error",
+    "no-async-promise-executor": "error",
+    "no-promise-executor-return": "error",
+    "require-atomic-updates": "error",
+    "no-unreachable": "error",
+    "no-const-assign": "error",
+    "no-dupe-keys": "error",
+    "no-duplicate-case": "error",
+    "no-empty": "warn",
+    "no-extra-semi": "error",
+    "no-func-assign": "error",
+    "no-irregular-whitespace": "error",
+    "no-sparse-arrays": "warn",
+    "no-unexpected-multiline": "error",
+    "use-isnan": "error",
+    "valid-typeof": "error",
+    "no-redeclare": "error",
+    "no-self-assign": "error",
+    "no-useless-escape": "warn"
+  },
+  "ignorePatterns": [
+    "www/vendor/**",
+    "www/circuitjs1/**",
+    "node_modules/**",
+    "*.min.js"
+  ],
+  "overrides": [
+    {
+      "files": ["www/debugger/*.js", "www/editor/ace-controller-v2.js"],
+      "parserOptions": {
+        "sourceType": "module"
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 class LineItem{
     constructor(c, quantity, manufacturer, model){
 
-        this.logger = new Logger("LineItem", Logger.LEVEL.DEBUG);
+        this.logger = new Logger('LineItem', Logger.LEVEL.DEBUG);
 
         this.label = CircuitModel.labelForJsid(c.jsid);
         this.sublabel = LineItem.sublabel(c);
@@ -24,9 +24,9 @@ class LineItem{
 
         const label = CircuitModel.labelForJsid(c.jsid);
 
-        if(label === "Or Gate")
+        if(label === 'Or Gate')
             return ` (${c.getPostCount()} pin)`;
 
-        return "";
+        return '';
     }
 }

@@ -1,6 +1,6 @@
 class AceController {
     constructor() {
-        this.logger = new Logger("AceController");
+        this.logger = new Logger('AceController');
         this.editor = null;
         this.editorFrame = null;
         this.currentFile = null;  // Keep for backward compatibility
@@ -40,11 +40,11 @@ class AceController {
 
         // Load debugger client dependencies
         this.loadDebuggerClient().then(() => {
-            this.logger.info("Debugger client loaded");
+            this.logger.info('Debugger client loaded');
             this.debuggerClientLoaded = true;
             this.bind();
         }).catch((error) => {
-            this.logger.error("Failed to load debugger client:", error);
+            this.logger.error('Failed to load debugger client:', error);
             this.bind(); // Continue anyway, debugger features will be disabled
         });
     }
@@ -54,7 +54,7 @@ class AceController {
      * @returns {Promise}
      */
     async loadDebuggerClient() {
-        this.logger.info("Loading debugger client scripts...");
+        this.logger.info('Loading debugger client scripts...');
 
         // Load from node-inspector-websocket-proxy server
         const baseUrl = 'http://localhost:8080';
@@ -72,15 +72,15 @@ class AceController {
             await this.loadScript(src);
         }
 
-        this.logger.info("All debugger client scripts loaded successfully");
+        this.logger.info('All debugger client scripts loaded successfully');
 
         // Verify BaseDomainController is available
         if (typeof BaseDomainController === 'undefined') {
-            this.logger.error("BaseDomainController not found after loading scripts!");
-            throw new Error("Debugger client failed to initialize properly");
+            this.logger.error('BaseDomainController not found after loading scripts!');
+            throw new Error('Debugger client failed to initialize properly');
         }
 
-        this.logger.info("BaseDomainController is available");
+        this.logger.info('BaseDomainController is available');
     }
 
     /**
@@ -105,23 +105,23 @@ class AceController {
     }
 
     bind() {
-        this.logger.info("bind()");
+        this.logger.info('bind()');
 
         // Get reference to the iframe
-        this.editorFrame = $("#code")[0];
+        this.editorFrame = $('#code')[0];
 
         // Wait for iframe to load and get editor instance
         if (this.editorFrame && this.editorFrame.contentWindow) {
             this.editor = this.editorFrame.contentWindow.editor;
 
             if (this.editor) {
-                this.logger.info("Ace editor instance acquired");
+                this.logger.info('Ace editor instance acquired');
                 this.editorHelper.setupEditor();
 
                 // Initialize tab manager after editor is setup
                 this.initTabManager(this.editorHelper);
             } else {
-                this.logger.warn("Ace editor not yet available, will retry");
+                this.logger.warn('Ace editor not yet available, will retry');
                 // Retry after a short delay
                 setTimeout(() => this.bind(), 100);
             }
@@ -140,7 +140,7 @@ class AceController {
     }
 
     initializeConsole() {
-        this.logger.info("initializeConsole()");
+        this.logger.info('initializeConsole()');
 
         // Create console view (only once)
         if (!this.consoleView) {
@@ -153,86 +153,86 @@ class AceController {
             this.consoleController.setCtx(this.application);
             this.consoleController.setView(this.consoleView);
             this.consoleController.bind();
-            this.logger.info("Console UI initialized and bound");
+            this.logger.info('Console UI initialized and bound');
         } else {
-            this.logger.warn("Application context not available, cannot initialize console");
+            this.logger.warn('Application context not available, cannot initialize console');
         }
     }
 
     bindOpenProjectButton() {
-        this.logger.info("bindOpenProjectButton()");
+        this.logger.info('bindOpenProjectButton()');
 
-        const openProjectBtn = $("#open-project-btn");
+        const openProjectBtn = $('#open-project-btn');
 
-        openProjectBtn.on("click", () => {
-            this.logger.info("Open Project button clicked");
+        openProjectBtn.on('click', () => {
+            this.logger.info('Open Project button clicked');
             this.projectHelper.showProjectDialog();
         });
     }
 
     bindConnectButton() {
-        this.logger.info("bindConnectButton()");
+        this.logger.info('bindConnectButton()');
 
-        const debugStartBtn = $("#debug-start-btn");
+        const debugStartBtn = $('#debug-start-btn');
 
-        debugStartBtn.on("click", () => {
-            this.logger.info("Debug button clicked");
+        debugStartBtn.on('click', () => {
+            this.logger.info('Debug button clicked');
             this.debuggerConnectionHelper.connectToDebuggerWithSelectedFile();
         });
     }
 
     bindDebugControls() {
-        this.logger.info("bindDebugControls()");
+        this.logger.info('bindDebugControls()');
 
         // Continue/Resume button
-        $("#debug-continue").on("click", () => {
+        $('#debug-continue').on('click', () => {
             if (!this.inspectorProxy) {
-                alert("Not connected to debugger");
+                alert('Not connected to debugger');
                 return;
             }
             this.inspectorProxy.debuggerController.resume();
         });
 
         // Pause button
-        $("#debug-pause").on("click", () => {
+        $('#debug-pause').on('click', () => {
             if (!this.inspectorProxy) {
-                alert("Not connected to debugger");
+                alert('Not connected to debugger');
                 return;
             }
             this.inspectorProxy.debuggerController.pause();
         });
 
         // Step Over button
-        $("#debug-step-over").on("click", () => {
+        $('#debug-step-over').on('click', () => {
             if (!this.inspectorProxy) {
-                alert("Not connected to debugger");
+                alert('Not connected to debugger');
                 return;
             }
             this.inspectorProxy.debuggerController.stepOver();
         });
 
         // Step Into button
-        $("#debug-step-into").on("click", () => {
+        $('#debug-step-into').on('click', () => {
             if (!this.inspectorProxy) {
-                alert("Not connected to debugger");
+                alert('Not connected to debugger');
                 return;
             }
             this.inspectorProxy.debuggerController.stepInto();
         });
 
         // Step Out button
-        $("#debug-step-out").on("click", () => {
+        $('#debug-step-out').on('click', () => {
             if (!this.inspectorProxy) {
-                alert("Not connected to debugger");
+                alert('Not connected to debugger');
                 return;
             }
             this.inspectorProxy.debuggerController.stepOut();
         });
 
         // Stop button
-        $("#debug-stop").on("click", async () => {
+        $('#debug-stop').on('click', async () => {
             if (!this.inspectorProxy) {
-                alert("Not connected to debugger");
+                alert('Not connected to debugger');
                 return;
             }
 
@@ -251,26 +251,26 @@ class AceController {
                 this.inspectorProxy = null;
                 this.hideDebugControls();
 
-                alert("Disconnected from debugger");
+                alert('Disconnected from debugger');
             } catch (error) {
-                this.logger.error("Failed to stop debugger:", error);
+                this.logger.error('Failed to stop debugger:', error);
                 alert(`Failed to stop debugger: ${error.message}`);
             }
         });
 
         // Toolbar detach button
-        $("#toolbar-detach-btn").on("click", () => {
-            this.logger.info("Toolbar detach button clicked");
+        $('#toolbar-detach-btn').on('click', () => {
+            this.logger.info('Toolbar detach button clicked');
             this.toolbarHelper.detachToolbar();
         });
 
-        this.logger.info("Debug controls bound");
+        this.logger.info('Debug controls bound');
     }
 
     // Delegation methods to helpers
 
     setCtx(ctx) {
-        this.logger.info("setCtx", ctx);
+        this.logger.info('setCtx', ctx);
         this.application = ctx;
 
         // Initialize console now that we have the application context
@@ -309,7 +309,7 @@ class AceController {
         const ace = this.editorFrame.contentWindow.ace;
 
         // Create Ace session - automatically handles undo/redo, cursor, scroll position
-        const session = ace.createEditSession(content || "", mode);
+        const session = ace.createEditSession(content || '', mode);
 
         const sessionData = {
             session: session,
@@ -414,6 +414,6 @@ class AceController {
      */
     initTabManager(editorHelper) {
         this.tabManager = new AceTabManager(this, editorHelper);
-        this.logger.info("Tab manager initialized");
+        this.logger.info('Tab manager initialized');
     }
 }

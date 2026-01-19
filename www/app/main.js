@@ -48,11 +48,8 @@ class GutterController{
             this.split.setSizes([0, 100]);
         })
 
-        this.logoBtnContainer = $("#logo-btn-container").click(()=>{
-            this.logger.info("logoBtn");
-            const menu = $("#dbts-menu");
-            menu.is(":visible")?menu.fadeOut(250):menu.fadeIn(250);
-        });
+        // Logo button no longer opens a menu - just for branding
+        this.logoBtnContainer = $("#logo-btn-container");
 
         let isDragging = false;
         let isDown = false;
@@ -186,8 +183,11 @@ class DBTSMenuController{
         this.dbtsBtns = $(this.dbtsBtnSel);
 
         this.dbtsBtns.click((e)=>{
+            // Use currentTarget to get the button, not the child element that was clicked
+            const cmd = $(e.currentTarget).attr("cmd");
+            this.logger.info("Button clicked with cmd:", cmd);
 
-            switch($(e.target).attr("cmd")){
+            switch(cmd){
                 case "design":
                     this.designMode();
                     break;
@@ -203,7 +203,8 @@ class DBTSMenuController{
                     break;
             }
 
-            this.dbtsMenu.toggle("slow");
+            // Close the mode dropdown menu
+            $('.mode-dropdown-content').removeClass('show');
         });
     }
 }

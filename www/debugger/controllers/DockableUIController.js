@@ -138,7 +138,14 @@ export class DockableUIController extends BaseUIController {
     restorePosition() {
         const key = `${this.storagePrefix}-dock-pos`;
         const saved = localStorage.getItem(key);
-        return saved ? JSON.parse(saved) : null;
+        if (!saved) return null;
+
+        try {
+            return JSON.parse(saved);
+        } catch (error) {
+            console.error('Failed to parse saved dock position:', error);
+            return null;
+        }
     }
 
     /**

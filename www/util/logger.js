@@ -6,14 +6,14 @@ class Logger{
         WARN:  2,
         ERROR: 3,
         NONE:  4  // Disable all logging
-    }
+    };
 
     // Global log level - set to WARN to reduce console spam
     // Change to Logger.LEVEL.DEBUG for verbose logging
     static globalLogLevel = Logger.LEVEL.INFO;
 
     constructor(label, defaultLogLevel) {
-        this.defaultLogLevel = defaultLogLevel || "info";
+        this.defaultLogLevel = defaultLogLevel || 'info';
         this.label = label;
     }
 

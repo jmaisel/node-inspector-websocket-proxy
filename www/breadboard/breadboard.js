@@ -6,12 +6,12 @@ class Bus {
 
 class BusGroup {
     static ORIENTATION = {
-        "V": 1,
-        "H": 2
-    }
+        'V': 1,
+        'H': 2
+    };
 
     constructor(name, orientation) {
-        this.logger = new Logger("Busgroup:" + name);
+        this.logger = new Logger('Busgroup:' + name);
         this.orientation = orientation || BusGroup.ORIENTATION.V;
         this.name = name;
     }
@@ -23,26 +23,26 @@ class BusGroup {
     isTagged(idx) {
         let bus = this.getBus(idx);
         let $bus = $(bus.node);
-        return $bus.attr("jsid") !== undefined && $bus.attr("logicalPin") !== undefined;
+        return $bus.attr('jsid') !== undefined && $bus.attr('logicalPin') !== undefined;
     }
 
     tag(row, component, mapping) {
-        this.logger.info("tag", {jsid: component.jsid, row, mapping});
+        this.logger.info('tag', {jsid: component.jsid, row, mapping});
 
         if (!mapping) return;
 
         let bus = this.getBus(row);
 
         if(bus === undefined){
-            throw "No bus exists for row " + row;
+            throw 'No bus exists for row ' + row;
         }
 
         let $bus = $(bus.node);
 
-        this.logger.debug("using bus", bus);
+        this.logger.debug('using bus', bus);
 
         if (this.isTagged(row)) {
-            this.logger.info(`${$bus.attr("id")} is tagged by jsid ${$bus.attr("jsid")} logicalPin ${$bus.attr("logicalPin")}`);
+            this.logger.info(`${$bus.attr('id')} is tagged by jsid ${$bus.attr('jsid')} logicalPin ${$bus.attr('logicalPin')}`);
             return;
         }
 
@@ -59,8 +59,8 @@ class BusGroup {
         let bus = this.getBus(row);
         let $bus = $(bus.node);
 
-        if ($bus.attr("jsid") || $bus.attr("logicalPin")) {
-            this.logger.info(`removing tag for ${$bus.attr("jsid")} at pin ${$bus.attr("logicalPin")}`);
+        if ($bus.attr('jsid') || $bus.attr('logicalPin')) {
+            this.logger.info(`removing tag for ${$bus.attr('jsid')} at pin ${$bus.attr('logicalPin')}`);
             Breadboard.SVG_RECT_ATTRS.forEach((attr) => $bus.removeAttr(attr));
         }
     }
@@ -103,7 +103,7 @@ class BusGroup {
             let rect = this.renderBus(ctx, item, i);
 
             if(item.voltages)
-                rect.attr("voltage", item.voltages[i])
+                rect.attr('voltage', item.voltages[i]);
 
             this.items.push(rect);
             ctx.cursor.x += (ctx.busStrokePx + ctx.margin);
@@ -117,7 +117,7 @@ class BusGroup {
             let rect = this.renderBus(ctx, item, i);
 
             if(item.voltages)
-                rect.attr("voltage", item.voltages[i])
+                rect.attr('voltage', item.voltages[i]);
 
             this.items.push(rect);
             ctx.cursor.y += (ctx.busStrokePx + ctx.margin);
@@ -137,10 +137,10 @@ class Rails extends BusGroup {
 
 class Breadboard {
 
-    static SVG_RECT_ATTRS = Object.freeze(["jsid", "logicalPin", "physicalPin", "side", "label", "name", "fill"])
+    static SVG_RECT_ATTRS = Object.freeze(['jsid', 'logicalPin', 'physicalPin', 'side', 'label', 'name', 'fill']);
 
     static filters = Object.freeze({
-        logic: ["Logic", "Logic Output", "Logic Input"]
+        logic: ['Logic', 'Logic Output', 'Logic Input']
     });
 
     constructor(svgId) {
@@ -148,14 +148,14 @@ class Breadboard {
         this.svg = $(this.svgId);
         this.snap = new Snap(this.svgId);
 
-        this.rails = new Rails(new Bus("rails"));
-        this.busgroup = new BusGroup(new Bus("left side"))
-        this.busgroup1 = new BusGroup(new Bus("right side"));
-        this.gpio = new BusGroup(new Bus("gpio"));
+        this.rails = new Rails(new Bus('rails'));
+        this.busgroup = new BusGroup(new Bus('left side'));
+        this.busgroup1 = new BusGroup(new Bus('right side'));
+        this.gpio = new BusGroup(new Bus('gpio'));
 
         this.busgroups = [this.rails, this.busgroup, this.busgroup1, this.gpio];
 
-        this.logger = new Logger("Breadboard");
+        this.logger = new Logger('Breadboard');
     }
 
     static ignore = (label) => Object.entries(Breadboard.filters).find(([k, v]) => v.indexOf(label) !== -1) !== undefined;
@@ -180,8 +180,8 @@ class Breadboard {
         }
     }
 
-    static fill = (el)=>$(el).attr("fill", "white")
-    static unfill = (el)=>$(el).attr("fill")
+    static fill = (el)=>$(el).attr('fill', 'white');
+    static unfill = (el)=>$(el).attr('fill');
 
     setCtx(ctx) {
 
@@ -191,18 +191,18 @@ class Breadboard {
             ctx.simulator.watch({
                 notify:(op, jsid)=>{
                     // that.syncToModel()
-                    this.logger.info(`watching change:${op} for ${jsid}`)
+                    this.logger.info(`watching change:${op} for ${jsid}`);
 
                     switch(op){
-                        case "add":
-                            this.overlay(this.application.simulator.findByJsid(jsid))
+                        case 'add':
+                            this.overlay(this.application.simulator.findByJsid(jsid));
                             break;
 
-                        case "removeAll":
+                        case 'removeAll':
                             this.application.overlayController.clear();
                             break;
 
-                        case "remove":
+                        case 'remove':
                             // this.application.breadboard.remove(jsid);
                             // this.application.overlayController.remove(jsid);
                             this.remove(jsid);
@@ -221,14 +221,14 @@ class Breadboard {
             });
         }
 
-        this.logger.info("setCtx", ctx);
+        this.logger.info('setCtx', ctx);
         this.clear();
         this.application = ctx;
         this.busgroups.forEach((item) => item.application = ctx);
     }
 
     render() {
-        this.logger.info("render()");
+        this.logger.info('render()');
         let margin = 4;
         let busStrokePx = 2;
         let padding = 20;
@@ -252,44 +252,44 @@ class Breadboard {
             offsetX: cursor.x + padding
         };
 
-        this.renderRails(Object.assign(evt, {busGroup: "rails"}));
-        this.renderBank1(Object.assign(evt, {busGroup: "left-bank"}));
-        this.renderBank2(Object.assign(evt, {busGroup: "right-bank"}));
-        this.renderGPIO(Object.assign(evt, {busGroup: "gpio"}));
+        this.renderRails(Object.assign(evt, {busGroup: 'rails'}));
+        this.renderBank1(Object.assign(evt, {busGroup: 'left-bank'}));
+        this.renderBank2(Object.assign(evt, {busGroup: 'right-bank'}));
+        this.renderGPIO(Object.assign(evt, {busGroup: 'gpio'}));
     }
 
     renderRails(evt) {
-        this.logger.info("renderRails", evt);
+        this.logger.info('renderRails', evt);
         evt.idx = 0;
         let rails = this.busgroups[evt.idx];
-        rails.name = evt.busGroup
+        rails.name = evt.busGroup;
         rails.render(evt);
     }
 
     renderBank1(evt) {
-        this.logger.info("renderBank1", evt);
+        this.logger.info('renderBank1', evt);
         evt.idx = 1;
         evt.cursor.x += evt.margin;
         let busses = this.busgroups[evt.idx];
-        busses.name = evt.busGroup
+        busses.name = evt.busGroup;
         busses.render(evt);
     }
 
     renderBank2(evt) {
-        this.logger.info("renderBank2", evt);
+        this.logger.info('renderBank2', evt);
         evt.idx = 2;
         evt.cursor.x += evt.margin;
         let busses = this.busgroups[evt.idx];
-        busses.name = evt.busGroup
+        busses.name = evt.busGroup;
         busses.render(evt);
     }
 
     renderGPIO(evt) {
-        this.logger.info("renderGPIO", evt);
+        this.logger.info('renderGPIO', evt);
         evt.idx = 3;
         evt.cursor.x += evt.margin;
         let busses = this.busgroups[evt.idx];
-        busses.name = evt.busGroup
+        busses.name = evt.busGroup;
         busses.render(evt);
     }
 
@@ -311,36 +311,36 @@ class Breadboard {
                 this.syncToModel();
             }
         } catch(e) {
-            this.logger.debug("Error checking component type on remove", e);
+            this.logger.debug('Error checking component type on remove', e);
         }
     }
 
     reset() {
-        this.logger.info("reset()");
+        this.logger.info('reset()');
 
         if(this.application){
-            this.application.breadboard.svg.find("[fill]").each((i, el)=>{
-                $(el).removeAttr("fill");
+            this.application.breadboard.svg.find('[fill]').each((i, el)=>{
+                $(el).removeAttr('fill');
             });
         }
     }
 
     clear() {
-        this.logger.info("clear()");
+        this.logger.info('clear()');
         this.busgroup.clear();
         this.busgroup1.clear();
         this.gpio.clear();
         this.rails.clear();
 
         if(this.application){
-            this.application.breadboard.svg.find("[jsid]").each((i, el)=>{
+            this.application.breadboard.svg.find('[jsid]').each((i, el)=>{
                 Breadboard.SVG_RECT_ATTRS.forEach((attr) => $(el).removeAttr(attr));
             });
         }
     }
 
     highlightBus(jsid, logicalPin) {
-        this.logger.info("highlightBus", { jsid, logicalPin });
+        this.logger.info('highlightBus', { jsid, logicalPin });
         let bus = this.busFor(jsid, logicalPin);
 
         if (bus) {
@@ -349,69 +349,69 @@ class Breadboard {
     }
 
     unhighlightBus(jsid, logicalPin) {
-        this.logger.info("unhighlightBus", { jsid, logicalPin });
+        this.logger.info('unhighlightBus', { jsid, logicalPin });
         let bus = this.busFor(jsid, logicalPin);
 
         if (bus) {
-            $(bus).removeAttr("fill");
+            $(bus).removeAttr('fill');
         }
     }
 
     highlightComponent(component) {
         let jsid = component.jsid;
-        this.logger.info("highlightComponent", component.jsid);
+        this.logger.info('highlightComponent', component.jsid);
 
         this.application.breadboard.svg.find(`[jsid="${component.jsid}"]`).each((i, el)=>{
-            Breadboard.fill(el)
+            Breadboard.fill(el);
         });
     }
 
     unhighlightComponent(component) {
         let jsid = component.jsid;
-        this.logger.info("unhighlightComponent", jsid);
+        this.logger.info('unhighlightComponent', jsid);
 
         this.application.breadboard.svg.find(`[jsid="${jsid}"]`).each((i, el)=>{
-            $(el).removeAttr("fill");
+            $(el).removeAttr('fill');
         });
     }
 
     highlightByAttr([k,v]) {
-        this.logger.info("highlightByAttr", [k, v]);
+        this.logger.info('highlightByAttr', [k, v]);
         this.application.breadboard.svg.find(`[${k}="${v}"]`).each((i, el)=>{
-            Breadboard.fill(el)
+            Breadboard.fill(el);
         });
     }
 
     unhighlightByAttr([k,v]) {
-        this.logger.info("highlightByAttr", [k, v]);
+        this.logger.info('highlightByAttr', [k, v]);
         this.application.breadboard.svg.find(`[${k}="${v}"]`).each((i, el)=>{
             Breadboard.unfill(el);
         });
     }
 
     unhighlightByType(label) {
-        this.logger.info("unhighlightByType", label);
+        this.logger.info('unhighlightByType', label);
         this.application.breadboard.svg.find(`[label="${label}"]`).each((i, el)=>{
-            $(el).removeAttr("fill");
+            $(el).removeAttr('fill');
         });
     }
 
     unhighlightMapped(){
-        this.logger.info("unhighlightMapped");
+        this.logger.info('unhighlightMapped');
         this.application.breadboard.svg.find(`[fill]`).each((i, el)=>{
-            $(el).removeAttr("fill");
+            $(el).removeAttr('fill');
         });
     }
 
     highlightMapped(){
-        this.logger.info("highlightMapped");
+        this.logger.info('highlightMapped');
         this.application.breadboard.svg.find(`[label]`).each((i, el)=>{
-            Breadboard.fill(el)
+            Breadboard.fill(el);
         });
     }
 
     busFor(jsid, logicalPin) {
-        this.logger.info("busFor", {jsid, logicalPin});
+        this.logger.info('busFor', {jsid, logicalPin});
 
         const findIt = (bg) => {
             // return bg.items.filter(bus => bus.attr("jsid") === jsid && bus.attr("logicalPin") === String(logicalPin));
@@ -420,7 +420,7 @@ class Breadboard {
 
             bg.items.forEach(v => {
                 let bus = $(v.node);
-                if (bus.attr("jsid") === jsid && bus.attr("logicalPin") === String(logicalPin)) {
+                if (bus.attr('jsid') === jsid && bus.attr('logicalPin') === String(logicalPin)) {
                     result = bus;
                 }
             });
@@ -442,7 +442,7 @@ class Breadboard {
     }
 
     syncToModel() {
-        this.logger.info("syncToModel");
+        this.logger.info('syncToModel');
 
         this.application.overlayController.clear();
         Object.values(this.application.circuitModel.getComponents()).forEach((c)=>this.overlay(c));
@@ -450,9 +450,9 @@ class Breadboard {
         const assignSimpleComponent = (component, row) => {
 
             // required by Breadboard.tag();
-            component.pins = [{logicalPin:0, name:"V"}, {logicalPin:1, name:"G"}]
+            component.pins = [{logicalPin:0, name:'V'}, {logicalPin:1, name:'G'}];
 
-            this.logger.info("assigning simple component pins", { component });
+            this.logger.info('assigning simple component pins', { component });
             for (let i = 0; i < component.pins.length; i++) {
                 let mapping = component.pins[i];
                 let bank = i % 2 === 0 ? this.busgroup : this.busgroup1;
@@ -491,7 +491,7 @@ class Breadboard {
         };
 
         const assignRail = (component) => {
-            this.logger.info("assigning rail component", { component });
+            this.logger.info('assigning rail component', { component });
 
             // Determine voltage
             let voltage = 5; // Default
@@ -503,7 +503,7 @@ class Breadboard {
                     voltage = component.getVoltage();
                 }
             } catch(e) {
-                this.logger.debug("Error getting voltage, using default", e);
+                this.logger.debug('Error getting voltage, using default', e);
             }
 
             // Find matching rail index
@@ -523,7 +523,7 @@ class Breadboard {
         };
 
         const assignGPIO = (component) => {
-            this.logger.info("assigning GPIO component", { component });
+            this.logger.info('assigning GPIO component', { component });
 
             // Get GPIO properties
             let props = null;
@@ -532,7 +532,7 @@ class Breadboard {
                     props = component.getGPIOProperties();
                 }
             } catch(e) {
-                this.logger.debug("Error getting GPIO properties", e);
+                this.logger.debug('Error getting GPIO properties', e);
             }
 
             if (props && props.bcmPinNumber >= 0 && props.bcmPinNumber < this.gpio.items.length && !this.gpio.isTagged(props.bcmPinNumber)) {
@@ -545,7 +545,7 @@ class Breadboard {
                     name: props.pinName || `GPIO${props.bcmPinNumber}`
                 });
 
-                this.logger.info("Tagged GPIO bus", { bcmPin: props.bcmPinNumber, pinName: props.pinName });
+                this.logger.info('Tagged GPIO bus', { bcmPin: props.bcmPinNumber, pinName: props.pinName });
             }
 
             return 0; // Don't increment cursor for GPIO
@@ -554,7 +554,7 @@ class Breadboard {
         let cursor = 0;
         let bom = this.application.circuitModel.asBOM();
 
-        this.logger.info("syncToModel bom:", bom);
+        this.logger.info('syncToModel bom:', bom);
 
         [...bom.lineItems.values()]
             .forEach(lineItem => {
@@ -566,41 +566,41 @@ class Breadboard {
                         let li = bom.itemByJsid(jsid);
 
                         // Set the pin manager mapping on the component
-                        this.logger.info("\tsyncToModel lineItem:", li);
+                        this.logger.info('\tsyncToModel lineItem:', li);
 
                         // Route component to appropriate assignment method
                         if (Breadboard.isRail(component)) {
-                            this.logger.info("Placing rail component", jsid);
+                            this.logger.info('Placing rail component', jsid);
                             assignRail(component);
                         }
                         else if (Breadboard.isGPIO(component)) {
-                            this.logger.info("Placing GPIO component", jsid);
+                            this.logger.info('Placing GPIO component', jsid);
                             assignGPIO(component);
                         }
                         else if(Breadboard.ignore(CircuitModel.labelForJsid(jsid))){
-                            this.logger.info("Ignoring placement on breadboard for", jsid);
+                            this.logger.info('Ignoring placement on breadboard for', jsid);
                         }
                         else if(CircuitModel.isSimpleComponent(component)) {
-                            this.logger.info("Placing simple component", jsid);
+                            this.logger.info('Placing simple component', jsid);
                             cursor += assignSimpleComponent(component, cursor);
                         }
                         else {
-                            this.logger.info("Placing complex component", jsid);
+                            this.logger.info('Placing complex component', jsid);
                             cursor += assignComplexComponent(component, cursor);
                         }
                     });
                 }
             });
 
-        this.logger.info("layoutComponents completed", { cursor });
+        this.logger.info('layoutComponents completed', { cursor });
     }
 
     show(){
-        $("#breadboard-pane").fadeIn();
+        $('#breadboard-pane').fadeIn();
     }
 
     hide(){
-        $("#breadboard-pane").fadeOut();
+        $('#breadboard-pane').fadeOut();
     }
 }
 

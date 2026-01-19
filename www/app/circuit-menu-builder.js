@@ -5,7 +5,7 @@
 class CircuitMenuBuilder {
     constructor() {
         this.menuData = null;
-        this.logger = new Logger("CircuitMenuBuilder");
+        this.logger = new Logger('CircuitMenuBuilder');
     }
 
     async loadSetupList() {
@@ -15,7 +15,7 @@ class CircuitMenuBuilder {
             this.menuData = this.parseSetupList(text);
             return this.menuData;
         } catch (err) {
-            this.logger.error("Failed to load setuplist.txt:", err);
+            this.logger.error('Failed to load setuplist.txt:', err);
             throw err;
         }
     }
@@ -106,28 +106,28 @@ class CircuitMenuBuilder {
 
 // Global helper to load circuits
 window.loadCircuit = function(filename, title) {
-    const logger = new Logger("loadCircuit");
+    const logger = new Logger('loadCircuit');
     const circuitFrame = document.getElementById('circuitFrame');
 
     if (!circuitFrame || !circuitFrame.contentWindow) {
-        logger.error("Circuit frame not found");
+        logger.error('Circuit frame not found');
         return;
     }
 
     const sim = circuitFrame.contentWindow.CircuitJS1;
 
     if (!sim) {
-        logger.error("CircuitJS1 not loaded yet");
+        logger.error('CircuitJS1 not loaded yet');
         return;
     }
 
     if (!sim.menuPerformed) {
-        logger.error("menuPerformed method not available on CircuitJS1");
+        logger.error('menuPerformed method not available on CircuitJS1');
         return;
     }
 
-    logger.info("Loading circuit:", filename, title);
-    sim.menuPerformed("circuits", "setup " + filename + " " + title);
+    logger.info('Loading circuit:', filename, title);
+    sim.menuPerformed('circuits', 'setup ' + filename + ' ' + title);
 
     // Close dropdown after selection
     const dropdown = document.getElementById('circuits-dropdown-content');
@@ -138,26 +138,26 @@ window.loadCircuit = function(filename, title) {
 
 // Global helper to call circuit menu actions
 window.callCircuitMenu = function(menu, item) {
-    const logger = new Logger("callCircuitMenu");
+    const logger = new Logger('callCircuitMenu');
     const circuitFrame = document.getElementById('circuitFrame');
 
     if (!circuitFrame || !circuitFrame.contentWindow) {
-        logger.error("Circuit frame not found");
+        logger.error('Circuit frame not found');
         return;
     }
 
     const sim = circuitFrame.contentWindow.CircuitJS1;
 
     if (!sim) {
-        logger.error("CircuitJS1 not loaded yet");
+        logger.error('CircuitJS1 not loaded yet');
         return;
     }
 
     if (!sim.menuPerformed) {
-        logger.error("menuPerformed method not available on CircuitJS1");
+        logger.error('menuPerformed method not available on CircuitJS1');
         return;
     }
 
-    logger.info("Calling menu:", menu, item);
+    logger.info('Calling menu:', menu, item);
     sim.menuPerformed(menu, item);
 };

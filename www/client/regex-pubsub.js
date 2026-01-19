@@ -24,7 +24,7 @@ class RegexPubSub {
    */
   subscribe(pattern, callback) {
 
-    console.log("adding subscription for " + pattern);
+    console.log('adding subscription for ' + pattern);
 
     if (typeof callback !== 'function') {
       throw new TypeError('Callback must be a function');

@@ -1,27 +1,27 @@
 class BillOfMaterials{
     constructor(application) {
-        this.logger = new Logger("BillOfMaterials", Logger.LEVEL.DEBUG);
+        this.logger = new Logger('BillOfMaterials', Logger.LEVEL.DEBUG);
         this.application = application;
         this.lineItems = new Map();
         this.dictionary = new Map();
 
         Object
             .values(this.application.circuitModel.getComponents())
-            .forEach(c => this.add(new LineItem(c)))
+            .forEach(c => this.add(new LineItem(c)));
 
-        this.logger.debug("created BillOfMaterials", this);
+        this.logger.debug('created BillOfMaterials', this);
     }
 
     static filters = Object.freeze({
-        logic: ["Logic", "Logic Output", "Logic Input", "Output"],
-        power: ["Voltage", "Ground", "Rail"],
-        passive: ["Wire"]
+        logic: ['Logic', 'Logic Output', 'Logic Input', 'Output'],
+        power: ['Voltage', 'Ground', 'Rail'],
+        passive: ['Wire']
     });
 
     static ignore = (label) => Object.entries(BillOfMaterials.filters).find(([k, v]) => v.indexOf(label) !== -1) !== undefined;
     add(item){
 
-        this.logger.debug(".add", item.label, item);
+        this.logger.debug('.add', item.label, item);
 
         if(!item.label){
             item.label = CircuitModel.labelForJsid(item.jsid);
@@ -31,7 +31,7 @@ class BillOfMaterials{
 
         if(BillOfMaterials.ignore(item.label)){
             this.logger.debug(`ignoring ${item.label}.  nothing to add.`);
-            return
+            return;
         }
 
         if(this.lineItems.has(item.fullLabel)){
@@ -48,17 +48,17 @@ class BillOfMaterials{
             this.dictionary.set(item.example, clone);
         }
 
-        this.logger.debug(".add done", "this.dictionary=", this.dictionary);
+        this.logger.debug('.add done', 'this.dictionary=', this.dictionary);
     }
 
     remove(jsid){
 
-        this.logger.debug(".remove", jsid);
+        this.logger.debug('.remove', jsid);
         let label = CircuitModel.fullLabelForJsid(jsid);
 
         if(BillOfMaterials.ignore(label)){
             this.logger.debug(`ignoring ${label}.  nothing to remove.`);
-            return
+            return;
         }
 
         if(this.lineItems.has(label)){
@@ -71,12 +71,12 @@ class BillOfMaterials{
             }
         }
         else{
-            this.logger.warn("remove called, but no jsid", jsid);
+            this.logger.warn('remove called, but no jsid', jsid);
         }
     }
 
     clear(){
-        this.logger.info("clear()");
+        this.logger.info('clear()');
         this.lineItems.clear();
     }
 
@@ -89,7 +89,7 @@ class BillOfMaterials{
     }
 
     isMapped(jsid){
-        this.logger.debug("isMapped: " + jsid);
+        this.logger.debug('isMapped: ' + jsid);
         let label = CircuitModel.fullLabelForJsid(jsid);
         return this.lineItems.has(label) && this.lineItems.get(label).mapping !== undefined;
     }

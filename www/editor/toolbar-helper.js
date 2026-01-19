@@ -4,7 +4,7 @@
 class ToolbarHelper {
     constructor(aceController) {
         this.ace = aceController;
-        this.logger = new Logger("ToolbarHelper");
+        this.logger = new Logger('ToolbarHelper');
     }
 
     detachToolbar() {
@@ -13,7 +13,7 @@ class ToolbarHelper {
             return;
         }
 
-        this.logger.info("Detaching toolbar");
+        this.logger.info('Detaching toolbar');
 
         // Get toolbar
         const toolbar = $('#code-toolbar').detach();
@@ -61,13 +61,13 @@ class ToolbarHelper {
 
         this.ace.isToolbarDetached = true;
 
-        this.logger.info("Toolbar detached");
+        this.logger.info('Toolbar detached');
     }
 
     reattachToolbar() {
         if (!this.ace.isToolbarDetached) return;
 
-        this.logger.info("Reattaching toolbar");
+        this.logger.info('Reattaching toolbar');
 
         // Get toolbar from floating window
         const toolbar = this.ace.detachedToolbar.find('#code-toolbar').detach();
@@ -84,6 +84,6 @@ class ToolbarHelper {
 
         this.ace.isToolbarDetached = false;
 
-        this.logger.info("Toolbar reattached");
+        this.logger.info('Toolbar reattached');
     }
 }

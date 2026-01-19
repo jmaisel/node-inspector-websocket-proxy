@@ -4,11 +4,11 @@
 class ProjectHelper {
     constructor(aceController) {
         this.ace = aceController;
-        this.logger = new Logger("ProjectHelper");
+        this.logger = new Logger('ProjectHelper');
     }
 
     async showProjectDialog() {
-        this.logger.info("showProjectDialog()");
+        this.logger.info('showProjectDialog()');
 
         // Check server health first
         const isServerHealthy = await this.ace.debuggerApiClient.checkServerHealth();
@@ -18,9 +18,9 @@ class ProjectHelper {
         }
 
         // Create dialog HTML if it doesn't exist
-        if (!$("#project-dialog").length) {
+        if (!$('#project-dialog').length) {
             const dialogHtml = this.buildProjectDialogHtml();
-            $("body").append(dialogHtml);
+            $('body').append(dialogHtml);
         }
 
         // Reset selection state
@@ -28,21 +28,21 @@ class ProjectHelper {
         this.ace.selectedEntryPoint = null;
 
         // Show the dialog
-        const dialog = $("#project-dialog").dialog({
+        const dialog = $('#project-dialog').dialog({
             autoOpen: true,
             modal: true,
             width: 550,
             buttons: {
-                "Select": () => {
+                'Select': () => {
                     this.onProjectSelectButtonClick(dialog);
                 },
-                "Cancel": function() {
-                    $(this).dialog("close");
+                'Cancel': function() {
+                    $(this).dialog('close');
                 }
             },
             open: () => {
                 // Disable Select button initially
-                $(".ui-dialog-buttonpane button:contains('Select')").prop("disabled", true);
+                $(".ui-dialog-buttonpane button:contains('Select')").prop('disabled', true);
 
                 // Bind the create buttons first (before loading projects)
                 this.bindCreateButtons();
@@ -86,33 +86,33 @@ class ProjectHelper {
     }
 
     bindCreateButtons() {
-        this.logger.info("bindCreateButtons()");
+        this.logger.info('bindCreateButtons()');
 
-        const createNewBtn = $("#create-new-btn");
-        const createDemoBtn = $("#create-demo-btn");
+        const createNewBtn = $('#create-new-btn');
+        const createDemoBtn = $('#create-demo-btn');
 
         this.logger.info(`Found create buttons: new=${createNewBtn.length}, demo=${createDemoBtn.length}`);
 
         if (createNewBtn.length === 0 || createDemoBtn.length === 0) {
-            this.logger.error("Create buttons not found in DOM!");
+            this.logger.error('Create buttons not found in DOM!');
             return;
         }
 
-        createNewBtn.off("click").on("click", () => {
-            this.logger.info("Create New button clicked");
+        createNewBtn.off('click').on('click', () => {
+            this.logger.info('Create New button clicked');
             this.onCreateNewProject();
         });
 
-        createDemoBtn.off("click").on("click", () => {
-            this.logger.info("Create Demo button clicked");
+        createDemoBtn.off('click').on('click', () => {
+            this.logger.info('Create Demo button clicked');
             this.onCreateDemoProject();
         });
 
-        this.logger.info("Create buttons bound successfully");
+        this.logger.info('Create buttons bound successfully');
     }
 
     async loadProjectsIntoDialog() {
-        const projectListContainer = $("#project-list");
+        const projectListContainer = $('#project-list');
 
         try {
             projectListContainer.html('<div class="loading-spinner">Loading workspace contents...</div>');
@@ -150,7 +150,7 @@ class ProjectHelper {
                     </div>
                 `);
 
-                workspaceItem.on("click", () => {
+                workspaceItem.on('click', () => {
                     this.onWorkspaceItemSelected(item.name, item.type, workspaceItem);
                 });
 
@@ -158,7 +158,7 @@ class ProjectHelper {
             });
 
         } catch (error) {
-            this.logger.error("Failed to load workspace:", error);
+            this.logger.error('Failed to load workspace:', error);
             projectListContainer.html(`
                 <div class="error-message">
                     Failed to load workspace: ${error.message}
@@ -174,7 +174,7 @@ class ProjectHelper {
     }
 
     showEmptyProjectState() {
-        $("#project-list").html(`
+        $('#project-list').html(`
             <div class="empty-state">
                 <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
                 <div style="font-size: 14px; margin-bottom: 20px; color: #999;">
@@ -186,25 +186,25 @@ class ProjectHelper {
     }
 
     async onWorkspaceItemSelected(itemName, itemType, itemElement) {
-        this.logger.info("Workspace item selected:", itemName, itemType);
+        this.logger.info('Workspace item selected:', itemName, itemType);
 
         // Remove selected class from all items
-        $(".project-item").removeClass("selected");
+        $('.project-item').removeClass('selected');
 
         // Add selected class to clicked item
-        itemElement.addClass("selected");
+        itemElement.addClass('selected');
 
         // Store selected item
         this.ace.selectedProject = itemName;
         this.ace.selectedItemType = itemType;
 
         // Show selected item info
-        $("#selected-project-info").show();
+        $('#selected-project-info').show();
         const displayText = itemType === 'directory' ? `📁 ${itemName}` : `📄 ${itemName}`;
-        $("#selected-project-name").text(displayText);
+        $('#selected-project-name').text(displayText);
 
         // Enable Select button
-        $(".ui-dialog-buttonpane button:contains('Select')").prop("disabled", false);
+        $(".ui-dialog-buttonpane button:contains('Select')").prop('disabled', false);
     }
 
     async findEntryPoint(projectName) {
@@ -212,7 +212,7 @@ class ProjectHelper {
             const projectPath = `/${projectName}`;
             const files = await this.ace.debuggerApiClient.listProjectFiles(projectPath);
 
-            this.logger.info("Project files:", files);
+            this.logger.info('Project files:', files);
 
             // Look for conventional entry points
             const entryPoints = ['index.js', 'main.js'];
@@ -238,7 +238,7 @@ class ProjectHelper {
             return await this.showFilePicker(projectName, jsFiles);
 
         } catch (error) {
-            this.logger.error("Error finding entry point:", error);
+            this.logger.error('Error finding entry point:', error);
             throw error;
         }
     }
@@ -256,11 +256,11 @@ class ProjectHelper {
                 </div>
             `;
 
-            if (!$("#file-picker-dialog").length) {
-                $("body").append(filePickerHtml);
+            if (!$('#file-picker-dialog').length) {
+                $('body').append(filePickerHtml);
             }
 
-            const filePickerList = $("#file-picker-list");
+            const filePickerList = $('#file-picker-list');
             filePickerList.empty();
 
             let selectedFile = null;
@@ -272,30 +272,30 @@ class ProjectHelper {
                     </div>
                 `);
 
-                fileItem.on("click", function() {
-                    $(".file-picker-item").css("background", "white").css("border-color", "#ddd");
-                    $(this).css("background", "#4caf50").css("color", "white").css("border-color", "#2e7d32");
+                fileItem.on('click', function() {
+                    $('.file-picker-item').css('background', 'white').css('border-color', '#ddd');
+                    $(this).css('background', '#4caf50').css('color', 'white').css('border-color', '#2e7d32');
                     selectedFile = file.name;
                 });
 
                 filePickerList.append(fileItem);
             });
 
-            $("#file-picker-dialog").dialog({
+            $('#file-picker-dialog').dialog({
                 modal: true,
                 width: 400,
                 buttons: {
-                    "Select": function() {
+                    'Select': function() {
                         if (selectedFile) {
-                            $(this).dialog("close");
+                            $(this).dialog('close');
                             resolve(selectedFile);
                         } else {
-                            alert("Please select a file");
+                            alert('Please select a file');
                         }
                     },
-                    "Cancel": function() {
-                        $(this).dialog("close");
-                        reject(new Error("File selection cancelled"));
+                    'Cancel': function() {
+                        $(this).dialog('close');
+                        reject(new Error('File selection cancelled'));
                     }
                 },
                 close: function() {
@@ -306,28 +306,28 @@ class ProjectHelper {
     }
 
     async onCreateNewProject() {
-        this.logger.info("Creating new project");
+        this.logger.info('Creating new project');
 
         // Prompt user for project name
-        const projectName = prompt("Enter a name for the new project:", "my-project");
+        const projectName = prompt('Enter a name for the new project:', 'my-project');
 
         if (!projectName) {
-            this.logger.info("Project creation cancelled");
+            this.logger.info('Project creation cancelled');
             return;
         }
 
         // Validate project name (basic validation)
         if (!/^[a-zA-Z0-9_-]+$/.test(projectName)) {
-            alert("Invalid project name. Please use only letters, numbers, hyphens, and underscores.");
+            alert('Invalid project name. Please use only letters, numbers, hyphens, and underscores.');
             return;
         }
 
-        const createBtn = $("#create-new-btn");
+        const createBtn = $('#create-new-btn');
         const originalText = createBtn.html();
 
         try {
             // Disable button and show loading state
-            createBtn.prop("disabled", true).html("Creating...");
+            createBtn.prop('disabled', true).html('Creating...');
 
             const projectPath = `/${projectName}`;
 
@@ -338,7 +338,7 @@ class ProjectHelper {
                 alert(`Note: Please create the directory '${projectName}' in your workspace manually.\nFor now, you can use the demo project or upload files.`);
 
             } catch (error) {
-                this.logger.warn("Cannot set active project for non-existent directory:", error);
+                this.logger.warn('Cannot set active project for non-existent directory:', error);
                 alert(`To create a new project:\n1. Create a folder named '${projectName}' in your workspace\n2. Add your JavaScript files\n3. Refresh and select it from the project list`);
             }
 
@@ -346,24 +346,24 @@ class ProjectHelper {
             await this.loadProjectsIntoDialog();
 
         } catch (error) {
-            this.logger.error("Failed to create new project:", error);
+            this.logger.error('Failed to create new project:', error);
             alert(`Failed to create project: ${error.message}`);
         } finally {
             // Re-enable button
-            createBtn.prop("disabled", false).html(originalText);
+            createBtn.prop('disabled', false).html(originalText);
         }
     }
 
     async onCreateDemoProject() {
-        this.logger.info("onCreateDemoProject called");
+        this.logger.info('onCreateDemoProject called');
 
         try {
             // Fetch available demo projects
             const projects = await this.ace.debuggerApiClient.listDemoProjects();
-            this.logger.info("Available demo projects:", projects);
+            this.logger.info('Available demo projects:', projects);
 
             if (projects.length === 0) {
-                alert("No demo projects available");
+                alert('No demo projects available');
                 return;
             }
 
@@ -371,7 +371,7 @@ class ProjectHelper {
             await this.showDemoProjectSelectionDialog(projects);
 
         } catch (error) {
-            this.logger.error("Failed to load demo projects:", error);
+            this.logger.error('Failed to load demo projects:', error);
             alert(`Failed to load demo projects: ${error.message || error.toString()}`);
         }
     }
@@ -394,32 +394,32 @@ class ProjectHelper {
                 </div>
             `;
 
-            $("#demo-project-dialog").remove();
-            $("body").append(dialogHtml);
+            $('#demo-project-dialog').remove();
+            $('body').append(dialogHtml);
 
             let selectedProject = null;
 
-            $(".demo-project-item").on("click", function() {
-                $(".demo-project-item").css({ "background": "#f9f9f9", "border-color": "#ddd" });
-                $(this).css({ "background": "#e3f2fd", "border-color": "#2196F3" });
-                selectedProject = $(this).data("name");
+            $('.demo-project-item').on('click', function() {
+                $('.demo-project-item').css({ 'background': '#f9f9f9', 'border-color': '#ddd' });
+                $(this).css({ 'background': '#e3f2fd', 'border-color': '#2196F3' });
+                selectedProject = $(this).data('name');
             });
 
-            $("#demo-project-dialog").dialog({
+            $('#demo-project-dialog').dialog({
                 modal: true,
                 width: 450,
                 buttons: {
-                    "Copy to Workspace": async () => {
+                    'Copy to Workspace': async () => {
                         if (!selectedProject) {
-                            alert("Please select a project");
+                            alert('Please select a project');
                             return;
                         }
 
-                        $("#demo-project-dialog").dialog("close");
+                        $('#demo-project-dialog').dialog('close');
 
                         try {
                             const result = await this.ace.debuggerApiClient.copyDemoProject(selectedProject);
-                            this.logger.info("Demo project copied:", result);
+                            this.logger.info('Demo project copied:', result);
 
                             await this.loadProjectsIntoDialog();
 
@@ -430,17 +430,17 @@ class ProjectHelper {
                                 }
                             }
 
-                            alert(result.message || "Demo project copied successfully!");
+                            alert(result.message || 'Demo project copied successfully!');
 
                         } catch (error) {
-                            this.logger.error("Failed to copy demo project:", error);
+                            this.logger.error('Failed to copy demo project:', error);
                             alert(`Failed to copy demo project: ${error.message}`);
                         }
 
                         resolve();
                     },
-                    "Cancel": function() {
-                        $(this).dialog("close");
+                    'Cancel': function() {
+                        $(this).dialog('close');
                         resolve();
                     }
                 },
@@ -453,7 +453,7 @@ class ProjectHelper {
 
     async onProjectSelectButtonClick(dialog) {
         if (!this.ace.selectedProject) {
-            alert("Please select an item first");
+            alert('Please select an item first');
             return;
         }
 
@@ -472,7 +472,7 @@ class ProjectHelper {
                 // Load the project using ProjectManager (this loads circuit, editor state, etc.)
                 const projectManager = window.application?.projectManager;
                 if (projectManager) {
-                    this.logger.info("Loading project via ProjectManager:", itemPath);
+                    this.logger.info('Loading project via ProjectManager:', itemPath);
                     await projectManager.loadProject(itemPath, false); // false = don't run npm install
                 }
 
@@ -480,11 +480,11 @@ class ProjectHelper {
                 await this.loadProjectFilesIntoTree(this.ace.currentProjectPath);
 
                 // Show the file tree panel if it's collapsed
-                const fileTreePanel = $("#file-tree-panel");
-                const wasCollapsed = fileTreePanel.hasClass("collapsed");
+                const fileTreePanel = $('#file-tree-panel');
+                const wasCollapsed = fileTreePanel.hasClass('collapsed');
 
                 if (wasCollapsed) {
-                    $("#toggle-filetree").click();
+                    $('#toggle-filetree').click();
                 }
 
             } else if (this.ace.selectedItemType === 'file') {
@@ -498,34 +498,34 @@ class ProjectHelper {
                 if (this.ace.editor) {
                     this.ace.editor.setValue(content, -1);
                     this.ace.currentFile = itemPath;
-                    this.logger.info("File loaded into editor:", fileName);
+                    this.logger.info('File loaded into editor:', fileName);
 
                     // Enable debug button for .js files
                     if (fileName.endsWith('.js')) {
                         this.ace.selectedFileForDebugging = itemPath;
-                        $("#debug-start-btn").prop("disabled", false);
-                        $("#debug-filename").text(fileName);
+                        $('#debug-start-btn').prop('disabled', false);
+                        $('#debug-filename').text(fileName);
                     }
                 }
             }
 
             // Close the project dialog
-            dialog.dialog("close");
+            dialog.dialog('close');
 
         } catch (error) {
-            this.logger.error("Failed to load selected item:", error);
+            this.logger.error('Failed to load selected item:', error);
             alert(`Failed to load: ${error.message}`);
         }
     }
 
     async loadProjectFilesIntoTree(projectPath) {
-        this.logger.info("Loading files into tree for:", projectPath);
+        this.logger.info('Loading files into tree for:', projectPath);
 
         try {
             const files = await this.ace.debuggerApiClient.listProjectFiles(projectPath);
-            this.logger.info("Files loaded:", files);
+            this.logger.info('Files loaded:', files);
 
-            const fileTree = $("#file-tree");
+            const fileTree = $('#file-tree');
             fileTree.empty();
 
             if (files.length === 0) {
@@ -557,22 +557,22 @@ class ProjectHelper {
             fileTree.append(projectContents);
 
             // Make root collapsible
-            projectRoot.on("click", async (e) => {
+            projectRoot.on('click', async (e) => {
                 e.stopPropagation();
-                const dirIcon = projectRoot.find(".dir-icon");
-                const isExpanded = projectContents.hasClass("expanded");
+                const dirIcon = projectRoot.find('.dir-icon');
+                const isExpanded = projectContents.hasClass('expanded');
 
                 if (isExpanded) {
-                    dirIcon.text("▶");
-                    projectContents.removeClass("expanded");
+                    dirIcon.text('▶');
+                    projectContents.removeClass('expanded');
                 } else {
-                    dirIcon.text("▼");
-                    projectContents.addClass("expanded");
+                    dirIcon.text('▼');
+                    projectContents.addClass('expanded');
                 }
             });
 
         } catch (error) {
-            this.logger.error("Failed to load project files:", error);
+            this.logger.error('Failed to load project files:', error);
             throw error;
         }
     }
@@ -614,7 +614,7 @@ class ProjectHelper {
                 });
 
                 // Toggle directory on click (but not when clicking the add icon)
-                dirItem.on("click", async (e) => {
+                dirItem.on('click', async (e) => {
                     // Don't toggle if clicking the add icon
                     if ($(e.target).hasClass('add-icon')) {
                         return;
@@ -656,13 +656,13 @@ class ProjectHelper {
                 }
 
                 // Single click to select
-                fileItem.on("click", (e) => {
+                fileItem.on('click', (e) => {
                     e.stopPropagation();
                     this.onFileTreeItemSelected(fileItem, currentPath, item.name);
                 });
 
                 // Double click to open
-                fileItem.on("dblclick", async (e) => {
+                fileItem.on('dblclick', async (e) => {
                     e.stopPropagation();
                     await this.openFileInAce(currentPath, item.name);
                 });
@@ -698,16 +698,16 @@ class ProjectHelper {
     }
 
     async toggleDirectory(dirItem, dirContents, parentPath, dirName, depth) {
-        const dirIcon = dirItem.find(".dir-icon");
-        const isExpanded = dirContents.hasClass("expanded");
+        const dirIcon = dirItem.find('.dir-icon');
+        const isExpanded = dirContents.hasClass('expanded');
 
         if (isExpanded) {
             // Collapse directory
-            dirIcon.text("▶");
-            dirContents.removeClass("expanded");
+            dirIcon.text('▶');
+            dirContents.removeClass('expanded');
         } else {
             // Expand directory
-            dirIcon.text("▼");
+            dirIcon.text('▼');
 
             // Load directory contents if not already loaded
             if (dirContents.children().length === 0) {
@@ -716,35 +716,35 @@ class ProjectHelper {
                     const files = await this.ace.debuggerApiClient.listProjectFiles(dirPath);
                     this.renderFileTreeItems(files, dirPath, dirContents, depth + 1);
                 } catch (error) {
-                    this.logger.error("Failed to load directory:", error);
+                    this.logger.error('Failed to load directory:', error);
                     dirContents.html(`<div style="padding-left: ${(depth + 1) * 16 + 8}px; color: #f44; font-size: 11px;">Error loading directory</div>`);
                 }
             }
 
-            dirContents.addClass("expanded");
+            dirContents.addClass('expanded');
         }
     }
 
     onFileTreeItemSelected(fileItem, projectPath, fileName) {
-        this.logger.info("File selected from tree:", fileName);
+        this.logger.info('File selected from tree:', fileName);
 
         // Remove selected class from all file items
-        $(".file-tree-file").removeClass("selected");
+        $('.file-tree-file').removeClass('selected');
 
         // Add selected class to clicked item
-        fileItem.addClass("selected");
+        fileItem.addClass('selected');
 
         // Store selected file
         this.ace.selectedFileForDebugging = `${projectPath}/${fileName}`;
 
         // Enable Connect button
-        $("#connect-debugger-btn").prop("disabled", false);
+        $('#connect-debugger-btn').prop('disabled', false);
 
-        this.logger.info("Selected file for debugging:", this.ace.selectedFileForDebugging);
+        this.logger.info('Selected file for debugging:', this.ace.selectedFileForDebugging);
     }
 
     async openFileInAce(filePath, fileName) {
-        this.logger.info("Opening file in ace:", filePath, fileName);
+        this.logger.info('Opening file in ace:', filePath, fileName);
 
         try {
             const fullPath = `${filePath}/${fileName}`;
@@ -752,13 +752,13 @@ class ProjectHelper {
             // Check if file is already open - just switch to it
             // Only if openSessions exists (MDI is initialized)
             if (this.ace.openSessions && this.ace.openSessions.has(fullPath)) {
-                this.logger.info("File already open, switching to it:", fullPath);
+                this.logger.info('File already open, switching to it:', fullPath);
                 this.ace.editorHelper.switchToFile(fullPath);
 
                 // Enable debug button
                 this.ace.selectedFileForDebugging = fullPath;
-                $("#debug-start-btn").prop("disabled", false);
-                $("#debug-filename").text(fileName);
+                $('#debug-start-btn').prop('disabled', false);
+                $('#debug-filename').text(fileName);
                 return;
             }
 
@@ -768,22 +768,22 @@ class ProjectHelper {
             // Open file with new session-based method if available, otherwise use old method
             if (this.ace.editor && this.ace.editorHelper && this.ace.editorHelper.openFile) {
                 this.ace.editorHelper.openFile(fullPath, content);
-                this.logger.info("File loaded into ace with new session:", fileName);
+                this.logger.info('File loaded into ace with new session:', fileName);
             } else if (this.ace.editor) {
                 // Fallback to old method if MDI not available
-                this.logger.info("Using fallback loadFile method");
+                this.logger.info('Using fallback loadFile method');
                 this.ace.editorHelper.loadFile(fullPath, content);
             } else {
-                this.logger.warn("Ace editor not available yet");
+                this.logger.warn('Ace editor not available yet');
             }
 
             // Enable debug button now that we have a file loaded
             this.ace.selectedFileForDebugging = fullPath;
-            $("#debug-start-btn").prop("disabled", false);
-            $("#debug-filename").text(fileName);
+            $('#debug-start-btn').prop('disabled', false);
+            $('#debug-filename').text(fileName);
 
         } catch (error) {
-            this.logger.error("Failed to load file:", error);
+            this.logger.error('Failed to load file:', error);
             alert(`Failed to open file: ${error.message}`);
         }
     }
@@ -805,27 +805,27 @@ class ProjectHelper {
             </div>
         `;
 
-        if (!$("#server-error-dialog").length) {
-            $("body").append(errorHtml);
+        if (!$('#server-error-dialog').length) {
+            $('body').append(errorHtml);
         }
 
-        $("#server-error-dialog").dialog({
+        $('#server-error-dialog').dialog({
             modal: true,
             width: 500,
             buttons: {
-                "Retry": () => {
-                    $("#server-error-dialog").dialog("close");
+                'Retry': () => {
+                    $('#server-error-dialog').dialog('close');
                     this.showProjectDialog();
                 },
-                "Cancel": function() {
-                    $(this).dialog("close");
+                'Cancel': function() {
+                    $(this).dialog('close');
                 }
             }
         });
     }
 
     async runNpmInstall(projectPath) {
-        this.logger.info("Running npm install for project:", projectPath);
+        this.logger.info('Running npm install for project:', projectPath);
 
         try {
             // Show a status notification
@@ -844,14 +844,14 @@ class ProjectHelper {
                 $('body').append(successMsg);
                 setTimeout(() => successMsg.fadeOut(() => successMsg.remove()), 3000);
 
-                this.logger.info("npm install completed successfully");
+                this.logger.info('npm install completed successfully');
             } else {
                 // Show error
                 throw new Error(result.error || 'npm install failed');
             }
 
         } catch (error) {
-            this.logger.error("npm install failed:", error);
+            this.logger.error('npm install failed:', error);
 
             // Remove any existing status messages
             $('.npm-install-status').remove();
@@ -864,7 +864,7 @@ class ProjectHelper {
     }
 
     async showCreateItemDialog(directoryPath, dirItem, dirContents, depth) {
-        this.logger.info("Showing create item dialog for:", directoryPath);
+        this.logger.info('Showing create item dialog for:', directoryPath);
 
         return new Promise((resolve) => {
             // Create dialog HTML
@@ -886,64 +886,64 @@ class ProjectHelper {
             `;
 
             // Remove existing dialog if present
-            $("#create-item-dialog").remove();
+            $('#create-item-dialog').remove();
 
             // Add to DOM
-            $("body").append(dialogHtml);
+            $('body').append(dialogHtml);
 
             let itemType = null;
 
             // Button handlers
-            $("#create-file-btn").on("click", () => {
+            $('#create-file-btn').on('click', () => {
                 itemType = 'file';
-                $("#create-file-btn").css("background", "#1976D2");
-                $("#create-folder-btn").css("background", "#4CAF50");
-                $("#new-item-name").focus();
+                $('#create-file-btn').css('background', '#1976D2');
+                $('#create-folder-btn').css('background', '#4CAF50');
+                $('#new-item-name').focus();
             });
 
-            $("#create-folder-btn").on("click", () => {
+            $('#create-folder-btn').on('click', () => {
                 itemType = 'folder';
-                $("#create-folder-btn").css("background", "#388E3C");
-                $("#create-file-btn").css("background", "#2196F3");
-                $("#new-item-name").focus();
+                $('#create-folder-btn').css('background', '#388E3C');
+                $('#create-file-btn').css('background', '#2196F3');
+                $('#new-item-name').focus();
             });
 
             // Show dialog
-            $("#create-item-dialog").dialog({
+            $('#create-item-dialog').dialog({
                 modal: true,
                 width: 400,
                 buttons: {
-                    "Create": async () => {
-                        const itemName = $("#new-item-name").val().trim();
+                    'Create': async () => {
+                        const itemName = $('#new-item-name').val().trim();
 
                         if (!itemName) {
-                            alert("Please enter a name");
+                            alert('Please enter a name');
                             return;
                         }
 
                         if (!itemType) {
-                            alert("Please select File or Folder");
+                            alert('Please select File or Folder');
                             return;
                         }
 
                         // Validate name
                         if (!/^[a-zA-Z0-9_.-]+$/.test(itemName)) {
-                            alert("Invalid name. Use only letters, numbers, dots, hyphens, and underscores.");
+                            alert('Invalid name. Use only letters, numbers, dots, hyphens, and underscores.');
                             return;
                         }
 
-                        $("#create-item-dialog").dialog("close");
+                        $('#create-item-dialog').dialog('close');
 
                         try {
                             await this.createItem(directoryPath, itemName, itemType, dirItem, dirContents, depth);
                             resolve();
                         } catch (error) {
-                            this.logger.error("Failed to create item:", error);
+                            this.logger.error('Failed to create item:', error);
                             alert(`Failed to create ${itemType}: ${error.message}`);
                         }
                     },
-                    "Cancel": function() {
-                        $(this).dialog("close");
+                    'Cancel': function() {
+                        $(this).dialog('close');
                         resolve();
                     }
                 },
@@ -953,10 +953,10 @@ class ProjectHelper {
             });
 
             // Focus input
-            $("#new-item-name").focus();
+            $('#new-item-name').focus();
 
             // Handle Enter key
-            $("#new-item-name").on("keypress", (e) => {
+            $('#new-item-name').on('keypress', (e) => {
                 if (e.which === 13) {
                     $(".ui-dialog-buttonpane button:contains('Create')").click();
                 }
@@ -965,7 +965,7 @@ class ProjectHelper {
     }
 
     async createItem(directoryPath, itemName, itemType, dirItem, dirContents, depth) {
-        this.logger.info(`Creating ${itemType}:`, itemName, "in", directoryPath);
+        this.logger.info(`Creating ${itemType}:`, itemName, 'in', directoryPath);
 
         const fullPath = `${directoryPath}/${itemName}`;
 
@@ -973,11 +973,11 @@ class ProjectHelper {
             if (itemType === 'file') {
                 // Create empty file by saving empty content
                 await this.ace.debuggerApiClient.saveFile(fullPath, '');
-                this.logger.info("File created:", fullPath);
+                this.logger.info('File created:', fullPath);
             } else {
                 // Create folder via API (we need to add this endpoint)
                 await this.ace.debuggerApiClient.createDirectory(fullPath);
-                this.logger.info("Folder created:", fullPath);
+                this.logger.info('Folder created:', fullPath);
             }
 
             // Refresh the directory contents
@@ -989,13 +989,13 @@ class ProjectHelper {
             setTimeout(() => successMsg.fadeOut(() => successMsg.remove()), 3000);
 
         } catch (error) {
-            this.logger.error("Failed to create item:", error);
+            this.logger.error('Failed to create item:', error);
             throw error;
         }
     }
 
     async refreshDirectory(dirItem, dirContents, directoryPath, depth) {
-        this.logger.info("Refreshing directory:", directoryPath);
+        this.logger.info('Refreshing directory:', directoryPath);
 
         try {
             // Clear current contents
@@ -1006,12 +1006,12 @@ class ProjectHelper {
             this.renderFileTreeItems(files, directoryPath, dirContents, depth + 1);
 
             // Ensure directory is expanded
-            const dirIcon = dirItem.find(".dir-icon");
-            dirIcon.text("▼");
-            dirContents.addClass("expanded");
+            const dirIcon = dirItem.find('.dir-icon');
+            dirIcon.text('▼');
+            dirContents.addClass('expanded');
 
         } catch (error) {
-            this.logger.error("Failed to refresh directory:", error);
+            this.logger.error('Failed to refresh directory:', error);
             throw error;
         }
     }

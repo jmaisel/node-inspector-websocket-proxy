@@ -4,11 +4,11 @@
 class EditorHelper {
     constructor(aceController) {
         this.ace = aceController;
-        this.logger = new Logger("EditorHelper");
+        this.logger = new Logger('EditorHelper');
     }
 
     setupEditor() {
-        this.logger.info("setupEditor()");
+        this.logger.info('setupEditor()');
 
         // Configure editor options
         this.ace.editor.setOptions({
@@ -30,7 +30,7 @@ class EditorHelper {
             }
 
             if (this.ace.application) {
-                this.ace.application.pub("editor:content:changed", {
+                this.ace.application.pub('editor:content:changed', {
                     file: this.ace.currentFile,
                     content: this.ace.editor.getValue(),
                     timestamp: Date.now()
@@ -39,10 +39,10 @@ class EditorHelper {
         });
 
         // Track cursor position changes
-        this.ace.editor.on("changeSelection", () => {
+        this.ace.editor.on('changeSelection', () => {
             const cursor = this.ace.editor.getCursorPosition();
             if (this.ace.application) {
-                this.ace.application.pub("editor:cursor:moved", {
+                this.ace.application.pub('editor:cursor:moved', {
                     row: cursor.row,
                     column: cursor.column,
                     timestamp: Date.now()
@@ -56,15 +56,15 @@ class EditorHelper {
         // Setup keyboard shortcuts for tab navigation (parent document)
         this.setupKeyboardShortcuts();
 
-        this.logger.info("Editor setup complete");
+        this.logger.info('Editor setup complete');
     }
 
     loadFile(filename, content) {
-        this.logger.info("loadFile", filename);
+        this.logger.info('loadFile', filename);
         this.ace.currentFile = filename;
 
         if (this.ace.editor) {
-            this.ace.editor.setValue(content || "", -1); // -1 moves cursor to start
+            this.ace.editor.setValue(content || '', -1); // -1 moves cursor to start
             this.clearDebugMarkers();
 
             // Determine mode based on file extension
@@ -72,7 +72,7 @@ class EditorHelper {
             this.setMode(extension);
 
             if (this.ace.application) {
-                this.ace.application.pub("editor:file:loaded", {
+                this.ace.application.pub('editor:file:loaded', {
                     filename: filename,
                     timestamp: Date.now()
                 });
@@ -97,7 +97,7 @@ class EditorHelper {
         };
 
         const mode = modeMap[extension] || 'text';
-        this.logger.info("Setting editor mode to", mode);
+        this.logger.info('Setting editor mode to', mode);
 
         if (this.ace.editor) {
             this.ace.editor.session.setMode(`ace/mode/${mode}`);
@@ -110,12 +110,12 @@ class EditorHelper {
 
     setValue(content) {
         if (this.ace.editor) {
-            this.ace.editor.setValue(content || "", -1);
+            this.ace.editor.setValue(content || '', -1);
         }
     }
 
     setDebugLine(row) {
-        this.logger.info("setDebugLine", row);
+        this.logger.info('setDebugLine', row);
 
         // Clear previous debug line
         this.clearDebugLine();
@@ -124,23 +124,23 @@ class EditorHelper {
             this.ace.currentDebugLine = row;
 
             // Add marker for current execution line
-            const Range = this.ace.editorFrame.contentWindow.ace.require("ace/range").Range;
+            const Range = this.ace.editorFrame.contentWindow.ace.require('ace/range').Range;
             const range = new Range(row, 0, row, 1);
 
             this.ace.debugMarker = this.ace.editor.session.addMarker(
                 range,
-                "ace_active-line ace_debug-line",
-                "fullLine"
+                'ace_active-line ace_debug-line',
+                'fullLine'
             );
 
             // Scroll to the debug line
             this.ace.editor.scrollToLine(row, true, true, () => {});
 
             // Optionally highlight gutter
-            this.ace.editor.session.addGutterDecoration(row, "ace_debug-gutter");
+            this.ace.editor.session.addGutterDecoration(row, 'ace_debug-gutter');
 
             if (this.ace.application) {
-                this.ace.application.pub("debugger:line:set", {
+                this.ace.application.pub('debugger:line:set', {
                     file: this.ace.currentFile,
                     line: row,
                     timestamp: Date.now()
@@ -150,7 +150,7 @@ class EditorHelper {
     }
 
     clearDebugLine() {
-        this.logger.info("clearDebugLine");
+        this.logger.info('clearDebugLine');
 
         if (this.ace.editor && this.ace.currentDebugLine !== null) {
             // Remove marker
@@ -160,14 +160,14 @@ class EditorHelper {
             }
 
             // Remove gutter decoration
-            this.ace.editor.session.removeGutterDecoration(this.ace.currentDebugLine, "ace_debug-gutter");
+            this.ace.editor.session.removeGutterDecoration(this.ace.currentDebugLine, 'ace_debug-gutter');
 
             this.ace.currentDebugLine = null;
         }
     }
 
     clearDebugMarkers() {
-        this.logger.info("clearDebugMarkers");
+        this.logger.info('clearDebugMarkers');
         this.clearDebugLine();
     }
 
@@ -198,27 +198,27 @@ class EditorHelper {
     }
 
     setupBreakpoints(debugToolbarHelper) {
-        this.logger.info("setupBreakpoints");
+        this.logger.info('setupBreakpoints');
         this.debugToolbarHelper = debugToolbarHelper;
 
         if (!this.ace.editor) {
-            this.logger.error("Cannot setup breakpoints: editor not initialized");
+            this.logger.error('Cannot setup breakpoints: editor not initialized');
             return;
         }
 
         // Add gutter click event to toggle breakpoints
-        this.ace.editor.on("guttermousedown", (e) => {
+        this.ace.editor.on('guttermousedown', (e) => {
             const target = e.domEvent.target;
 
             // Only handle clicks on the gutter (line numbers area)
-            if (target.className.indexOf("ace_gutter-cell") === -1) {
+            if (target.className.indexOf('ace_gutter-cell') === -1) {
                 return;
             }
 
             const row = e.getDocumentPosition().row;
             const breakpoints = this.ace.editor.session.getBreakpoints();
 
-            this.logger.info("Gutter clicked at row", row, "existing breakpoint:", !!breakpoints[row]);
+            this.logger.info('Gutter clicked at row', row, 'existing breakpoint:', !!breakpoints[row]);
 
             // Toggle breakpoint
             if (breakpoints[row]) {
@@ -231,7 +231,7 @@ class EditorHelper {
                 }
             } else {
                 // Add breakpoint
-                this.ace.editor.session.setBreakpoint(row, "ace_breakpoint");
+                this.ace.editor.session.setBreakpoint(row, 'ace_breakpoint');
 
                 // Notify debug toolbar helper
                 if (this.debugToolbarHelper) {
@@ -242,7 +242,7 @@ class EditorHelper {
             e.stop();
         });
 
-        this.logger.info("Breakpoint gutter clicks enabled");
+        this.logger.info('Breakpoint gutter clicks enabled');
     }
 
     // === MDI (Multiple Document Interface) Methods ===
@@ -278,7 +278,7 @@ class EditorHelper {
      * @param {string} content - File content
      */
     openFile(filename, content) {
-        this.logger.info("openFile", filename);
+        this.logger.info('openFile', filename);
 
         const extension = filename.split('.').pop();
         const mode = this.getModeForExtension(extension);
@@ -298,7 +298,7 @@ class EditorHelper {
         }
 
         if (this.ace.application) {
-            this.ace.application.pub("editor:file:loaded", {
+            this.ace.application.pub('editor:file:loaded', {
                 filename: filename,
                 timestamp: Date.now()
             });
@@ -310,7 +310,7 @@ class EditorHelper {
      * @param {string} filename - File path
      */
     switchToFile(filename) {
-        this.logger.info("switchToFile", filename);
+        this.logger.info('switchToFile', filename);
 
         if (this.ace.switchToSession(filename)) {
             // Ace automatically restores cursor, scroll, undo/redo
@@ -320,7 +320,7 @@ class EditorHelper {
             }
 
             if (this.ace.application) {
-                this.ace.application.pub("editor:file:switched", {
+                this.ace.application.pub('editor:file:switched', {
                     filename: filename,
                     timestamp: Date.now()
                 });
@@ -334,7 +334,7 @@ class EditorHelper {
      * @returns {boolean} True if closed, false if cancelled
      */
     closeFile(filename) {
-        this.logger.info("closeFile", filename);
+        this.logger.info('closeFile', filename);
 
         // Check if dirty
         const sessionData = this.ace.openSessions.get(filename);
@@ -352,7 +352,7 @@ class EditorHelper {
         this.ace.closeSession(filename);
 
         if (this.ace.application) {
-            this.ace.application.pub("editor:file:closed", {
+            this.ace.application.pub('editor:file:closed', {
                 filename: filename,
                 timestamp: Date.now()
             });
@@ -366,10 +366,10 @@ class EditorHelper {
      * This properly handles keyboard events within the editor iframe
      */
     setupAceKeyboardShortcuts() {
-        this.logger.info("setupAceKeyboardShortcuts");
+        this.logger.info('setupAceKeyboardShortcuts');
 
         if (!this.ace.editor) {
-            this.logger.error("Cannot setup Ace keyboard shortcuts: editor not initialized");
+            this.logger.error('Cannot setup Ace keyboard shortcuts: editor not initialized');
             return;
         }
 
@@ -381,20 +381,20 @@ class EditorHelper {
                 mac: 'Command-S'
             },
             exec: (editor) => {
-                this.logger.info("Ctrl+S triggered in editor");
+                this.logger.info('Ctrl+S triggered in editor');
                 this.saveCurrentFile();
             },
             readOnly: false
         });
 
-        this.logger.info("Ace keyboard shortcuts enabled");
+        this.logger.info('Ace keyboard shortcuts enabled');
     }
 
     /**
      * Setup keyboard shortcuts for tab navigation
      */
     setupKeyboardShortcuts() {
-        this.logger.info("setupKeyboardShortcuts");
+        this.logger.info('setupKeyboardShortcuts');
 
         document.addEventListener('keydown', (e) => {
             // Ctrl+Tab - Next tab
@@ -419,25 +419,25 @@ class EditorHelper {
             }
         });
 
-        this.logger.info("Keyboard shortcuts enabled");
+        this.logger.info('Keyboard shortcuts enabled');
     }
 
     /**
      * Save the currently active file to the workspace
      */
     async saveCurrentFile() {
-        this.logger.info("saveCurrentFile");
+        this.logger.info('saveCurrentFile');
 
         const activeFile = this.ace.activeFile;
         if (!activeFile) {
-            this.logger.warn("No active file to save");
+            this.logger.warn('No active file to save');
             return;
         }
 
         // Check if file is from debugger workspace (starts with /)
         if (!activeFile.startsWith('/')) {
-            this.logger.warn("Cannot save file - not from debugger workspace:", activeFile);
-            alert("Only files loaded from the debugger workspace can be saved.");
+            this.logger.warn('Cannot save file - not from debugger workspace:', activeFile);
+            alert('Only files loaded from the debugger workspace can be saved.');
             return;
         }
 
@@ -451,7 +451,7 @@ class EditorHelper {
             // Call API to save file
             const response = await this.ace.debuggerApiClient.saveFile(activeFile, content);
 
-            this.logger.info("File saved successfully:", response);
+            this.logger.info('File saved successfully:', response);
 
             // Mark file as clean (no unsaved changes)
             this.ace.markClean(activeFile);
@@ -463,7 +463,7 @@ class EditorHelper {
 
             // Publish save event
             if (this.ace.application) {
-                this.ace.application.pub("editor:file:saved", {
+                this.ace.application.pub('editor:file:saved', {
                     filename: activeFile,
                     size: response.size,
                     modified: response.modified,
@@ -475,7 +475,7 @@ class EditorHelper {
             this.logger.info(`File saved: ${activeFile}`);
 
         } catch (error) {
-            this.logger.error("Failed to save file:", error);
+            this.logger.error('Failed to save file:', error);
             alert(`Failed to save file: ${error.message}`);
         }
     }

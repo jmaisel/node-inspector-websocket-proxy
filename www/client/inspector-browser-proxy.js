@@ -6,14 +6,14 @@
  */
 
 const METHOD_TYPE = {
-  RESPONSE: "RESPONSE",
-  EVENT: "EVENT"
-}
+  RESPONSE: 'RESPONSE',
+  EVENT: 'EVENT'
+};
 
 class InspectorBrowserProxy {
 
   constructor(wsSpec, options = {}) {
-    console.log("new InspectorBrowserProxy", wsSpec);
+    console.log('new InspectorBrowserProxy', wsSpec);
     this.queue = new RegexPubSub();
     this.messageId = 1;
     this.wsSpec = wsSpec;
@@ -40,27 +40,31 @@ class InspectorBrowserProxy {
 
     // ⚠️ STATE ENFORCEMENT: Check if session guard is enabled
     if (this.sessionGuard) {
-      console.log("🔒 Checking for active debug session...");
+      console.log('🔒 Checking for active debug session...');
       try {
         const session = await this.sessionGuard.getActiveSession();
-        console.log("✓ Active session found:", session.sessionId);
+        console.log('✓ Active session found:', session.sessionId);
       } catch (error) {
-        console.error("✗ Cannot connect: " + error.message);
-        console.error("💡 Start a session first via POST /debug/session or click Debug on a file");
+        console.error('✗ Cannot connect: ' + error.message);
+        console.error('💡 Start a session first via POST /debug/session or click Debug on a file');
         throw error;
       }
     }
 
-    console.log("connecting to " + this.wsSpec);
+    console.log('connecting to ' + this.wsSpec);
 
     this.ws = new WebSocket(this.wsSpec);
 
     this.ws.addEventListener('open', this.open);
 
     this.ws.addEventListener('message', (event) => {
-      const message = JSON.parse(event.data);
-      this.message(message);
-      console.log(`message: ${JSON.stringify(message, null, 2)}`)
+      try {
+        const message = JSON.parse(event.data);
+        this.message(message);
+        console.log(`message: ${JSON.stringify(message, null, 2)}`);
+      } catch (error) {
+        console.error('Failed to parse WebSocket message:', error, event.data);
+      }
     });
 
     this.ws.addEventListener('error', this.error);
@@ -68,19 +72,19 @@ class InspectorBrowserProxy {
   }
 
   open = ()=>{
-    console.log("connection opened");
+    console.log('connection opened');
     this.queue.publish('WebSocket.open', {});
-  }
+  };
 
   close = ()=>{
     console.log('🔌 Connection closed');
     this.queue.publish('WebSocket.close', {});
-  }
+  };
 
   error = (error)=>{
     console.error('❌ WebSocket error:', error);
     this.queue.publish('WebSocket.error', { error });
-  }
+  };
 
   message = (message)=>{
     // Analyze message structure
@@ -109,7 +113,7 @@ class InspectorBrowserProxy {
 
     // console.log(JSON.stringify(message, null, 2));
     // console.log('='.repeat(60));
-  }
+  };
 
   send(method, params={}){
     const command = {

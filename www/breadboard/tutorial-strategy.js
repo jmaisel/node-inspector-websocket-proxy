@@ -5,25 +5,25 @@ class AbstractBuildTutorialStrategy {
     }
 
     forward(evt) {
-        this.logger.warn(".forward")
-        throw "unimplemented"
+        this.logger.warn('.forward');
+        throw 'unimplemented';
     }
 
     back(evt) {
-        throw "unimplemented"
+        throw 'unimplemented';
     }
 
     totalSteps() {
-        throw "unimplemented"
+        throw 'unimplemented';
     }
 
     currentStep() {
-        throw "unimplemented"
+        throw 'unimplemented';
     }
 
     setCtx(application) {
 
-        this.logger.info("setCtx", application);
+        this.logger.info('setCtx', application);
 
         this.application = application;
         this.overlayController = this.application.overlayController;
@@ -34,9 +34,9 @@ class AbstractBuildTutorialStrategy {
         const changeHandler = (evt) => {
             this.steps = [];
             this.application.overlayController.setCtx(this.application);
-        }
+        };
 
-        this.overlayController.listenFor("circuitRead", changeHandler);
+        this.overlayController.listenFor('circuitRead', changeHandler);
 
         // Subscribe to BOM updates to rebuild tutorial steps
         if (!this.bomSubscription) {
@@ -49,17 +49,17 @@ class AbstractBuildTutorialStrategy {
         }
 
         if(!this.nextBtn){
-            this.nextBtn = $("#nextBtn", this.application.stepControls);
-            this.backBtn = $("#backBtn", this.application.stepControls);
-            this.resetBtn = $("#resetBtn", this.application.stepControls);
+            this.nextBtn = $('#nextBtn', this.application.stepControls);
+            this.backBtn = $('#backBtn', this.application.stepControls);
+            this.resetBtn = $('#resetBtn', this.application.stepControls);
         }
 
         if(!this.handlerId){
             this.handlerId = this.application.simulator.randomString(10);
 
-            this.nextBtn.once("click", () => this.forward(), "nxt-" + this.handlerId);
-            this.backBtn.once("click", () => this.back(), "rst-" + this.handlerId);
-            this.resetBtn.once("click", () => this.reset(this.application), "prv-" + this.handlerId);
+            this.nextBtn.once('click', () => this.forward(), 'nxt-' + this.handlerId);
+            this.backBtn.once('click', () => this.back(), 'rst-' + this.handlerId);
+            this.resetBtn.once('click', () => this.reset(this.application), 'prv-' + this.handlerId);
         }
     }
 }
@@ -68,27 +68,27 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
 
     constructor() {
         super();
-        this.logger = new Logger("ComponentFocusedTutorialStrategy");
+        this.logger = new Logger('ComponentFocusedTutorialStrategy');
     }
 
     // called by the application when the pin mapping is determined
     // RN that's after the pin manager closes, if there are no complex
     // components in the circuit.
     buildSteps() {
-        this.logger.info("buildSteps()");
+        this.logger.info('buildSteps()');
 
         if(!this.initialized){
 
-            this.logger.info("Initializing in buildSteps");
+            this.logger.info('Initializing in buildSteps');
 
             this.initialized = true;
             const notify  = (evt)=>{
                 let bom = this.application.circuitModel.asBOM();
-                this.logger.debug("notify", evt, "syncing bom inspector to simulator: bom", bom);
+                this.logger.debug('notify', evt, 'syncing bom inspector to simulator: bom', bom);
                 // this.application.dbtsMenuController.bomView.syncToModel(bom);
-            }
+            };
 
-            notify("buildSteps");
+            notify('buildSteps');
             this.application.simulator.watch({notify});
         }
 
@@ -104,7 +104,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
         let generator = new BomBasedBuildInstructions(this.application);
         this.steps = generator.generate();
 
-        this.logger.info("built steps:", this.steps);
+        this.logger.info('built steps:', this.steps);
 
         // Emit tutorial steps generated event
         this.application.pub('tutorial:steps:generated', {
@@ -120,7 +120,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
 
         let step = this.cursor.step;
         let pstep = this.cursor.pstep;
-        this.logger.info("displayCurrentStep", step, pstep);
+        this.logger.info('displayCurrentStep', step, pstep);
 
         this.handleCurrentStep(step);
 
@@ -135,7 +135,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
 
     handleCurrentStep(step) {
 
-        this.logger.info("handleCurrentStep", step);
+        this.logger.info('handleCurrentStep', step);
 
         // reset everything.
         this.application.breadboard.unhighlightMapped();
@@ -145,7 +145,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
 
         if (step.type === BuildStep.TYPE.PLACE_COMPONENT) {
             this.application.stepContentView.html(step.text);
-            this.application.breadboard.highlightByAttr(["jsid", step.src.comp]);
+            this.application.breadboard.highlightByAttr(['jsid', step.src.comp]);
             this.application.overlayController.overlays.get(step.src.comp).fadeComponentIn();
             this.application.overlayController.overlays.get(step.src.comp).fadePinsIn();
         }
@@ -154,7 +154,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
             let src = step.src;
             let dest = step.dest;
 
-            this.logger.info("handling connection step src / dest", {src, dest})
+            this.logger.info('handling connection step src / dest', {src, dest});
 
             let sview = this.application.overlayController.overlays.get(src.comp);
             let dview = this.application.overlayController.overlays.get(dest.comp);
@@ -196,12 +196,12 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
             this.application.breadboard.highlightBus(dest.comp, dest.pin);
         }
 
-        this.logger.info("rendering instructions", step.text);
+        this.logger.info('rendering instructions', step.text);
         this.application.stepContentView.html(step.text);
     }
 
     forward() {
-        this.logger.info("forward()");
+        this.logger.info('forward()');
 
         if(!this.cursor)
             this.buildSteps();
@@ -226,7 +226,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
 
         this.cursor.step = this.steps[this.cursor.stepNbr];
 
-        this.logger.info("next", this.cursor.stepNbr, this.cursor.step);
+        this.logger.info('next', this.cursor.stepNbr, this.cursor.step);
 
         // Emit tutorial completed event if we just finished the last step
         if (previousStepNbr === this.steps.length - 1 && wrappedAround) {
@@ -258,7 +258,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
     }
 
     back(evt) {
-        this.logger.info("back", evt);
+        this.logger.info('back', evt);
 
         if(!this.cursor)
             this.buildSteps();
@@ -283,7 +283,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
 
         this.cursor.step = this.steps[this.cursor.stepNbr];
 
-        this.logger.info("previous", this.cursor.stepNbr);
+        this.logger.info('previous', this.cursor.stepNbr);
 
         // Emit step backward event
         this.application.pub('tutorial:step:backward', {
@@ -307,7 +307,7 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
     }
 
     reset() {
-        this.logger.info("reset()");
+        this.logger.info('reset()');
 
         // Emit reset and steps cleared events
         this.application.pub('tutorial:steps:cleared', {

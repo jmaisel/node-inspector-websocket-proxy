@@ -97,6 +97,31 @@ class GPIOWebSocketClient {
     }
 
     /**
+     * Cleanup and destroy the client
+     * Call this before removing the client instance to prevent memory leaks
+     */
+    destroy() {
+        // Disconnect first
+        this.disconnect();
+
+        // Remove all WebSocket event handlers to prevent memory leaks
+        if (this.ws) {
+            this.ws.onopen = null;
+            this.ws.onmessage = null;
+            this.ws.onclose = null;
+            this.ws.onerror = null;
+            this.ws = null;
+        }
+
+        // Clear callback registrations
+        this.callbackRegistrations.clear();
+
+        // Clear references
+        this.circuitJS1 = null;
+        this.logger = null;
+    }
+
+    /**
      * Handle incoming message from server
      */
     handleMessage(message) {

@@ -7,7 +7,7 @@ class ConsoleUIModel {
         this.maxSize = maxSize;
         this.messages = [];
         this.nextId = 1;
-        this.logger = new Logger("ConsoleUIModel");
+        this.logger = new Logger('ConsoleUIModel');
     }
 
     /**
@@ -36,7 +36,7 @@ class ConsoleUIModel {
             this.messages.shift();
         }
 
-        this.logger.debug("Message added", msg);
+        this.logger.debug('Message added', msg);
         return msg;
     }
 
@@ -70,7 +70,7 @@ class ConsoleUIModel {
      */
     clear() {
         this.messages = [];
-        this.logger.info("Console cleared");
+        this.logger.info('Console cleared');
     }
 
     /**

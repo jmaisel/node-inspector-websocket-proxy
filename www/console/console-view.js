@@ -7,7 +7,7 @@ class ConsoleUIView {
         this.model = model;
         this.contentDiv = this.container.find('#console-content');
         this.autoScroll = true;
-        this.logger = new Logger("ConsoleUIView");
+        this.logger = new Logger('ConsoleUIView');
 
         this.levelColors = {
             'DEBUG': '#999',
@@ -173,7 +173,7 @@ class ConsoleUIView {
     clear() {
         this.contentDiv.empty();
         this.lastRenderedId = 0;
-        this.logger.info("Console view cleared");
+        this.logger.info('Console view cleared');
     }
 
     /**
@@ -233,7 +233,7 @@ class ConsoleUIView {
 
         // Detach button - use direct selector since ID is unique
         $('#console-detach-btn').on('click', () => {
-            this.logger.info("Detach button clicked");
+            this.logger.info('Detach button clicked');
             if (handlers.onDetach) {
                 handlers.onDetach();
             }
@@ -244,7 +244,7 @@ class ConsoleUIView {
             this.autoScroll = this.isScrolledToBottom();
         });
 
-        this.logger.info("Toolbar handlers bound");
+        this.logger.info('Toolbar handlers bound');
     }
 
     /**

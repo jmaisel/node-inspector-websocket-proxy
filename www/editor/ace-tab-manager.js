@@ -6,12 +6,12 @@ class AceTabManager {
         this.aceController = aceController;
         this.editorHelper = editorHelper;
         this.tabContainer = document.getElementById('editor-tabs');
-        this.logger = new Logger("AceTabManager");
+        this.logger = new Logger('AceTabManager');
 
         if (!this.tabContainer) {
-            this.logger.error("Tab container #editor-tabs not found!");
+            this.logger.error('Tab container #editor-tabs not found!');
         } else {
-            this.logger.info("AceTabManager initialized");
+            this.logger.info('AceTabManager initialized');
         }
     }
 
@@ -51,7 +51,7 @@ class AceTabManager {
         this.tabContainer.appendChild(tab);
         this.setActiveTab(filePath);
 
-        this.logger.info("Created tab for:", filePath);
+        this.logger.info('Created tab for:', filePath);
     }
 
     /**
@@ -78,7 +78,7 @@ class AceTabManager {
      * @param {string} filePath - Full path to the file
      */
     switchToTab(filePath) {
-        this.logger.info("Switching to tab:", filePath);
+        this.logger.info('Switching to tab:', filePath);
         // Editor helper will switch the session and call setActiveTab
         this.editorHelper.switchToFile(filePath);
     }
@@ -88,7 +88,7 @@ class AceTabManager {
      * @param {string} filePath - Full path to the file
      */
     closeTab(filePath) {
-        this.logger.info("Closing tab:", filePath);
+        this.logger.info('Closing tab:', filePath);
         // Editor helper will handle dirty check and call removeTab if successful
         this.editorHelper.closeFile(filePath);
     }
@@ -101,7 +101,7 @@ class AceTabManager {
         const tab = this.tabContainer.querySelector(`[data-filepath="${filePath}"]`);
         if (tab) {
             tab.remove();
-            this.logger.info("Removed tab:", filePath);
+            this.logger.info('Removed tab:', filePath);
         }
 
         // Switch to another tab if available
@@ -124,7 +124,7 @@ class AceTabManager {
             if (!label.textContent.startsWith('• ')) {
                 label.textContent = '• ' + label.textContent;
             }
-            this.logger.debug("Marked tab as dirty:", filePath);
+            this.logger.debug('Marked tab as dirty:', filePath);
         }
     }
 
@@ -138,7 +138,7 @@ class AceTabManager {
             tab.classList.remove('dirty');
             const label = tab.querySelector('.editor-tab-label');
             label.textContent = label.textContent.replace('• ', '');
-            this.logger.debug("Marked tab as clean:", filePath);
+            this.logger.debug('Marked tab as clean:', filePath);
         }
     }
 }

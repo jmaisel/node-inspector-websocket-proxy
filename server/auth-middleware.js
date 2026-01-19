@@ -40,7 +40,7 @@ class AuthMiddleware {
 
         // Authentication successful
         next();
-    }
+    };
 
     /**
      * Express middleware that allows all requests (no authentication)
@@ -52,7 +52,7 @@ class AuthMiddleware {
     noAuth = (req, res, next) => {
         // No authentication required, just pass through
         next();
-    }
+    };
 
     /**
      * Validates an API key

@@ -6,7 +6,7 @@
 class ConsoleUIController {
 
     constructor() {
-        this.logger = new Logger("ConsoleUIController");
+        this.logger = new Logger('ConsoleUIController');
         this.application = null;
         this.model = null;
         this.view = null;
@@ -32,7 +32,7 @@ class ConsoleUIController {
      */
     setCtx(ctx) {
         this.application = ctx;
-        this.logger.info("Context set");
+        this.logger.info('Context set');
     }
 
     /**
@@ -41,7 +41,7 @@ class ConsoleUIController {
      */
     setModel(model) {
         this.model = model;
-        this.logger.info("Model set");
+        this.logger.info('Model set');
     }
 
     /**
@@ -50,17 +50,17 @@ class ConsoleUIController {
      */
     setView(view) {
         this.view = view;
-        this.logger.info("View set");
+        this.logger.info('View set');
     }
 
     /**
      * Initialize and bind event listeners
      */
     bind() {
-        this.logger.info("Binding console UI controller");
+        this.logger.info('Binding console UI controller');
 
         if (!this.application || !this.model || !this.view) {
-            this.logger.error("Cannot bind - missing dependencies");
+            this.logger.error('Cannot bind - missing dependencies');
             return;
         }
 
@@ -78,12 +78,12 @@ class ConsoleUIController {
 
         // Subscribe to debugger connection events to show/hide tabs
         this.application.sub(/^debugger:connected$/, (topic, data) => {
-            this.logger.info("Debugger connected - showing tabs");
+            this.logger.info('Debugger connected - showing tabs');
             this.showTabs();
         });
 
         this.application.sub(/^debugger:disconnected$/, (topic, data) => {
-            this.logger.info("Debugger disconnected - hiding tabs");
+            this.logger.info('Debugger disconnected - hiding tabs');
             this.hideTabs();
         });
 
@@ -107,7 +107,7 @@ class ConsoleUIController {
             this.toggleCollapse();
         }
 
-        this.logger.info("Console UI controller bound");
+        this.logger.info('Console UI controller bound');
     }
 
     /**
@@ -116,7 +116,7 @@ class ConsoleUIController {
      * @param {Object} data - Event data {type, args, stackTrace}
      */
     handleDebuggerConsole(topic, data) {
-        this.logger.debug("Debugger console:", data);
+        this.logger.debug('Debugger console:', data);
 
         // Transform args array to message string
         const message = this.formatDebuggerMessage(data.args);
@@ -172,7 +172,7 @@ class ConsoleUIController {
      * @param {Object} data - Event data
      */
     handleApplicationEvent(topic, data) {
-        this.logger.debug("Application event:", topic, data);
+        this.logger.debug('Application event:', topic, data);
 
         // Format event message
         const message = this.formatEventMessage(topic, data);
@@ -267,7 +267,7 @@ class ConsoleUIController {
     clearConsole() {
         this.model.clear();
         this.view.clear();
-        this.logger.info("Console cleared");
+        this.logger.info('Console cleared');
     }
 
     /**
@@ -311,7 +311,7 @@ class ConsoleUIController {
         // Persist state
         localStorage.setItem('console-collapsed', !wasCollapsed);
 
-        this.logger.info("Console collapsed:", !wasCollapsed);
+        this.logger.info('Console collapsed:', !wasCollapsed);
     }
 
     /**
@@ -323,7 +323,7 @@ class ConsoleUIController {
             return;
         }
 
-        this.logger.info("Detaching console");
+        this.logger.info('Detaching console');
 
         // Get console content
         const consoleContent = $('#console-content').detach();
@@ -417,7 +417,7 @@ class ConsoleUIController {
             this.detachedWindow.find('.console-tab-content').removeClass('active');
             this.detachedWindow.find(`[data-tab-content="${tabName}"]`).addClass('active');
 
-            this.logger.info("Switched to tab:", tabName);
+            this.logger.info('Switched to tab:', tabName);
         });
 
         // Make draggable and resizable
@@ -453,7 +453,7 @@ class ConsoleUIController {
         // Resize editor
         this.resizeAceEditor();
 
-        this.logger.info("Console detached with tabs");
+        this.logger.info('Console detached with tabs');
     }
 
     /**
@@ -462,7 +462,7 @@ class ConsoleUIController {
     reattachConsole() {
         if (!this.isDetached) return;
 
-        this.logger.info("Reattaching console");
+        this.logger.info('Reattaching console');
 
         // Get content from floating window
         const consoleContent = this.detachedWindow.find('#console-content').detach();
@@ -502,7 +502,7 @@ class ConsoleUIController {
             this.resizeAceEditor();
         }, 100);
 
-        this.logger.info("Console reattached");
+        this.logger.info('Console reattached');
     }
 
     /**
@@ -512,7 +512,7 @@ class ConsoleUIController {
         const codeFrame = document.getElementById('code');
         if (codeFrame && codeFrame.contentWindow && codeFrame.contentWindow.editor) {
             codeFrame.contentWindow.editor.resize();
-            this.logger.debug("Ace editor resized");
+            this.logger.debug('Ace editor resized');
         }
     }
 
@@ -522,7 +522,7 @@ class ConsoleUIController {
      */
     setConsoleSplit(split) {
         this.consoleSplit = split;
-        this.logger.info("Console split instance set");
+        this.logger.info('Console split instance set');
     }
 
     /**
@@ -530,7 +530,7 @@ class ConsoleUIController {
      */
     showTabs() {
         $('#console-tabs').fadeIn(200);
-        this.logger.info("Tabs shown");
+        this.logger.info('Tabs shown');
     }
 
     /**
@@ -540,7 +540,7 @@ class ConsoleUIController {
         $('#console-tabs').fadeOut(200);
         // Reset to console tab
         this.switchToTab('console');
-        this.logger.info("Tabs hidden");
+        this.logger.info('Tabs hidden');
     }
 
     /**
@@ -564,6 +564,6 @@ class ConsoleUIController {
         $('#console-panel .console-tab-content').removeClass('active');
         $(`#console-panel [data-tab-content="${tabName}"]`).addClass('active');
 
-        this.logger.info("Switched to tab:", tabName);
+        this.logger.info('Switched to tab:', tabName);
     }
 }

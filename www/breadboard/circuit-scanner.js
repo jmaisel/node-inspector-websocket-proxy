@@ -1,8 +1,8 @@
 class CircuitScanner{
     static Node = {
-        src: "src",
-        dest: "dest",
-        arr: ["src", "dest"],
+        src: 'src',
+        dest: 'dest',
+        arr: ['src', 'dest'],
         each: (fun)=>{
             CircuitScanner.Node.arr.forEach(fun);
         }
@@ -12,11 +12,11 @@ class CircuitScanner{
 
     constructor(simmodel) {
         this.simmodel = simmodel;
-        this.logger = new Logger("CircuitScanner");
+        this.logger = new Logger('CircuitScanner');
     }
 
     static isWire(jsid){
-        return jsid.includes("WireElm");
+        return jsid.includes('WireElm');
     }
 
     links() {
@@ -38,7 +38,7 @@ class CircuitScanner{
                 // sim model, and that's way too big for the breadboard anyway.
                 components.forEach(otherComp => {
 
-                    delete otherComp.point
+                    delete otherComp.point;
                     const otherCompPin = `${otherComp.comp}:${otherComp.pin}`;
 
                     if (compPin !== otherCompPin) {
@@ -48,7 +48,7 @@ class CircuitScanner{
                         let kdi = JSON.stringify(di);
 
                         if(!map[kbi] && !map[kdi]){
-                            map[kbi] = bi
+                            map[kbi] = bi;
                             map[kdi] = di;
                             links.push(bi);
                         }
@@ -62,7 +62,7 @@ class CircuitScanner{
 
     traceWire(wire, done = new Set()){
 
-        this.logger.debug("traceWire", {wire, done})
+        this.logger.debug('traceWire', {wire, done});
 
         let result = [];
 
@@ -78,7 +78,7 @@ class CircuitScanner{
         let scans = [
             this.scanTargets(p0, CircuitScanner.Node.src), this.scanTargets(p0, CircuitScanner.Node.dest),
             this.scanTargets(p1, CircuitScanner.Node.src), this.scanTargets(p1, CircuitScanner.Node.dest)
-        ]
+        ];
 
         // prevent infinite recursion.
         done.add(wire);
@@ -95,7 +95,7 @@ class CircuitScanner{
                         let target = conn[0][st];
 
                         if(CircuitScanner.isWire(target.comp)){
-                            let t = this.traceWire(target.comp, done)
+                            let t = this.traceWire(target.comp, done);
 
                             if(t && t.length)
                                 result.push(...t);
@@ -104,8 +104,8 @@ class CircuitScanner{
                             result.push(target);
                         }
                     }
-                })
-            })
+                });
+            });
 
         result.sort((i1, i2) => JSON.stringify(i1).localeCompare(JSON.stringify(i2)));
         return result;
@@ -140,17 +140,17 @@ class CircuitScanner{
                         result = this.traceWire(node.comp);
                     }
                     else if(!CircuitScanner.match(node, pinout)){
-                        result = [node]
+                        result = [node];
                     }
 
                     if(CircuitScanner.isWire(inv.comp)){
                         result = this.traceWire(inv.comp);
                     }
                     else if(!CircuitScanner.match(inv, pinout)){
-                        result = [inv]
+                        result = [inv];
                     }
-                })
-        })
+                });
+        });
         return [...result].filter(i => !CircuitScanner.match(i, pinout));
     }
 
@@ -162,16 +162,16 @@ class CircuitScanner{
             const mapEntries = [...map.entries()];
             mapEntries.sort(([keyA, valueA], [keyB, valueB]) => s(keyA).localeCompare(s(keyB)));
             return new Map(mapEntries);
-        }
+        };
 
         this.links().forEach(link => {
             CircuitScanner.Node.each(i => {
 
                 if(!CircuitScanner.isWire(link[i].comp)){
-                    dictionary.set(link[i], this.connectsTo(link[i]))
+                    dictionary.set(link[i], this.connectsTo(link[i]));
                 }
-            })
-        })
+            });
+        });
 
         return sortByEntries(dictionary);
     }
