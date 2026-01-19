@@ -359,14 +359,14 @@
             };
 
             // Initialize application after delay (ensures iframes are loaded)
-            setTimeout(() => {
+            setTimeout(async () => {
                 logger.log("================= INITIALIZING PITHAGORAS V2 ==================");
 
                 // Clear any collapsed state
                 localStorage.removeItem('console-collapsed');
 
                 let pithagoras = new Pithagoras();
-                pithagoras.pageReady();
+                await pithagoras.pageReady();
 
                 logger.log("================= DONE INITIALIZING PITHAGORAS V2 ==================");
             }, 1500);

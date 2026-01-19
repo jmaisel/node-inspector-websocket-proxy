@@ -194,8 +194,9 @@ class Pithagoras {
     /**
      * Initialize all application services
      * @param {Object} ctx - Application context
+     * @returns {Promise<void>}
      */
-    initializeServices(ctx) {
+    async initializeServices(ctx) {
         this.logger.info('initializeServices', ctx);
 
         ctx.breadboard.render();
@@ -207,10 +208,13 @@ class Pithagoras {
         ctx.aceController.setCtx(ctx);
         ctx.debuggerSimulatorSync.setCtx(ctx);
 
-        // Initialize project manager
-        ctx.projectManager.initialize().catch(err => {
+        // Initialize project manager and wait for it to complete
+        try {
+            await ctx.projectManager.initialize();
+            this.logger.info('Project manager initialized successfully');
+        } catch (err) {
             this.logger.error('Failed to initialize project manager:', err);
-        });
+        }
 
         // Initialize project UI controller
         ctx.projectUIController = new ProjectUIController(ctx.projectManager);
@@ -311,8 +315,9 @@ class Pithagoras {
 
     /**
      * Initialize the application when the page is ready
+     * @returns {Promise<void>}
      */
-    pageReady() {
+    async pageReady() {
         this.logger.info('pageReady()');
 
         let ctx = this.createCtx();
@@ -323,12 +328,12 @@ class Pithagoras {
         if (ctx.simulator) {
             this.logger.info('initializing pithagoras with config', ctx);
             this.bindHandlers(ctx);
-            this.initializeServices(ctx);
+            await this.initializeServices(ctx);
             ctx.simulatorWindow.oncircuitjsloaded = () => this.circuitLoadListener(ctx);
         }
 
-        // Initialize circuit menu
-        this.initCircuitMenu();
+        // Initialize circuit menu (async)
+        await this.initCircuitMenu();
 
         // Initialize project menu
         this.initProjectMenu();
