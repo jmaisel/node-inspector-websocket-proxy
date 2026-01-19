@@ -319,10 +319,40 @@ class Pithagoras {
     }
 
     /**
+     * Show splash screen
+     */
+    showSplashScreen() {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+            splash.style.display = 'flex';
+            splash.classList.remove('fade-out');
+            this.logger.info('Splash screen shown');
+        }
+    }
+
+    /**
+     * Hide splash screen with fade out animation
+     */
+    hideSplashScreen() {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+            splash.classList.add('fade-out');
+            // Remove from DOM after animation completes
+            setTimeout(() => {
+                splash.style.display = 'none';
+                this.logger.info('Splash screen hidden');
+            }, 500);
+        }
+    }
+
+    /**
      * Emit initialization started event and log
      */
     initializing() {
         this.logger.log("================= INITIALIZING PITHAGORAS V2 ==================");
+
+        // Show splash screen
+        this.showSplashScreen();
 
         // Emit application lifecycle event
         if (this.pub) {
@@ -338,6 +368,9 @@ class Pithagoras {
      */
     initialized() {
         this.logger.log("================= DONE INITIALIZING PITHAGORAS V2 ==================");
+
+        // Hide splash screen
+        this.hideSplashScreen();
 
         // Emit application lifecycle event
         if (this.pub) {
