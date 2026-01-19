@@ -345,6 +345,7 @@ class Pithagoras {
         if (splash) {
             splash.style.display = 'flex';
             splash.classList.remove('fade-out');
+            this.splashShownTime = Date.now(); // Track when splash was shown
             this.logger.info('Splash screen shown');
         }
 
@@ -407,25 +408,38 @@ class Pithagoras {
 
     /**
      * Hide splash screen with fade out animation
+     * Ensures splash is visible for at least 2 seconds, then fades out over 1.5 seconds
      */
     hideSplashScreen() {
         const splash = document.getElementById('splash-screen');
-        if (splash) {
-            this.updateSplashStatus('Ready!');
+        if (!splash) return;
 
+        this.updateSplashStatus('Ready!');
+
+        // Calculate how long the splash has been visible
+        const MIN_DISPLAY_TIME = 2000; // 2 seconds minimum
+        const FADE_DURATION = 1500; // 1.5 seconds fade
+        const elapsedTime = Date.now() - (this.splashShownTime || 0);
+        const remainingTime = Math.max(0, MIN_DISPLAY_TIME - elapsedTime);
+
+        // Wait for remaining time before starting fade-out
+        setTimeout(() => {
             // Unsubscribe from splash events
             if (this.splashEventSubscription) {
                 this.unsub(this.splashEventSubscription);
                 this.splashEventSubscription = null;
             }
 
+            // Start fade-out animation
             splash.classList.add('fade-out');
-            // Remove from DOM after animation completes
+            this.logger.info('Splash screen fading out');
+
+            // Remove from DOM after fade completes
             setTimeout(() => {
                 splash.style.display = 'none';
                 this.logger.info('Splash screen hidden');
-            }, 500);
-        }
+            }, FADE_DURATION);
+        }, remainingTime);
     }
 
     /**
