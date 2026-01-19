@@ -91,49 +91,80 @@
     <div class="unified-app-toolbar">
         <!-- Project section -->
         <div class="toolbar-section">
-            <div class="project-dropdown">
-                <button class="toolbar-btn toolbar-btn-vertical project-btn" id="project-menu-btn">
+            <div class="toolbar-dropdown">
+                <button class="toolbar-btn toolbar-btn-vertical" id="project-menu-btn">
                     <span class="btn-icon">📁</span>
                     <span class="btn-label">Project ▾</span>
                 </button>
-                <div class="project-dropdown-content" id="project-dropdown-content">
-                    <div class="project-menu-item" id="project-new-btn-menu" title="New Project">
+                <div class="toolbar-dropdown-content" id="project-dropdown-content">
+                    <div class="menu-item" id="project-new-btn-menu" title="New Project">
                         📄 New Project
                     </div>
-                    <div class="project-menu-item" id="project-open-btn-menu" title="Open Project">
+                    <div class="menu-item" id="project-open-btn-menu" title="Open Project">
                         📁 Open Project
                     </div>
-                    <div class="project-menu-item" id="project-save-btn-menu" title="Save Project">
+                    <div class="menu-item" id="project-save-btn-menu" title="Save Project">
                         💾 Save Project
                     </div>
-                    <div class="project-menu-separator"></div>
-                    <div class="project-menu-item" id="project-import-btn-menu" title="Import Project">
+                    <div class="menu-separator"></div>
+                    <div class="menu-item" id="project-import-btn-menu" title="Import Project">
                         📥 Import Project
                     </div>
-                    <div class="project-menu-item" id="project-export-btn-menu" title="Export Project">
+                    <div class="menu-item" id="project-export-btn-menu" title="Export Project">
                         📤 Export Project
                     </div>
                 </div>
             </div>
-            <div class="toolbar-separator"></div>
+<!--            <div class="toolbar-separator"></div>
             <button id="project-save-btn" class="toolbar-btn toolbar-btn-vertical" title="Save Project">
                 <span class="btn-icon">💾</span>
                 <span class="btn-label">Save</span>
-            </button>
+            </button>-->
         </div>
-
-        <div class="toolbar-separator"></div>
 
         <!-- Mode section -->
         <div class="toolbar-section">
-            <button class="toolbar-btn toolbar-btn-vertical dbts-btn" cmd="design">
-                <span class="btn-icon">🎨</span>
-                <span class="btn-label">Design</span>
-            </button>
-            <button class="toolbar-btn toolbar-btn-vertical dbts-btn" cmd="build">
-                <span class="btn-icon">🔨</span>
-                <span class="btn-label">Build</span>
-            </button>
+            <div class="toolbar-dropdown">
+                <button class="toolbar-btn toolbar-btn-vertical" id="mode-menu-btn">
+                    <span class="btn-icon" style="overflow:hidden"><img alt="joebotics" src="/img/jb-logo.png" style="width: 20px; height: 20px; position:relative; overflow: hidden; filter: invert(100%);"/></span>
+                    <span class="btn-label">Mode ▾</span>
+                </button>
+                <div class="toolbar-dropdown-content" id="mode-dropdown-content">
+                    <div class="menu-item" cmd="design" id="mode-design-btn" title="Design Mode">
+                        🎨 Design
+                    </div>
+                    <div class="menu-item" cmd="build" id="mode-build-btn" title="Build Mode">
+                        🔨 Build
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theme section -->
+        <div class="toolbar-section">
+            <div class="toolbar-dropdown">
+                <button class="toolbar-btn toolbar-btn-vertical" id="theme-menu-btn">
+                    <span class="btn-icon">🎨</span>
+                    <span class="btn-label">Theme ▾</span>
+                </button>
+                <div class="toolbar-dropdown-content" id="theme-dropdown-content">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Circuits section -->
+        <div class="toolbar-section">
+            <div class="toolbar-dropdown">
+                <button class="toolbar-btn toolbar-btn-vertical" id="circuits-menu-btn">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-label">Circuits ▾</span>
+                </button>
+                <div class="toolbar-dropdown-content" id="circuits-dropdown-content">
+                    <!-- Will be populated by JavaScript -->
+                    <div style="padding: 8px; color: #888;">Loading circuits...</div>
+                </div>
+            </div>
         </div>
 
         <div class="toolbar-separator"></div>
@@ -177,30 +208,6 @@
             </button>
         </div>
 
-        <div class="toolbar-separator"></div>
-
-        <!-- Circuit section -->
-        <div class="toolbar-section">
-            <button class="toolbar-btn toolbar-btn-vertical" onclick="callCircuitMenu('edit','undo')" title="Undo (Ctrl+Z)">
-                <span class="btn-icon">↶</span>
-                <span class="btn-label">Undo</span>
-            </button>
-            <button class="toolbar-btn toolbar-btn-vertical" onclick="callCircuitMenu('edit','redo')" title="Redo (Ctrl+Y)">
-                <span class="btn-icon">↷</span>
-                <span class="btn-label">Redo</span>
-            </button>
-            <div class="toolbar-separator"></div>
-            <div class="circuits-dropdown">
-                <button class="toolbar-btn toolbar-btn-vertical circuits-btn" id="circuits-menu-btn">
-                    <span class="btn-icon">⚡</span>
-                    <span class="btn-label">Circuits ▾</span>
-                </button>
-                <div class="circuits-dropdown-content" id="circuits-dropdown-content">
-                    <!-- Will be populated by JavaScript -->
-                    <div style="padding: 8px; color: #888;">Loading circuits...</div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Hidden project buttons for maintaining existing functionality -->
@@ -405,6 +412,99 @@
                 searchInput.focus();
             });
 
+            // Mode dropdown handler
+            $(document).on('click', '#mode-menu-btn', function(e) {
+                e.stopPropagation();
+                const dropdown = $('#mode-dropdown-content');
+
+                // Toggle dropdown
+                const isVisible = dropdown.hasClass('show');
+                $('.toolbar-dropdown-content').removeClass('show');
+
+                if (!isVisible) {
+                    dropdown.addClass('show');
+
+                    // Position dropdown below button
+                    const rect = this.getBoundingClientRect();
+                    dropdown.css({
+                        top: (rect.bottom + 2) + 'px',
+                        left: rect.left + 'px'
+                    });
+                }
+            });
+
+            // Mode menu item handlers
+            $(document).on('click', '#mode-design-btn', function(e) {
+                e.stopPropagation();
+                if (window.application && window.application.dbtsMenuController) {
+                    window.application.dbtsMenuController.designMode();
+                    $('#mode-dropdown-content').removeClass('show');
+                }
+            });
+
+            $(document).on('click', '#mode-build-btn', function(e) {
+                e.stopPropagation();
+                if (window.application && window.application.dbtsMenuController) {
+                    window.application.dbtsMenuController.buildMode();
+                    $('#mode-dropdown-content').removeClass('show');
+                }
+            });
+
+            // Theme dropdown handler
+            $(document).on('click', '#theme-menu-btn', function(e) {
+                e.stopPropagation();
+                const dropdown = $('#theme-dropdown-content');
+
+                // Populate dropdown if empty
+                if (dropdown.children().length === 0 && window.themeSwitcher && window.themeSwitcher.themes) {
+                    window.themeSwitcher.themes.forEach(theme => {
+                        const option = $('<div>')
+                            .addClass('menu-item')
+                            .attr('data-theme', theme.id)
+                            .html(`${theme.icon} ${theme.name}`)
+                            .attr('title', `Switch to ${theme.name} theme`);
+
+                        if (theme.id === window.themeSwitcher.currentTheme) {
+                            option.css('font-weight', 'bold');
+                        }
+
+                        option.on('click', function(e) {
+                            e.stopPropagation();
+                            window.themeSwitcher.applyTheme(theme.id);
+                            dropdown.removeClass('show');
+
+                            // Update active indicator
+                            dropdown.find('.menu-item').css('font-weight', 'normal');
+                            $(this).css('font-weight', 'bold');
+                        });
+
+                        dropdown.append(option);
+                    });
+                }
+
+                // Toggle dropdown
+                const isVisible = dropdown.hasClass('show');
+                $('.toolbar-dropdown-content').removeClass('show');
+
+                if (!isVisible) {
+                    dropdown.addClass('show');
+
+                    // Position dropdown below button
+                    const rect = this.getBoundingClientRect();
+                    dropdown.css({
+                        top: (rect.bottom + 2) + 'px',
+                        left: rect.left + 'px'
+                    });
+                }
+            });
+
+            // Close dropdowns when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.toolbar-dropdown').length) {
+                    $('.toolbar-dropdown-content').removeClass('show');
+                }
+            });
+
             // this is a hack
             setTimeout(()=>{
                 logger.log("================= INITIALIZING PITHAGORAS V2 ==================");
@@ -452,20 +552,12 @@
         });
     </script>
 
-    <div id="gutter-buttons" style="position: absolute; z-index: 100; top: 0; left: 0;">
+    <div id="gutter-buttons" style="position: absolute; z-index: 100; margin-top: -30px; margin-left:2px">
         <table width="70">
             <tr>
-                <td colspan="3">
-                    <div id="logo-btn-container">
-                        <img src="/img/jb-logo.png" id="logo-btn"/>
-<!--                        <span id="logo-arrow">▼</span>-->
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td align="left"><img id="max-right" class="gutter-btn" src="/img/left-chevrons.png" height="35" style="transform: rotate(-90deg)"></td>
-                <td align="center"><img id="return-gutter" class="gutter-btn" src="/img/left-chevrons.png" height="35" style="transform: rotate(180deg)"></td>
-                <td align="right"><img id="max-left" class="gutter-btn" src="/img/left-chevrons.png" height="35" style="transform: rotate(90deg)"></td>
+                <td align="left"><img id="max-right" class="gutter-btn" src="/img/left-chevrons.png" height="25" style="transform: rotate(-90deg)"></td>
+                <td align="center"><img id="return-gutter" class="gutter-btn" src="/img/left-chevrons.png" width="13" height="23" style="transform: rotate(180deg)"></td>
+                <td align="right"><img id="max-left" class="gutter-btn" src="/img/left-chevrons.png" height="25" style="transform: rotate(90deg)"></td>
             </tr>
         </table>
     </div>

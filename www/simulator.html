@@ -15,6 +15,10 @@
     <title>simulator frame</title>
 
 <style>
+body {
+	margin: 0 !important;
+}
+
 .disabled {
 	color: lightgray
 }
@@ -217,8 +221,150 @@
 </style>
 
 <link rel="stylesheet" href="font/fontello.css">
+
+<!-- Theme System -->
+<link rel="stylesheet" href="/styles/theme-base.css"/>
+<link rel="stylesheet" href="/styles/theme-dark.css"/>
+<link rel="stylesheet" href="/styles/theme-light.css"/>
+<link rel="stylesheet" href="/styles/theme-cinnamon.css"/>
+<link rel="stylesheet" href="/styles/theme-maple-waffles.css"/>
+
+<style>
+/* Apply theme to GWT controls and simulator UI */
+
+/* Style the control panel area */
+body {
+    background-color: var(--simulator-bg);
+}
+
+/* GWT MenuBar wrapper - the parent div that contains the menubar */
+div[style*="position: absolute"][style*="height: 30px"],
+div[style*="position: absolute"][style*="height: 35px"] {
+    background-color: var(--color-bg-elevated) !important;
+    height: 35px !important;
+}
+
+/* GWT MenuBar (File, Edit, Draw, etc.) */
+.gwt-MenuBar {
+    background-color: var(--color-bg-elevated) !important;
+    border-bottom: 2px solid var(--color-border-default) !important;
+}
+
+.gwt-MenuBar-horizontal {
+    background-color: var(--color-bg-elevated) !important;
+}
+
+.gwt-MenuBar table {
+    background-color: var(--color-bg-elevated) !important;
+}
+
+.gwt-MenuItem {
+    color: var(--color-text-primary) !important;
+    padding: 6px 12px !important;
+    transition: background-color var(--transition-fast) !important;
+}
+
+.gwt-MenuItem:hover {
+    background-color: var(--color-bg-hover) !important;
+}
+
+.gwt-MenuItem[aria-haspopup="true"]:hover {
+    background-color: var(--color-bg-hover) !important;
+}
+
+/* Vertical control panel */
+#painel,
+.verticalPanel {
+    background-color: var(--color-bg-tertiary) !important;
+}
+
+/* Top buttons (Reset, Run/Stop) */
+.topButton {
+    background-color: var(--color-bg-elevated) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-default) !important;
+    border-radius: var(--radius-sm) !important;
+    transition: background-color var(--transition-fast) !important;
+}
+
+.topButton:hover {
+    background-color: var(--color-bg-hover) !important;
+}
+
+.topButton-red {
+    background-color: var(--color-status-error) !important;
+    color: var(--color-text-inverse) !important;
+    border: 1px solid var(--color-status-error) !important;
+    border-radius: var(--radius-sm) !important;
+    transition: background-color var(--transition-fast) !important;
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+    margin-left: 5px !important;
+    padding: 5px 7px !important;
+    cursor: pointer !important;
+    font-size: small !important;
+}
+
+.topButton-red:hover {
+    opacity: 0.9 !important;
+}
+
+/* GWT Labels in control panel */
+.gwt-Label {
+    color: var(--color-text-primary) !important;
+}
+
+.gwt-Label.disabled {
+    color: var(--color-text-muted) !important;
+}
+
+/* GWT Buttons */
+.gwt-Button {
+    background-color: var(--color-bg-elevated) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-default) !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+.gwt-Button:hover {
+    background-color: var(--color-bg-hover) !important;
+}
+
+/* GWT TextBox inputs */
+.gwt-TextBox {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-default) !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+.gwt-TextBox:focus {
+    border-color: var(--brand-accent) !important;
+}
+
+/* Collapsible control panels */
+.expand-but {
+    background: var(--color-bg-hover) !important;
+    color: var(--color-text-primary) !important;
+    border: 1px solid var(--color-border-default) !important;
+}
+
+.expand-but:hover {
+    background: var(--color-bg-elevated) !important;
+}
+
+/* GWT Frame in control panel */
+.gwt-Frame {
+    background-color: var(--color-bg-primary) !important;
+    border: 1px solid var(--color-border-default) !important;
+}
+</style>
+
 </head>
   <body>
+    <!-- Mask to cover GWT menu wrapper with themed background -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 35px; background-color: var(--color-bg-elevated); z-index: 100; pointer-events: none;"></div>
+
     <!-- Include the next line to allow support for dropbox import/export. You will need your own app key. -->
     <!--<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="YOUR_KEY"></script>-->
 
@@ -234,6 +380,32 @@
     <!-- (the id must be exactly as shown)                           -->
     <iframe src="javascript:''" id="__gwt_historyFrame" style="width:0;height:0;border:0"></iframe>
 
+    <script>
+        // Apply theme from parent window
+        (function() {
+            function applyTheme() {
+                try {
+                    // Get theme from parent window's localStorage
+                    const savedTheme = window.parent.localStorage.getItem('app-theme') || 'dark';
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                    console.log('Simulator: Applied theme:', savedTheme);
+                } catch (e) {
+                    console.warn('Simulator: Could not access parent theme', e);
+                }
+            }
+
+            // Apply on load
+            applyTheme();
+
+            // Listen for theme changes from parent
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'theme-change') {
+                    document.documentElement.setAttribute('data-theme', event.data.theme);
+                    console.log('Simulator: Theme changed to:', event.data.theme);
+                }
+            });
+        })();
+    </script>
   </body>
 
  </html>
