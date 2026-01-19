@@ -1,6 +1,6 @@
 {
   "name": "node-inspector-websocket-proxy",
-  "version": "1.0.0",
+  "version": "v0.2.0-baseline-dist",
   "description": "Node.js Inspector WebSocket proxy with GPIO simulation support",
   "main": "server.js",
   "scripts": {

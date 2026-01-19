@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Interactive Layout</title>
+    <title>Joebotics Brometheus</title>
 
     <meta charset="utf-8">
     <meta http-equiv='cache-control' content='no-cache'>
@@ -238,11 +238,11 @@
     <!-- Splash Screen -->
     <div id="splash-screen">
         <div class="splash-content">
-            <div class="splash-logo">PITHAGORAS</div>
-            <div class="splash-subtitle">Interactive Electronics Learning Platform</div>
+            <div class="splash-logo">Brometheus</div>
             <div class="splash-version" id="splash-version">Loading version...</div>
             <div class="splash-logo-container">
-                <img src="/img/jb-logo.png" alt="Pithagoras Logo" style="padding-left: 4px; filter: invert(100%)" width="220" height="120">
+                <div class="splash-subtitle">Interactive Electronics Learning Platform</div>
+                <img src="/img/jb-logo.png" alt="Pithagoras Logo" style="padding-left: -2px; margin-top: -11px; filter: invert(100%)" width="220">
                 <div class="splash-spinner"></div>
             </div>
             <div class="splash-status">Initializing...</div>
@@ -511,21 +511,42 @@
 
             /**
              * Fetch and display version from package.json
+             * Implements timeout and offline detection
              */
             async function loadVersion() {
+                const MAX_VERSION_LOAD_TIME = 5000; // 5 seconds max
+                const versionEl = document.getElementById('splash-version');
+
                 try {
-                    const response = await fetch('/package.json');
-                    const packageJson = await response.json();
-                    const versionEl = document.getElementById('splash-version');
-                    if (versionEl && packageJson.version) {
-                        versionEl.textContent = packageJson.version;
-                        logger.log('Version loaded:', packageJson.version);
+                    // Race fetch against timeout
+                    const fetchPromise = fetch('/package.json').then(r => r.json());
+                    const timeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('timeout')), MAX_VERSION_LOAD_TIME)
+                    );
+
+                    const packageJson = await Promise.race([fetchPromise, timeoutPromise]);
+                    const version = packageJson.version || 'unknown';
+
+                    if (versionEl) {
+                        versionEl.textContent = version;
+                    }
+                    logger.log('Version loaded:', version);
+
+                    // Notify Pithagoras: online mode
+                    if (window.application?.onVersionLoaded) {
+                        window.application.onVersionLoaded(version, true);
                     }
                 } catch (error) {
-                    logger.warn('Could not load version:', error);
-                    const versionEl = document.getElementById('splash-version');
+                    // Timeout or network error: offline mode
+                    logger.warn('Could not load version (offline mode):', error);
+
                     if (versionEl) {
-                        versionEl.textContent = 'version unknown';
+                        versionEl.textContent = 'offline mode';
+                    }
+
+                    // Notify Pithagoras: offline mode
+                    if (window.application?.onVersionLoaded) {
+                        window.application.onVersionLoaded('offline mode', false);
                     }
                 }
             }

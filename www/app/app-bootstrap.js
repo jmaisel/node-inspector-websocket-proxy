@@ -338,6 +338,20 @@ class Pithagoras {
     }
 
     /**
+     * Called when version is loaded from server
+     * Starts the minimum display time counter
+     */
+    onVersionLoaded(version, isOnline = true) {
+        this.versionLoadedTime = Date.now();
+        this.isOnlineMode = isOnline;
+        this.logger.info(`Version loaded: ${version}, online: ${isOnline}`);
+
+        if (!isOnline) {
+            this.updateSplashStatus('Working offline - local mode only');
+        }
+    }
+
+    /**
      * Show splash screen and subscribe to initialization events
      */
     showSplashScreen() {
@@ -346,6 +360,8 @@ class Pithagoras {
             splash.style.display = 'flex';
             splash.classList.remove('fade-out');
             this.splashShownTime = Date.now(); // Track when splash was shown
+            this.versionLoadedTime = null; // Will be set when version loads
+            this.isOnlineMode = true; // Assume online until proven otherwise
             this.logger.info('Splash screen shown');
         }
 
@@ -408,19 +424,30 @@ class Pithagoras {
 
     /**
      * Hide splash screen with fade out animation
-     * Ensures splash is visible for at least 2 seconds, then fades out over 1.5 seconds
+     * Ensures splash is visible for at least 2 seconds after version loads,
+     * then fades out over 1.5 seconds
      */
     hideSplashScreen() {
         const splash = document.getElementById('splash-screen');
         if (!splash) return;
 
-        this.updateSplashStatus('Ready!');
+        // Show appropriate ready message based on online status
+        if (this.isOnlineMode) {
+            this.updateSplashStatus('Ready!');
+        } else {
+            this.updateSplashStatus('Ready - offline mode');
+        }
 
-        // Calculate how long the splash has been visible
-        const MIN_DISPLAY_TIME = 2000; // 2 seconds minimum
+        // Calculate how long since version was loaded (or splash was shown if version never loaded)
+        const MIN_DISPLAY_TIME = 2000; // 2 seconds minimum after version loads
         const FADE_DURATION = 1500; // 1.5 seconds fade
-        const elapsedTime = Date.now() - (this.splashShownTime || 0);
+
+        // Use version loaded time if available, otherwise fall back to splash shown time
+        const referenceTime = this.versionLoadedTime || this.splashShownTime || Date.now();
+        const elapsedTime = Date.now() - referenceTime;
         const remainingTime = Math.max(0, MIN_DISPLAY_TIME - elapsedTime);
+
+        this.logger.info(`Hiding splash: elapsed=${elapsedTime}ms, waiting=${remainingTime}ms`);
 
         // Wait for remaining time before starting fade-out
         setTimeout(() => {
