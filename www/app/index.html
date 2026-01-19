@@ -358,11 +358,91 @@
                 }
             };
 
-            // Initialize application after delay (ensures iframes are loaded)
-            setTimeout(async () => {
+            /**
+             * Wait for a specific iframe to load and be ready
+             * @param {string} selector - jQuery selector for the iframe
+             * @param {function} readyCheck - Optional function to check if iframe content is ready
+             * @returns {Promise<void>}
+             */
+            function waitForIframe(selector, readyCheck = null) {
+                return new Promise((resolve, reject) => {
+                    const iframe = $(selector)[0];
+
+                    if (!iframe) {
+                        reject(new Error(`Iframe ${selector} not found`));
+                        return;
+                    }
+
+                    // Check if already loaded
+                    if (iframe.contentWindow && iframe.contentDocument) {
+                        if (!readyCheck || readyCheck(iframe)) {
+                            logger.log(`Iframe ${selector} already loaded`);
+                            resolve();
+                            return;
+                        }
+                    }
+
+                    // Wait for load event
+                    $(iframe).on('load', function onLoad() {
+                        logger.log(`Iframe ${selector} loaded`);
+
+                        // If there's a ready check, poll until it passes
+                        if (readyCheck) {
+                            const checkInterval = setInterval(() => {
+                                if (readyCheck(iframe)) {
+                                    clearInterval(checkInterval);
+                                    resolve();
+                                }
+                            }, 50);
+
+                            // Timeout after 10 seconds
+                            setTimeout(() => {
+                                clearInterval(checkInterval);
+                                logger.warn(`Iframe ${selector} ready check timed out`);
+                                resolve(); // Resolve anyway to not block initialization
+                            }, 10000);
+                        } else {
+                            resolve();
+                        }
+                    });
+
+                    // Timeout fallback
+                    setTimeout(() => {
+                        logger.warn(`Iframe ${selector} load timeout, proceeding anyway`);
+                        resolve();
+                    }, 15000);
+                });
+            }
+
+            /**
+             * Wait for all required iframes to be ready
+             * @returns {Promise<void>}
+             */
+            async function waitForIframes() {
+                logger.log('Waiting for iframes to load...');
+
+                await Promise.all([
+                    // Wait for circuit simulator iframe and CircuitJS1 to be available
+                    waitForIframe('#circuitFrame', (iframe) => {
+                        return iframe.contentWindow && iframe.contentWindow.CircuitJS1;
+                    }),
+
+                    // Wait for code editor iframe
+                    waitForIframe('#code', (iframe) => {
+                        return iframe.contentWindow && iframe.contentWindow.document;
+                    })
+                ]);
+
+                logger.log('All iframes ready');
+            }
+
+            // Initialize application after iframes are loaded
+            (async () => {
+                await waitForIframes();
+
                 const pithagoras = new Pithagoras();
                 await pithagoras.initialize();
-            }, 1500);
+            })();
         });
     </script>
 
