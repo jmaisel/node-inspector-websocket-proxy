@@ -87,34 +87,55 @@
 </head>
 
 <body>
-    <div class="header">
-        <div id="dbts-menu">
-            <span class="dbts-btn" cmd="design">Design</span>
-            <span class="dbts-btn" cmd="build">Build</span>
-            <span class="dbts-btn" cmd="test">Test</span>
-            <span class="dbts-btn" cmd="share">Share</span>
+    <!-- Unified Toolbar spanning entire application -->
+    <div class="unified-app-toolbar">
+        <!-- Project section -->
+        <div class="toolbar-section">
+            <button id="project-new-btn" class="toolbar-btn" title="New Project">📄 New</button>
+            <button id="project-open-btn" class="toolbar-btn" title="Open Project">📁 Open</button>
+            <button id="project-save-btn" class="toolbar-btn" title="Save Project">💾 Save</button>
+            <div class="toolbar-separator"></div>
+            <button id="project-export-btn" class="toolbar-btn" title="Export Project">📤 Export</button>
+            <button id="project-import-btn" class="toolbar-btn" title="Import Project">📥 Import</button>
+        </div>
+
+        <div class="toolbar-separator"></div>
+
+        <!-- Mode section -->
+        <div class="toolbar-section">
+            <button class="toolbar-btn dbts-btn" cmd="design">🎨 Design</button>
+            <button class="toolbar-btn dbts-btn" cmd="build">🔨 Build</button>
+            <button class="toolbar-btn dbts-btn" cmd="test">🧪 Test</button>
+            <button class="toolbar-btn dbts-btn" cmd="share">🔗 Share</button>
+        </div>
+
+        <div class="toolbar-separator"></div>
+
+        <!-- Circuit section -->
+        <div class="toolbar-section">
+            <button class="toolbar-btn" onclick="callCircuitMenu('edit','undo')" title="Undo (Ctrl+Z)">↶ Undo</button>
+            <button class="toolbar-btn" onclick="callCircuitMenu('edit','redo')" title="Redo (Ctrl+Y)">↷ Redo</button>
+            <div class="toolbar-separator"></div>
+            <div class="circuits-dropdown">
+                <button class="toolbar-btn circuits-btn" id="circuits-menu-btn">
+                    ⚡ Circuits ▾
+                </button>
+                <div class="circuits-dropdown-content" id="circuits-dropdown-content">
+                    <!-- Will be populated by JavaScript -->
+                    <div style="padding: 8px; color: #888;">Loading circuits...</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="container">
         <div class="pane" id="west-pane">
-            <!-- Editor menubar -->
-            <div class="editor-menubar"></div>
-
             <div id="code-workspace">
                 <div id="code-editor-container">
                     <div id="file-tree-panel" class="file-tree-panel">
                         <div class="file-tree-header">
                             <span class="file-tree-title">Files</span>
                             <button id="toggle-filetree" class="file-tree-toggle" title="Toggle File Panel">◀</button>
-                        </div>
-                        <div id="project-toolbar" class="project-toolbar">
-                            <button id="project-new-btn" class="project-btn" title="New Project">New</button>
-                            <button id="project-open-btn" class="project-btn" title="Open Project">Open</button>
-                            <button id="project-save-btn" class="project-btn" title="Save Project">Save</button>
-                            <div class="project-toolbar-separator"></div>
-                            <button id="project-export-btn" class="project-btn" title="Export Project">Export</button>
-                            <button id="project-import-btn" class="project-btn" title="Import Project">Import</button>
                         </div>
                         <div id="file-tree" class="file-tree-content">
                             <!-- File tree will be populated here -->
@@ -186,30 +207,6 @@
         </div>
 
         <div class="pane" id="east-pane">
-            <!-- Unified Circuit Toolbar -->
-            <div class="unified-toolbar">
-                <!-- Edit operations -->
-                <div class="toolbar-group">
-                    <button class="toolbar-btn" onclick="callCircuitMenu('edit','undo')" title="Undo (Ctrl+Z)">↶ Undo</button>
-                    <button class="toolbar-btn" onclick="callCircuitMenu('edit','redo')" title="Redo (Ctrl+Y)">↷ Redo</button>
-                </div>
-
-                <div class="toolbar-separator"></div>
-
-                <!-- Circuits dropdown -->
-                <div class="toolbar-group">
-                    <div class="circuits-dropdown">
-                        <button class="toolbar-btn circuits-btn" id="circuits-menu-btn">
-                            ⚡ Circuits ▾
-                        </button>
-                        <div class="circuits-dropdown-content" id="circuits-dropdown-content">
-                            <!-- Will be populated by JavaScript -->
-                            <div style="padding: 8px; color: #888;">Loading circuits...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <iframe id="circuitFrame" src="/simulator.html?startCircuit=555square.txt"></iframe>
         </div>
 
