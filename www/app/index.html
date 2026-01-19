@@ -94,14 +94,33 @@
             font-family: monospace;
         }
 
+        .splash-logo-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .splash-logo-container img {
+            position: relative;
+            z-index: 2;
+        }
+
         .splash-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 120px;
+            height: 120px;
+            border: 4px solid rgba(255, 255, 255, 0.05);
             border-top-color: #667eea;
+            border-right-color: #764ba2;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+            animation: spin 2s linear infinite;
+            z-index: 1;
         }
 
         @keyframes spin {
@@ -199,8 +218,10 @@
             <div class="splash-logo">PITHAGORAS</div>
             <div class="splash-subtitle">Interactive Electronics Learning Platform</div>
             <div class="splash-version" id="splash-version">Loading version...</div>
-            <div><img src="/img/jb-logo.png" alt="Pithagoras Logo" style="background-color:lightgoldenrodyellow" width="100" height="100"></div>
-            <div class="splash-spinner"></div>
+            <div class="splash-logo-container">
+                <img src="/img/jb-logo.png" alt="Pithagoras Logo" style="filter: invert(100%)" width="100" height="100">
+                <div class="splash-spinner"></div>
+            </div>
             <div class="splash-status">Initializing...</div>
         </div>
     </div>
