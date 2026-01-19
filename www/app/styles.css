@@ -1147,6 +1147,53 @@ div.pm-bom-row:hover {
     margin: 0 4px;
 }
 
+/* Project dropdown */
+.project-dropdown {
+    position: relative;
+}
+
+.project-btn {
+    font-weight: 600;
+}
+
+.project-dropdown-content {
+    display: none;
+    position: fixed;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    min-width: 200px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 4px 0;
+}
+
+.project-dropdown-content.show {
+    display: block;
+}
+
+.project-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--color-text-primary);
+    transition: background-color var(--transition-fast);
+}
+
+.project-menu-item:hover {
+    background: var(--color-bg-hover);
+}
+
+.project-menu-item:active {
+    background: var(--color-border-default);
+}
+
+.project-menu-separator {
+    height: 1px;
+    background: var(--color-border-default);
+    margin: 4px 0;
+}
+
 /* Circuits dropdown */
 .circuits-dropdown {
     position: relative;

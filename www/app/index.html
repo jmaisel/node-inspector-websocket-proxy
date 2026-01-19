@@ -91,26 +91,34 @@
     <div class="unified-app-toolbar">
         <!-- Project section -->
         <div class="toolbar-section">
-            <button id="project-new-btn" class="toolbar-btn toolbar-btn-vertical" title="New Project">
-                <span class="btn-icon">📄</span>
-                <span class="btn-label">New</span>
-            </button>
-            <button id="project-open-btn" class="toolbar-btn toolbar-btn-vertical" title="Open Project">
-                <span class="btn-icon">📁</span>
-                <span class="btn-label">Open</span>
-            </button>
+            <div class="project-dropdown">
+                <button class="toolbar-btn toolbar-btn-vertical project-btn" id="project-menu-btn">
+                    <span class="btn-icon">📁</span>
+                    <span class="btn-label">Project ▾</span>
+                </button>
+                <div class="project-dropdown-content" id="project-dropdown-content">
+                    <div class="project-menu-item" id="project-new-btn-menu" title="New Project">
+                        📄 New Project
+                    </div>
+                    <div class="project-menu-item" id="project-open-btn-menu" title="Open Project">
+                        📁 Open Project
+                    </div>
+                    <div class="project-menu-item" id="project-save-btn-menu" title="Save Project">
+                        💾 Save Project
+                    </div>
+                    <div class="project-menu-separator"></div>
+                    <div class="project-menu-item" id="project-import-btn-menu" title="Import Project">
+                        📥 Import Project
+                    </div>
+                    <div class="project-menu-item" id="project-export-btn-menu" title="Export Project">
+                        📤 Export Project
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar-separator"></div>
             <button id="project-save-btn" class="toolbar-btn toolbar-btn-vertical" title="Save Project">
                 <span class="btn-icon">💾</span>
                 <span class="btn-label">Save</span>
-            </button>
-            <div class="toolbar-separator"></div>
-            <button id="project-export-btn" class="toolbar-btn toolbar-btn-vertical" title="Export Project">
-                <span class="btn-icon">📤</span>
-                <span class="btn-label">Export</span>
-            </button>
-            <button id="project-import-btn" class="toolbar-btn toolbar-btn-vertical" title="Import Project">
-                <span class="btn-icon">📥</span>
-                <span class="btn-label">Import</span>
             </button>
         </div>
 
@@ -176,6 +184,13 @@
             </div>
         </div>
     </div>
+
+    <!-- Hidden project buttons for maintaining existing functionality -->
+    <button id="project-new-btn" style="display: none;" title="New Project"></button>
+    <button id="project-open-btn" style="display: none;" title="Open Project"></button>
+    <button id="project-import-btn" style="display: none;" title="Import Project"></button>
+    <button id="project-export-btn" style="display: none;" title="Export Project"></button>
+    <input type="file" id="project-import-file" style="display: none;" accept=".zip">
 
     <div class="container">
         <div class="pane" id="west-pane">

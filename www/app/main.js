@@ -547,6 +547,9 @@ class Pithagoras{
 
         // Initialize circuit menu
         this.initCircuitMenu();
+
+        // Initialize project menu
+        this.initProjectMenu();
     }
 
     async initCircuitMenu() {
@@ -619,5 +622,68 @@ class Pithagoras{
         } catch (err) {
             logger.error('Failed to load circuits menu:', err);
         }
+    }
+
+    initProjectMenu() {
+        const logger = new Logger("initProjectMenu");
+
+        const projectMenuBtn = document.getElementById('project-menu-btn');
+        const projectDropdown = document.getElementById('project-dropdown-content');
+
+        if (!projectMenuBtn || !projectDropdown) {
+            logger.error("Project menu elements not found");
+            return;
+        }
+
+        // Toggle dropdown on button click
+        projectMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            logger.info("Project menu button clicked");
+
+            const isShowing = projectDropdown.classList.toggle('show');
+
+            if (isShowing) {
+                // Position dropdown below the button using fixed positioning
+                const rect = projectMenuBtn.getBoundingClientRect();
+                projectDropdown.style.top = (rect.bottom + 4) + 'px';
+                projectDropdown.style.left = rect.left + 'px';
+                logger.info("Positioned project dropdown at top:", projectDropdown.style.top, "left:", projectDropdown.style.left);
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.project-dropdown')) {
+                projectDropdown.classList.remove('show');
+            }
+        });
+
+        // Wire up menu items to existing button handlers
+        const menuItemMappings = [
+            { menuId: 'project-new-btn-menu', buttonId: 'project-new-btn' },
+            { menuId: 'project-open-btn-menu', buttonId: 'project-open-btn' },
+            { menuId: 'project-save-btn-menu', buttonId: 'project-save-btn' },
+            { menuId: 'project-import-btn-menu', buttonId: 'project-import-btn' },
+            { menuId: 'project-export-btn-menu', buttonId: 'project-export-btn' }
+        ];
+
+        menuItemMappings.forEach(mapping => {
+            const menuItem = document.getElementById(mapping.menuId);
+            const targetButton = document.getElementById(mapping.buttonId);
+
+            if (menuItem && targetButton) {
+                menuItem.addEventListener('click', () => {
+                    logger.info("Menu item clicked:", mapping.menuId);
+                    // Trigger click on the actual button to maintain existing functionality
+                    targetButton.click();
+                    // Close dropdown
+                    projectDropdown.classList.remove('show');
+                });
+            } else {
+                logger.warn("Could not wire up menu item:", mapping.menuId, "to button:", mapping.buttonId);
+            }
+        });
+
+        logger.info("Project menu initialized successfully");
     }
 }
