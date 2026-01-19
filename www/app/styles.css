@@ -49,6 +49,38 @@ iframe{
     justify-content: center;
 }
 
+/* Debug button with filename */
+#debug-start-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.debug-filename {
+    font-size: 10px;
+    opacity: 0.8;
+    font-weight: normal;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Debug controls */
+.debug-control-separator {
+    transition: opacity 0.3s;
+}
+
+.debug-control {
+    transition: opacity 0.3s;
+}
+
+.toolbar-btn-compact {
+    padding: 4px 8px !important;
+    font-size: 14px;
+}
+
 .header {
     height: 0px;
     background: transparent;
