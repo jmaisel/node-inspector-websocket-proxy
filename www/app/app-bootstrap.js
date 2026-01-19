@@ -319,6 +319,57 @@ class Pithagoras {
     }
 
     /**
+     * Emit initialization started event and log
+     */
+    initializing() {
+        this.logger.log("================= INITIALIZING PITHAGORAS V2 ==================");
+
+        // Emit application lifecycle event
+        if (this.pub) {
+            this.pub('application:initializing', {
+                timestamp: Date.now(),
+                version: 'v2'
+            });
+        }
+    }
+
+    /**
+     * Emit initialization completed event and log
+     */
+    initialized() {
+        this.logger.log("================= DONE INITIALIZING PITHAGORAS V2 ==================");
+
+        // Emit application lifecycle event
+        if (this.pub) {
+            this.pub('application:initialized', {
+                timestamp: Date.now(),
+                version: 'v2'
+            });
+        }
+    }
+
+    /**
+     * Main initialization entry point
+     * Orchestrates the complete application initialization sequence
+     * @returns {Promise<void>}
+     */
+    async initialize() {
+        this.logger.info('initialize()');
+
+        // Emit initializing event
+        this.initializing();
+
+        // Clear any collapsed state
+        localStorage.removeItem('console-collapsed');
+
+        // Run the page initialization
+        await this.pageReady();
+
+        // Emit initialized event
+        this.initialized();
+    }
+
+    /**
      * Initialize the application when the page is ready
      * @returns {Promise<void>}
      */
