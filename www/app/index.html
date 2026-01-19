@@ -91,20 +91,41 @@
     <div class="unified-app-toolbar">
         <!-- Project section -->
         <div class="toolbar-section">
-            <button id="project-new-btn" class="toolbar-btn" title="New Project">📄 New</button>
-            <button id="project-open-btn" class="toolbar-btn" title="Open Project">📁 Open</button>
-            <button id="project-save-btn" class="toolbar-btn" title="Save Project">💾 Save</button>
+            <button id="project-new-btn" class="toolbar-btn toolbar-btn-vertical" title="New Project">
+                <span class="btn-icon">📄</span>
+                <span class="btn-label">New</span>
+            </button>
+            <button id="project-open-btn" class="toolbar-btn toolbar-btn-vertical" title="Open Project">
+                <span class="btn-icon">📁</span>
+                <span class="btn-label">Open</span>
+            </button>
+            <button id="project-save-btn" class="toolbar-btn toolbar-btn-vertical" title="Save Project">
+                <span class="btn-icon">💾</span>
+                <span class="btn-label">Save</span>
+            </button>
             <div class="toolbar-separator"></div>
-            <button id="project-export-btn" class="toolbar-btn" title="Export Project">📤 Export</button>
-            <button id="project-import-btn" class="toolbar-btn" title="Import Project">📥 Import</button>
+            <button id="project-export-btn" class="toolbar-btn toolbar-btn-vertical" title="Export Project">
+                <span class="btn-icon">📤</span>
+                <span class="btn-label">Export</span>
+            </button>
+            <button id="project-import-btn" class="toolbar-btn toolbar-btn-vertical" title="Import Project">
+                <span class="btn-icon">📥</span>
+                <span class="btn-label">Import</span>
+            </button>
         </div>
 
         <div class="toolbar-separator"></div>
 
         <!-- Mode section -->
         <div class="toolbar-section">
-            <button class="toolbar-btn dbts-btn" cmd="design">🎨 Design</button>
-            <button class="toolbar-btn dbts-btn" cmd="build">🔨 Build</button>
+            <button class="toolbar-btn toolbar-btn-vertical dbts-btn" cmd="design">
+                <span class="btn-icon">🎨</span>
+                <span class="btn-label">Design</span>
+            </button>
+            <button class="toolbar-btn toolbar-btn-vertical dbts-btn" cmd="build">
+                <span class="btn-icon">🔨</span>
+                <span class="btn-label">Build</span>
+            </button>
         </div>
 
         <div class="toolbar-separator"></div>
@@ -134,12 +155,19 @@
 
         <!-- Circuit section -->
         <div class="toolbar-section">
-            <button class="toolbar-btn" onclick="callCircuitMenu('edit','undo')" title="Undo (Ctrl+Z)">↶ Undo</button>
-            <button class="toolbar-btn" onclick="callCircuitMenu('edit','redo')" title="Redo (Ctrl+Y)">↷ Redo</button>
+            <button class="toolbar-btn toolbar-btn-vertical" onclick="callCircuitMenu('edit','undo')" title="Undo (Ctrl+Z)">
+                <span class="btn-icon">↶</span>
+                <span class="btn-label">Undo</span>
+            </button>
+            <button class="toolbar-btn toolbar-btn-vertical" onclick="callCircuitMenu('edit','redo')" title="Redo (Ctrl+Y)">
+                <span class="btn-icon">↷</span>
+                <span class="btn-label">Redo</span>
+            </button>
             <div class="toolbar-separator"></div>
             <div class="circuits-dropdown">
-                <button class="toolbar-btn circuits-btn" id="circuits-menu-btn">
-                    ⚡ Circuits ▾
+                <button class="toolbar-btn toolbar-btn-vertical circuits-btn" id="circuits-menu-btn">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-label">Circuits ▾</span>
                 </button>
                 <div class="circuits-dropdown-content" id="circuits-dropdown-content">
                     <!-- Will be populated by JavaScript -->

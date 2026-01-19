@@ -49,6 +49,27 @@ iframe{
     justify-content: center;
 }
 
+/* Vertical toolbar buttons - icon on top, label below */
+.toolbar-btn-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    line-height: 1.2;
+    padding: 6px 10px !important;
+}
+
+.btn-icon {
+    font-size: 18px;
+    display: block;
+}
+
+.btn-label {
+    font-size: 11px;
+    display: block;
+    white-space: nowrap;
+}
+
 /* Debug button with filename */
 #debug-start-btn {
     display: flex;
