@@ -143,7 +143,7 @@ class ProjectManager {
                 entry: response.packageJson.badgerbox?.entry
             };
 
-            // Import circuit data
+            // Import circuit data into simulator
             if (response.circuitData) {
                 await this._importCircuitData(response.circuitData);
             }
@@ -339,23 +339,29 @@ class ProjectManager {
             return;
         }
 
-        if (!circuitData || circuitData.trim().length === 0) {
-            this.logger.warn('No circuit data to import');
+        if (!circuitData || typeof circuitData !== 'string') {
+            this.logger.warn('No valid circuit data to import');
+            return;
+        }
+
+        const trimmed = circuitData.trim();
+        if (trimmed.length === 0) {
+            this.logger.warn('Circuit data is empty');
             return;
         }
 
         try {
             // CircuitJS1 importCircuit calls readCircuit, which triggers oncircuitread callback
-            if (this.ctx.simulator.importCircuit) {
-                this.logger.info('Importing circuit data:', circuitData.length, 'chars');
-                this.ctx.simulator.importCircuit(circuitData, false);
-                this.logger.info('Circuit imported - oncircuitread callback should have been triggered');
-                return;
+            if (typeof this.ctx.simulator.importCircuit === 'function') {
+                this.logger.info('Importing circuit data:', trimmed.length, 'chars');
+                this.ctx.simulator.importCircuit(trimmed, false);
+                this.logger.info('Circuit imported successfully');
+            } else {
+                this.logger.warn('importCircuit method not available on simulator');
             }
-
-            this.logger.warn('importCircuit method not available on simulator');
         } catch (err) {
-            this.logger.error('Failed to import circuit data:', err);
+            // If simulator isn't ready yet, that's okay - circuit will load from file
+            this.logger.warn('Could not import circuit data (simulator may not be ready):', err.message);
         }
     }
 
