@@ -358,13 +358,6 @@
                 }
             };
 
-            // Helper function to resize Ace editor (used by console split)
-            function resizeAceEditor() {
-                if (window.application && window.application.fileTreeController) {
-                    window.application.fileTreeController.resizeAceEditor();
-                }
-            }
-
             // Initialize application after delay (ensures iframes are loaded)
             setTimeout(() => {
                 logger.log("================= INITIALIZING PITHAGORAS V2 ==================");
@@ -386,7 +379,9 @@
                     dragInterval: 1, // Update every pixel
                     onDragEnd: function(sizes) {
                         // Resize Ace editor after split drag
-                        resizeAceEditor();
+                        if (window.application && window.application.fileTreeController) {
+                            window.application.fileTreeController.resizeAceEditor();
+                        }
                         // Store sizes
                         localStorage.setItem('console-split-sizes', JSON.stringify(sizes));
                     }
