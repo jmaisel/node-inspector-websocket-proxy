@@ -549,70 +549,66 @@ class Pithagoras{
         this.initCircuitMenu();
     }
 
-    initCircuitMenu() {
+    async initCircuitMenu() {
         const logger = new Logger("initCircuitMenu");
         const circuitMenuBuilder = new CircuitMenuBuilder();
 
-        // Wait for DOM to be ready
-        const initMenu = async () => {
-            try {
-                logger.info("Loading circuits menu...");
-                const menuData = await circuitMenuBuilder.loadSetupList();
-                const dropdown = document.getElementById('circuits-dropdown-content');
+        try {
+            logger.info("Loading circuits menu...");
+            const menuData = await circuitMenuBuilder.loadSetupList();
+            const dropdown = document.getElementById('circuits-dropdown-content');
 
-                if (!dropdown) {
-                    logger.error("Circuits dropdown element not found");
-                    return;
-                }
-
-                dropdown.innerHTML = circuitMenuBuilder.buildDropdownHTML(menuData);
-                logger.info("Circuits menu loaded successfully");
-
-                // Toggle dropdown on button click
-                const menuBtn = document.getElementById('circuits-menu-btn');
-                if (menuBtn) {
-                    menuBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        dropdown.classList.toggle('show');
-                    });
-                }
-
-                // Handle submenu clicks (toggle open/close)
-                dropdown.addEventListener('click', (e) => {
-                    const submenuTitle = e.target.closest('.circuit-submenu-title');
-                    if (submenuTitle) {
-                        e.stopPropagation();
-                        const submenu = submenuTitle.closest('.circuit-submenu');
-                        submenu.classList.toggle('open');
-                    }
-
-                    // Handle circuit item clicks
-                    const menuItem = e.target.closest('.circuit-menu-item');
-                    if (menuItem) {
-                        const filename = menuItem.getAttribute('data-filename');
-                        const title = menuItem.getAttribute('data-title');
-                        if (filename && title) {
-                            window.loadCircuit(filename, title);
-                        }
-                    }
-                });
-
-                // Close dropdown when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('.circuits-dropdown')) {
-                        dropdown.classList.remove('show');
-                    }
-                });
-            } catch (err) {
-                logger.error('Failed to load circuits menu:', err);
+            if (!dropdown) {
+                logger.error("Circuits dropdown element not found");
+                return;
             }
-        };
 
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initMenu);
-        } else {
-            initMenu();
+            dropdown.innerHTML = circuitMenuBuilder.buildDropdownHTML(menuData);
+            logger.info("Circuits menu loaded successfully with", menuData.children.length, "items");
+
+            // Toggle dropdown on button click
+            const menuBtn = document.getElementById('circuits-menu-btn');
+            if (menuBtn) {
+                logger.info("Attaching click handler to circuits menu button");
+                menuBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    logger.info("Circuits menu button clicked, toggling dropdown");
+                    dropdown.classList.toggle('show');
+                });
+            } else {
+                logger.error("Circuits menu button not found");
+            }
+
+            // Handle submenu clicks (toggle open/close)
+            dropdown.addEventListener('click', (e) => {
+                const submenuTitle = e.target.closest('.circuit-submenu-title');
+                if (submenuTitle) {
+                    e.stopPropagation();
+                    const submenu = submenuTitle.closest('.circuit-submenu');
+                    submenu.classList.toggle('open');
+                    logger.info("Toggled submenu:", submenuTitle.textContent);
+                }
+
+                // Handle circuit item clicks
+                const menuItem = e.target.closest('.circuit-menu-item');
+                if (menuItem) {
+                    const filename = menuItem.getAttribute('data-filename');
+                    const title = menuItem.getAttribute('data-title');
+                    if (filename && title) {
+                        logger.info("Circuit item clicked:", title);
+                        window.loadCircuit(filename, title);
+                    }
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.circuits-dropdown')) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        } catch (err) {
+            logger.error('Failed to load circuits menu:', err);
         }
     }
 }
