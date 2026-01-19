@@ -94,8 +94,8 @@ class AceController {
         // DebuggerUIApplet instance
         this.debuggerApplet = null;
 
-        // Initialize applet first, then load debugger client
-        this.initializeApplet().then(() => {
+        // Store initialization promise so it can be awaited
+        this.initializationPromise = this.initializeApplet().then(() => {
             return this.loadDebuggerClient();
         }).then(() => {
             this.logger.info('Debugger client loaded');
@@ -105,6 +105,17 @@ class AceController {
             this.logger.error('Failed to load debugger client:', error);
             this.bind(); // Continue anyway, debugger features will be disabled
         });
+    }
+
+    /**
+     * Wait for asynchronous initialization to complete
+     * @returns {Promise<void>}
+     */
+    async waitForInitialization() {
+        if (this.initializationPromise) {
+            await this.initializationPromise;
+            this.logger.info('AceController initialization complete');
+        }
     }
 
     /**

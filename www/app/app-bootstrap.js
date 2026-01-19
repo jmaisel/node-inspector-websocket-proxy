@@ -208,6 +208,11 @@ class Pithagoras {
         ctx.aceController.setCtx(ctx);
         ctx.debuggerSimulatorSync.setCtx(ctx);
 
+        // Wait for AceController to complete async initialization
+        if (ctx.aceController.waitForInitialization) {
+            await ctx.aceController.waitForInitialization();
+        }
+
         // Initialize project manager and wait for it to complete
         try {
             await ctx.projectManager.initialize();
