@@ -61,10 +61,10 @@
 **Tasks:**
 
 1. **Split god files:**
-   - `project-helper.js` (1,018 lines) → `ProjectAPI`, `ProjectUI`, `ProjectState`
-   - `main.js` (688 lines) → `AppBootstrap`, `ModeController`, `CircuitController`
-   - `breadboard.js` (607 lines) → `BreadboardRenderer`, `BreadboardLogic`, `BreadboardEvents`
-   - `console-controller.js` (568 lines) → `ConsoleUI`, `MessageFormatter`, `LogFilter`
+   - ✅ `project-helper.js` (1,018 lines) → `ProjectAPI`, `ProjectUI`, `ProjectFileTree`
+   - ✅ `main.js` (688 lines) → `AppBootstrap`, `ModeController`, `GutterController`, `ObservableMap`
+   - ⏳ `breadboard.js` (607 lines) → `BreadboardRenderer`, `BreadboardLogic`, `BreadboardEvents`
+   - ⏳ `console-controller.js` (568 lines) → `ConsoleUI`, `MessageFormatter`, `LogFilter`
 
 2. **Create proper module boundaries**
    - Define clear interfaces between modules
