@@ -199,8 +199,10 @@ class Pithagoras {
     async initializeServices(ctx) {
         this.logger.info('initializeServices', ctx);
 
+        ctx.pub('application:init:breadboard', { timestamp: Date.now() });
         ctx.breadboard.render();
 
+        ctx.pub('application:init:controllers', { timestamp: Date.now() });
         ctx.breadboard.setCtx(ctx);
         ctx.overlayController.setCtx(ctx);
         ctx.buildStrategy.setCtx(ctx);
@@ -209,11 +211,13 @@ class Pithagoras {
         ctx.debuggerSimulatorSync.setCtx(ctx);
 
         // Wait for AceController to complete async initialization
+        ctx.pub('application:init:editor', { timestamp: Date.now() });
         if (ctx.aceController.waitForInitialization) {
             await ctx.aceController.waitForInitialization();
         }
 
         // Initialize project manager and wait for it to complete
+        ctx.pub('application:init:project', { timestamp: Date.now() });
         try {
             await ctx.projectManager.initialize();
             this.logger.info('Project manager initialized successfully');
@@ -226,13 +230,16 @@ class Pithagoras {
         ctx.projectUIController.initialize();
 
         // Initialize file tree controller
+        ctx.pub('application:init:filetree', { timestamp: Date.now() });
         ctx.fileTreeController.setCtx(ctx);
         ctx.fileTreeController.initialize();
 
         // Initialize toolbar controller
+        ctx.pub('application:init:toolbar', { timestamp: Date.now() });
         ctx.toolbarController.setCtx(ctx);
         ctx.toolbarController.initialize();
 
+        ctx.pub('application:init:layout', { timestamp: Date.now() });
         ctx.dbtsMenuController.designMode();
         ctx.gutter.controls.adjust();
 
@@ -319,7 +326,19 @@ class Pithagoras {
     }
 
     /**
-     * Show splash screen
+     * Update splash screen status message
+     * @param {string} message - Status message to display
+     */
+    updateSplashStatus(message) {
+        const statusEl = document.querySelector('.splash-status');
+        if (statusEl) {
+            statusEl.textContent = message;
+            this.logger.debug('Splash status:', message);
+        }
+    }
+
+    /**
+     * Show splash screen and subscribe to initialization events
      */
     showSplashScreen() {
         const splash = document.getElementById('splash-screen');
@@ -328,6 +347,62 @@ class Pithagoras {
             splash.classList.remove('fade-out');
             this.logger.info('Splash screen shown');
         }
+
+        // Subscribe to all events to show initialization progress
+        this.splashEventSubscription = this.sub(/.*/, (eventName, data) => {
+            // Map event names to user-friendly messages
+            const statusMessages = {
+                'application:initializing': 'Starting application...',
+                'application:init:simulator': 'Connecting to simulator...',
+                'application:init:breadboard': 'Rendering breadboard...',
+                'application:init:controllers': 'Initializing controllers...',
+                'application:init:editor': 'Loading code editor...',
+                'application:init:project': 'Loading project...',
+                'application:init:filetree': 'Setting up file tree...',
+                'application:init:toolbar': 'Configuring toolbar...',
+                'application:init:layout': 'Adjusting layout...',
+                'application:init:circuits': 'Loading circuits menu...',
+                'application:init:menus': 'Setting up menus...',
+                'application:init:splits': 'Configuring split views...',
+                'circuit:loaded': 'Circuit loaded',
+                'circuit:cleared': 'Circuit cleared',
+                'mode:design:entered': 'Design mode ready',
+                'mode:build:entered': 'Build mode ready',
+                'debugger:connected': 'Debugger connected',
+                'debugger:disconnected': 'Debugger disconnected',
+                'project:loaded': 'Project loaded',
+                'project:saved': 'Project saved',
+                'theme:changed': 'Theme applied'
+            };
+
+            // Check for logger events (from Logger class)
+            if (eventName.includes(':info') || eventName.includes(':log')) {
+                // Extract component name and show relevant initialization messages
+                const loggerMatch = eventName.match(/^(.+?):(info|log)$/);
+                if (loggerMatch) {
+                    const component = loggerMatch[1];
+                    const componentMessages = {
+                        'Pithagoras': 'Initializing core...',
+                        'ProjectManager': 'Loading project manager...',
+                        'AceControllerV2': 'Setting up code editor...',
+                        'ConsoleUIController': 'Initializing console...',
+                        'FileTreeController': 'Loading file tree...',
+                        'ToolbarController': 'Setting up toolbar...',
+                        'initCircuitMenu': 'Loading circuits menu...',
+                        'ThemeSwitcher': 'Applying theme...'
+                    };
+
+                    if (componentMessages[component]) {
+                        this.updateSplashStatus(componentMessages[component]);
+                    }
+                }
+            }
+
+            // Show mapped status messages
+            if (statusMessages[eventName]) {
+                this.updateSplashStatus(statusMessages[eventName]);
+            }
+        });
     }
 
     /**
@@ -336,6 +411,14 @@ class Pithagoras {
     hideSplashScreen() {
         const splash = document.getElementById('splash-screen');
         if (splash) {
+            this.updateSplashStatus('Ready!');
+
+            // Unsubscribe from splash events
+            if (this.splashEventSubscription) {
+                this.unsub(this.splashEventSubscription);
+                this.splashEventSubscription = null;
+            }
+
             splash.classList.add('fade-out');
             // Remove from DOM after animation completes
             setTimeout(() => {
@@ -416,18 +499,22 @@ class Pithagoras {
 
         if (ctx.simulator) {
             this.logger.info('initializing pithagoras with config', ctx);
+            ctx.pub('application:init:simulator', { timestamp: Date.now() });
             this.bindHandlers(ctx);
             await this.initializeServices(ctx);
             ctx.simulatorWindow.oncircuitjsloaded = () => this.circuitLoadListener(ctx);
         }
 
         // Initialize circuit menu (async)
+        ctx.pub('application:init:circuits', { timestamp: Date.now() });
         await this.initCircuitMenu();
 
         // Initialize project menu
+        ctx.pub('application:init:menus', { timestamp: Date.now() });
         this.initProjectMenu();
 
         // Initialize split views
+        ctx.pub('application:init:splits', { timestamp: Date.now() });
         this.initSplitViews();
     }
 
