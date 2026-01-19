@@ -332,6 +332,51 @@ class Pithagoras {
 
         // Initialize project menu
         this.initProjectMenu();
+
+        // Initialize split views
+        this.initSplitViews();
+    }
+
+    /**
+     * Initialize split views for the application layout
+     * Creates the console split and restores saved sizes
+     */
+    initSplitViews() {
+        this.logger.info('Initializing split views');
+
+        // Initialize vertical split for console
+        const consoleSplit = Split(['#code-editor-container', '#console-panel'], {
+            direction: 'vertical',
+            sizes: [70, 30],
+            minSize: [50, 28],
+            gutterSize: 8,
+            cursor: 'row-resize',
+            snapOffset: 0,  // Disable snapping
+            dragInterval: 1, // Update every pixel
+            onDragEnd: function(sizes) {
+                // Resize Ace editor after split drag
+                if (window.application && window.application.fileTreeController) {
+                    window.application.fileTreeController.resizeAceEditor();
+                }
+                // Store sizes
+                localStorage.setItem('console-split-sizes', JSON.stringify(sizes));
+            }
+        });
+
+        // Restore saved split sizes
+        const savedSizes = localStorage.getItem('console-split-sizes');
+        if (savedSizes) {
+            try {
+                consoleSplit.setSizes(JSON.parse(savedSizes));
+            } catch (e) {
+                this.logger.error("Failed to restore console split sizes:", e);
+            }
+        }
+
+        // Pass split instance to console controller
+        if (this.ctx && this.ctx.aceController && this.ctx.aceController.consoleController) {
+            this.ctx.aceController.consoleController.setConsoleSplit(consoleSplit);
+        }
     }
 
     /**
