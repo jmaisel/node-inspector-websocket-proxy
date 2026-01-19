@@ -216,7 +216,8 @@
                 <div id="code-editor-container">
                     <div id="file-tree-panel" class="file-tree-panel">
                         <div class="file-tree-header">
-                            <span class="file-tree-title">Files</span>
+                            <input type="text" id="file-tree-search" class="file-tree-search-input" placeholder="Filter files...">
+                            <button id="clear-file-search" class="file-tree-clear-btn" title="Clear filter">×</button>
                             <button id="toggle-filetree" class="file-tree-toggle" title="Toggle File Panel">◀</button>
                         </div>
                         <div id="file-tree" class="file-tree-content">
@@ -361,6 +362,47 @@
 
                 // Fallback timeout in case transitionend doesn't fire
                 setTimeout(resizeAceEditor, 400);
+            });
+
+            // File tree filter functionality
+            $(document).on('input', '#file-tree-search', function() {
+                const searchTerm = $(this).val().toLowerCase();
+                const clearBtn = $('#clear-file-search');
+
+                // Show/hide clear button
+                if (searchTerm) {
+                    clearBtn.addClass('visible');
+                } else {
+                    clearBtn.removeClass('visible');
+                }
+
+                // Filter file tree items
+                $('#file-tree .file-tree-item, #file-tree .tree-file').each(function() {
+                    const fileName = $(this).text().toLowerCase();
+                    if (fileName.includes(searchTerm)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                // Handle tree nodes - show parent nodes if any child matches
+                $('#file-tree .tree-node').each(function() {
+                    const $node = $(this);
+                    const $children = $node.find('.tree-file:visible, .file-tree-item:visible');
+                    if ($children.length > 0 || searchTerm === '') {
+                        $node.show();
+                    } else {
+                        $node.hide();
+                    }
+                });
+            });
+
+            // Clear button functionality
+            $(document).on('click', '#clear-file-search', function() {
+                const searchInput = $('#file-tree-search');
+                searchInput.val('').trigger('input');
+                searchInput.focus();
             });
 
             // this is a hack
