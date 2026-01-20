@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp www/client/*.js ../pithagoras/war/debugger-client/",
+    "sync:circuitjs1": "cp -r ../pithagoras/war/circuitjs1/* www/circuitjs1/",
     "lint": "eslint www/**/*.js server/**/*.js util/**/*.js *.js",
     "lint:fix": "eslint --fix www/**/*.js server/**/*.js util/**/*.js *.js"
   },

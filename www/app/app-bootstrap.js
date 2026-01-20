@@ -198,6 +198,7 @@ class Pithagoras {
      */
     async initializeServices(ctx) {
         this.logger.info('initializeServices', ctx);
+        ctx.simulator.setSimRunning(false);
 
         ctx.pub('application:init:breadboard', { timestamp: Date.now() });
         ctx.breadboard.render();
@@ -241,9 +242,9 @@ class Pithagoras {
 
         ctx.pub('application:init:layout', { timestamp: Date.now() });
         ctx.dbtsMenuController.designMode();
-        ctx.gutter.controls.adjust();
 
-        ctx.simulator.setSimRunning(false);
+        ctx.sub("application.initialized",
+            ()=>setTimeout(() => { ctx.gutter.controls.adjust(); }, 1000));
     }
 
     /**
