@@ -40,9 +40,19 @@ class ProjectUI {
                         </button>
                     </div>
 
-                    <div id="selected-project-info" style="padding: 10px; background: #f4f4f4; border-radius: 4px; font-size: 12px; display: none;">
-                        <span class="info-label">Selected:</span>
-                        <span id="selected-project-name" class="info-value" style="font-family: monospace;"></span>
+                    <div id="selected-project-info" style="padding: 15px; background: #f4f4f4; border: 2px solid #ddd; border-radius: 6px; font-size: 13px; display: none;">
+                        <div style="display: flex; align-items: flex-start; gap: 15px;">
+                            <div id="selected-project-icon" style="flex-shrink: 0; width: 64px; height: 64px; display: none;">
+                                <img src="" alt="Project icon" style="width: 100%; height: 100%; object-fit: contain;">
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">
+                                    <span id="selected-project-name" style="font-family: monospace;"></span>
+                                </div>
+                                <div id="selected-project-version" style="color: #666; font-size: 12px; margin-bottom: 6px; display: none;"></div>
+                                <div id="selected-project-description" style="color: #555; font-size: 12px; line-height: 1.4; display: none;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,7 +102,7 @@ class ProjectUI {
     /**
      * Render workspace items in the project list container
      * @param {Array} items - Array of workspace items
-     * @param {Function} onItemClick - Callback when item is clicked (item, element)
+     * @param {Function} onItemClick - Callback when item is clicked (item, element, packageInfo)
      */
     async renderWorkspaceItems(items, onItemClick) {
         const projectListContainer = $('#project-list');
@@ -122,11 +132,9 @@ class ProjectUI {
                 packageInfo = await this.readPackageJson(item.name);
             }
 
-            // Build metadata display
+            // Build metadata display (just show file size for files)
             let metaHtml = '';
-            if (item.type === 'directory' && packageInfo) {
-                metaHtml = `<div class="project-item-meta">v${packageInfo.version || 'unknown'} - ${packageInfo.description || 'No description'}</div>`;
-            } else if (item.type === 'file') {
+            if (item.type === 'file') {
                 metaHtml = `<div class="project-item-path" style="font-size: 11px; color: #666;">(${this.formatFileSize(item.size)})</div>`;
             }
 
@@ -142,7 +150,7 @@ class ProjectUI {
             `);
 
             workspaceItem.on('click', () => {
-                onItemClick(item, workspaceItem);
+                onItemClick(item, workspaceItem, packageInfo);
             });
 
             projectListContainer.append(workspaceItem);
@@ -206,11 +214,36 @@ class ProjectUI {
      * Update the selected project info display
      * @param {string} itemName - Name of the selected item
      * @param {string} itemType - Type of the item ('directory' or 'file')
+     * @param {Object} packageInfo - Package.json data (optional)
      */
-    updateSelectedInfo(itemName, itemType) {
+    updateSelectedInfo(itemName, itemType, packageInfo = null) {
         $('#selected-project-info').show();
+
+        // Update name
         const displayText = itemType === 'directory' ? `📁 ${itemName}` : `📄 ${itemName}`;
         $('#selected-project-name').text(displayText);
+
+        // Show/hide and update icon
+        if (packageInfo && packageInfo.icon) {
+            $('#selected-project-icon').show();
+            $('#selected-project-icon img').attr('src', packageInfo.icon);
+        } else {
+            $('#selected-project-icon').hide();
+        }
+
+        // Show/hide and update version
+        if (packageInfo && packageInfo.version) {
+            $('#selected-project-version').show().text(`Version ${packageInfo.version}`);
+        } else {
+            $('#selected-project-version').hide();
+        }
+
+        // Show/hide and update description
+        if (packageInfo && packageInfo.description) {
+            $('#selected-project-description').show().text(packageInfo.description);
+        } else {
+            $('#selected-project-description').hide();
+        }
     }
 
     /**

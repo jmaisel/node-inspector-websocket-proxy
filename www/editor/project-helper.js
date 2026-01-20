@@ -122,8 +122,8 @@ class ProjectHelper {
         try {
             const workspaceItems = await this.api.listWorkspaceItems();
 
-            await this.ui.renderWorkspaceItems(workspaceItems, (item, element) => {
-                this.onWorkspaceItemSelected(item.name, item.type, element);
+            await this.ui.renderWorkspaceItems(workspaceItems, (item, element, packageInfo) => {
+                this.onWorkspaceItemSelected(item.name, item.type, element, packageInfo);
             });
 
         } catch (error) {
@@ -137,8 +137,9 @@ class ProjectHelper {
      * @param {string} itemName - Name of the selected item
      * @param {string} itemType - Type: 'directory' or 'file'
      * @param {jQuery} itemElement - The selected element
+     * @param {Object} packageInfo - Package.json data (optional)
      */
-    async onWorkspaceItemSelected(itemName, itemType, itemElement) {
+    async onWorkspaceItemSelected(itemName, itemType, itemElement, packageInfo) {
         this.logger.info('Workspace item selected:', itemName, itemType);
 
         // Update UI
@@ -149,8 +150,8 @@ class ProjectHelper {
         this.ace.selectedProject = itemName;
         this.ace.selectedItemType = itemType;
 
-        // Update UI
-        this.ui.updateSelectedInfo(itemName, itemType);
+        // Update UI with package info
+        this.ui.updateSelectedInfo(itemName, itemType, packageInfo);
 
         // Enable Select button
         $(".ui-dialog-buttonpane button:contains('Select')").prop('disabled', false);
@@ -249,7 +250,9 @@ class ProjectHelper {
             if (result.path) {
                 const projectItem = $(`.project-item[data-item-path="/${projectName}"]`);
                 if (projectItem.length) {
-                    this.onWorkspaceItemSelected(projectName, 'directory', projectItem);
+                    // Read package info for the copied project
+                    const packageInfo = await this.ui.readPackageJson(projectName);
+                    this.onWorkspaceItemSelected(projectName, 'directory', projectItem, packageInfo);
                 }
             }
 

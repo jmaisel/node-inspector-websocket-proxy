@@ -2,6 +2,7 @@
   "name": "gpio-write",
   "version": "1.0.0",
   "description": "Control GPIO pins by writing HIGH/LOW states to the circuit simulator",
+  "icon": "/img/project-icons/gpio-write.svg",
   "main": "example.js",
   "dependencies": {
     "ws": "^8.18.3"

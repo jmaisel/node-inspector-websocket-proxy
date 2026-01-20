@@ -1,7 +1,8 @@
 {
-  "name": "gpio-write",
+  "name": "gpio-read-write",
   "version": "1.0.0",
-  "description": "Control GPIO pins by writing HIGH/LOW states to the circuit simulator",
+  "description": "Bidirectional GPIO control - read and write pin states interactively",
+  "icon": "/img/project-icons/gpio-read-write.svg",
   "main": "example.js",
   "dependencies": {
     "ws": "^8.18.3"
