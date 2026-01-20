@@ -122,7 +122,7 @@ class ProjectHelper {
         try {
             const workspaceItems = await this.api.listWorkspaceItems();
 
-            this.ui.renderWorkspaceItems(workspaceItems, (item, element) => {
+            await this.ui.renderWorkspaceItems(workspaceItems, (item, element) => {
                 this.onWorkspaceItemSelected(item.name, item.type, element);
             });
 

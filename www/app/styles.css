@@ -1309,3 +1309,78 @@ div.pm-bom-row:hover {
 #theme-switcher {
     display: none !important;
 }
+
+/* ===== Project Dialog Styles ===== */
+
+/* Ensure dialog is above splitters */
+.ui-dialog {
+    z-index: 10000 !important;
+}
+
+.ui-widget-overlay {
+    z-index: 9999 !important;
+}
+
+/* Make dialog text non-selectable */
+#project-dialog,
+#demo-project-dialog,
+#file-picker-dialog {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Project item styling */
+.project-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin: 6px 0;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.project-item:hover {
+    background: #f5f5f5;
+    border-color: #bbb;
+    transform: translateX(2px);
+}
+
+.project-item.selected {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border-color: #2e7d32;
+    color: white;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.project-item.selected .project-item-name {
+    font-weight: bold;
+}
+
+.project-item.selected .project-item-path,
+.project-item.selected .project-item-meta {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.project-item-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.project-item-path {
+    font-size: 11px;
+    color: #666;
+}
+
+.project-item-meta {
+    font-size: 10px;
+    color: #888;
+    margin-top: 4px;
+    font-style: italic;
+}

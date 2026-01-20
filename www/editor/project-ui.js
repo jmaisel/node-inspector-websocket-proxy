@@ -94,7 +94,7 @@ class ProjectUI {
      * @param {Array} items - Array of workspace items
      * @param {Function} onItemClick - Callback when item is clicked (item, element)
      */
-    renderWorkspaceItems(items, onItemClick) {
+    async renderWorkspaceItems(items, onItemClick) {
         const projectListContainer = $('#project-list');
         projectListContainer.empty();
 
@@ -112,16 +112,31 @@ class ProjectUI {
         });
 
         // Add each item as a selectable item
-        sortedItems.forEach(item => {
+        for (const item of sortedItems) {
             const icon = item.type === 'directory' ? '📁' : '📄';
             const itemType = item.type === 'directory' ? 'folder' : 'file';
+
+            // For directories, try to read package.json
+            let packageInfo = null;
+            if (item.type === 'directory') {
+                packageInfo = await this.readPackageJson(item.name);
+            }
+
+            // Build metadata display
+            let metaHtml = '';
+            if (item.type === 'directory' && packageInfo) {
+                metaHtml = `<div class="project-item-meta">v${packageInfo.version || 'unknown'} - ${packageInfo.description || 'No description'}</div>`;
+            } else if (item.type === 'file') {
+                metaHtml = `<div class="project-item-path" style="font-size: 11px; color: #666;">(${this.formatFileSize(item.size)})</div>`;
+            }
 
             const workspaceItem = $(`
                 <div class="project-item ${itemType}" data-item-path="/${item.name}" data-item-type="${item.type}">
                     <span style="margin-right: 8px;">${icon}</span>
                     <div style="flex: 1;">
                         <div class="project-item-name">${item.name}</div>
-                        <div class="project-item-path" style="font-size: 11px; color: #666;">/${item.name} ${item.type === 'directory' ? '' : '(' + this.formatFileSize(item.size) + ')'}</div>
+                        <div class="project-item-path" style="font-size: 11px; color: #666;">/${item.name}</div>
+                        ${metaHtml}
                     </div>
                 </div>
             `);
@@ -131,7 +146,26 @@ class ProjectUI {
             });
 
             projectListContainer.append(workspaceItem);
-        });
+        }
+    }
+
+    /**
+     * Read package.json from a project directory
+     * @param {string} projectName - Name of the project directory
+     * @returns {Promise<Object|null>} Package.json content or null if not found
+     */
+    async readPackageJson(projectName) {
+        try {
+            const response = await fetch(`/workspace/${projectName}/package.json`);
+            if (!response.ok) {
+                return null;
+            }
+            const packageJson = await response.json();
+            return packageJson;
+        } catch (error) {
+            this.logger?.debug?.(`Could not read package.json for ${projectName}:`, error);
+            return null;
+        }
     }
 
     /**
