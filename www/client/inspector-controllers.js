@@ -23,10 +23,7 @@ class BaseDomainController extends EventEmitter {
      * @returns {InspectorBrowserProxy} The initialized event queue
      */
     static initialize(wsUrl) {
-        if (BaseDomainController.eventQueue) {
-            console.warn('BaseDomainController already initialized. Returning existing event queue.');
-            return BaseDomainController.eventQueue;
-        }
+        // Always create a new event queue to prevent subscription leaks across debug sessions
         BaseDomainController.eventQueue = new InspectorBrowserProxy(wsUrl);
         // Initialize controllers after eventQueue is set
         BaseDomainController.eventQueue.initControllers();
