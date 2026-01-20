@@ -42,15 +42,15 @@ class ProjectUI {
 
                     <div id="selected-project-info" style="padding: 15px; background: #f4f4f4; border: 2px solid #ddd; border-radius: 6px; font-size: 13px; display: none;">
                         <div style="display: flex; align-items: flex-start; gap: 15px;">
-                            <div id="selected-project-icon" style="flex-shrink: 0; width: 64px; height: 64px; display: none;">
-                                <img src="" alt="Project icon" style="width: 100%; height: 100%; object-fit: contain;">
-                            </div>
                             <div style="flex: 1; min-width: 0;">
                                 <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">
                                     <span id="selected-project-name" style="font-family: monospace;"></span>
                                 </div>
                                 <div id="selected-project-version" style="color: #666; font-size: 12px; margin-bottom: 6px; display: none;"></div>
                                 <div id="selected-project-description" style="color: #555; font-size: 12px; line-height: 1.4; display: none;"></div>
+                            </div>
+                            <div id="selected-project-icon" style="flex-shrink: 0; width: 64px; height: 64px; display: none;">
+                                <img src="" alt="Project icon" style="width: 100%; height: 100%; object-fit: contain; border-radius: 4px;">
                             </div>
                         </div>
                     </div>
@@ -217,6 +217,7 @@ class ProjectUI {
      * @param {Object} packageInfo - Package.json data (optional)
      */
     updateSelectedInfo(itemName, itemType, packageInfo = null) {
+        this.logger?.debug?.('updateSelectedInfo:', itemName, itemType, packageInfo);
         $('#selected-project-info').show();
 
         // Update name
@@ -225,9 +226,11 @@ class ProjectUI {
 
         // Show/hide and update icon
         if (packageInfo && packageInfo.icon) {
+            this.logger?.debug?.('Showing icon:', packageInfo.icon);
             $('#selected-project-icon').show();
             $('#selected-project-icon img').attr('src', packageInfo.icon);
         } else {
+            this.logger?.debug?.('No icon in package info, hiding icon');
             $('#selected-project-icon').hide();
         }
 
