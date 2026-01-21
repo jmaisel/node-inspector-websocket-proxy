@@ -586,6 +586,66 @@ function createWorkspaceApi(config = {}) {
     router.post('/*', textBodyParser, auth.noAuth, uploadHandler);
     router.patch('/*', textBodyParser, auth.noAuth, uploadHandler);
 
+    /**
+     * DELETE /* - Delete a file or directory
+     */
+    router.delete('/*', auth.noAuth, async (req, res) => {
+        try {
+            const requestedPath = req.path;
+
+            // Validate and resolve the path
+            const fullPath = await security.validatePath(requestedPath);
+
+            // Check if path exists
+            const exists = await fs.access(fullPath).then(() => true).catch(() => false);
+            if (!exists) {
+                return res.status(404).json({
+                    error: 'Not found',
+                    message: `Path does not exist: ${requestedPath}`
+                });
+            }
+
+            // Get stats to check if it's a file or directory
+            const stats = await fs.stat(fullPath);
+
+            if (stats.isDirectory()) {
+                // Recursively delete directory
+                await fs.rm(fullPath, { recursive: true, force: true });
+                console.log(`Deleted directory: ${requestedPath}`);
+            } else {
+                // Delete file
+                await fs.unlink(fullPath);
+                console.log(`Deleted file: ${requestedPath}`);
+            }
+
+            res.json({
+                success: true,
+                message: `Deleted: ${requestedPath}`,
+                type: stats.isDirectory() ? 'directory' : 'file'
+            });
+
+        } catch (error) {
+            console.error('Delete error:', error);
+
+            if (error.code === 'ENOENT') {
+                res.status(404).json({
+                    error: 'Not found',
+                    message: 'File or directory does not exist'
+                });
+            } else if (error.code === 'EACCES' || error.code === 'EPERM') {
+                res.status(403).json({
+                    error: 'Permission denied',
+                    message: 'Cannot delete: permission denied'
+                });
+            } else {
+                res.status(500).json({
+                    error: 'Delete failed',
+                    message: error.message
+                });
+            }
+        }
+    });
+
     return router;
 }
 

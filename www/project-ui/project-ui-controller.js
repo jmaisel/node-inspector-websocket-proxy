@@ -40,25 +40,14 @@ class ProjectUIController {
      */
     async _handleNewProject() {
         try {
-            // Prompt for project details
-            const name = prompt('Enter project name:');
-            if (!name) return;
-
-            const hardware = prompt('Hardware type (esp32|rpi|none):', 'none');
-            if (!hardware) return;
-
-            const entry = prompt('Entry file path:', 'src/main.js');
-            if (!entry) return;
-
-            this.logger.info('Creating new project:', {name, hardware, entry});
-
-            // Show loading indicator
-            this._showStatus('Creating project...');
-
-            // Create project
-            await this.projectManager.createProject(name, hardware, entry);
-
-            this._showStatus(`Project "${name}" created successfully!`, 'success');
+            // Use ACE controller's ProjectHelper to show the new project dialog
+            const aceController = this.projectManager.ctx.aceController;
+            if (aceController && aceController.projectHelper) {
+                await aceController.projectHelper.onCreateNewProject();
+            } else {
+                this.logger.error('ACE controller or ProjectHelper not available');
+                alert('Project system not initialized');
+            }
         } catch (err) {
             this.logger.error('Failed to create project:', err);
             alert(`Failed to create project: ${err.message}`);

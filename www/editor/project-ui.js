@@ -24,30 +24,39 @@ class ProjectUI {
         return `
             <div id="project-dialog" title="Select or Create Project" style="display: none;">
                 <div style="padding: 15px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: bold; font-size: 13px;">Workspace Files & Folders:</label>
-                    <div id="project-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; border-radius: 4px; padding: 10px; margin-bottom: 15px; background: #f9f9f9;">
-                        <div class="loading-spinner">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold; font-size: 13px; color: var(--color-text-primary);">Projects:</label>
+                    <div id="project-list" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--color-border-default); border-radius: 4px; padding: 10px; margin-bottom: 15px; background: var(--color-bg-secondary);">
+                        <div class="loading-spinner" style="color: var(--color-text-secondary);">
                             Loading workspace contents...
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <button id="create-new-btn" style="flex: 1; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
-                            📁 Create New Project
+                        <button id="create-new-btn" style="flex: 1; padding: 10px; background: var(--color-status-success); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                            📁 Create New
                         </button>
-                        <button id="create-demo-btn" style="flex: 1; padding: 10px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
-                            📋 Copy Demo Project
+                        <button id="create-demo-btn" style="flex: 1; padding: 10px; background: var(--color-status-info); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                            📋 Copy Demo
+                        </button>
+                        <button id="import-project-btn" style="flex: 1; padding: 10px; background: var(--color-status-warning); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                            📥 Import
                         </button>
                     </div>
 
-                    <div id="selected-project-info" style="padding: 15px; background: #f4f4f4; border: 2px solid #ddd; border-radius: 6px; font-size: 13px; display: none;">
+                    <div id="selected-project-info" style="padding: 15px; background: var(--color-bg-tertiary); border: 2px solid var(--color-border-default); border-radius: 6px; font-size: 13px; display: none;">
                         <div style="display: flex; align-items: flex-start; gap: 15px;">
                             <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">
-                                    <span id="selected-project-name" style="font-family: monospace;"></span>
+                                <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">
+                                    <span id="selected-project-name" style="font-family: var(--font-family-mono); color: var(--color-text-primary);"></span>
                                 </div>
-                                <div id="selected-project-version" style="color: #666; font-size: 12px; margin-bottom: 6px; display: none;"></div>
-                                <div id="selected-project-description" style="color: #555; font-size: 12px; line-height: 1.4; display: none;"></div>
+                                <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
+                                    <div id="selected-project-version" style="color: var(--color-text-muted); font-size: 12px; display: none;"></div>
+                                    <div id="selected-project-author" style="color: var(--color-text-muted); font-size: 12px; display: none;"></div>
+                                    <div id="selected-project-platform" style="color: var(--color-text-muted); font-size: 12px; display: none;"></div>
+                                    <div id="selected-project-license" style="color: var(--color-text-muted); font-size: 12px; display: none;"></div>
+                                    <div id="selected-project-modified" style="color: var(--color-text-muted); font-size: 12px; display: none;"></div>
+                                </div>
+                                <div id="selected-project-description" style="color: var(--color-text-secondary); font-size: 12px; line-height: 1.4; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--color-border-subtle); display: none;"></div>
                             </div>
                             <div id="selected-project-icon" style="flex-shrink: 0; width: 64px; height: 64px; display: none;">
                                 <img src="" alt="Project icon" style="width: 100%; height: 100%; object-fit: contain; border-radius: 4px;">
@@ -60,6 +69,173 @@ class ProjectUI {
     }
 
     /**
+     * Show new project creation dialog
+     * @returns {Promise<Object|null>} Project info object or null if cancelled
+     */
+    async showNewProjectDialog() {
+        return new Promise((resolve) => {
+            const dialogHtml = `
+                <div id="new-project-dialog" title="Create New Project" style="display: none;">
+                    <div style="padding: 15px;">
+                        <form id="new-project-form" style="display: flex; flex-direction: column; gap: 15px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; color: var(--color-text-primary);">
+                                    Project Name <span style="color: var(--color-status-error);">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="new-project-name"
+                                    placeholder="my-project"
+                                    required
+                                    pattern="[a-zA-Z0-9_-]+"
+                                    style="width: 100%; padding: 8px; background: var(--color-bg-secondary); color: var(--color-text-primary); border: 1px solid var(--color-border-default); border-radius: 4px; font-family: var(--font-family-mono); font-size: 13px;"
+                                />
+                                <div style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">
+                                    Letters, numbers, hyphens, and underscores only
+                                </div>
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; color: var(--color-text-primary);">
+                                    Description
+                                </label>
+                                <textarea
+                                    id="new-project-description"
+                                    placeholder="A brief description of your project"
+                                    rows="2"
+                                    style="width: 100%; padding: 8px; background: var(--color-bg-secondary); color: var(--color-text-primary); border: 1px solid var(--color-border-default); border-radius: 4px; font-family: var(--font-family-base); font-size: 13px; resize: vertical;"
+                                ></textarea>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; color: var(--color-text-primary);">
+                                        Author
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="new-project-author"
+                                        placeholder="Your Name"
+                                        style="width: 100%; padding: 8px; background: var(--color-bg-secondary); color: var(--color-text-primary); border: 1px solid var(--color-border-default); border-radius: 4px; font-size: 13px;"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; color: var(--color-text-primary);">
+                                        Version
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="new-project-version"
+                                        value="1.0.0"
+                                        style="width: 100%; padding: 8px; background: var(--color-bg-secondary); color: var(--color-text-primary); border: 1px solid var(--color-border-default); border-radius: 4px; font-family: var(--font-family-mono); font-size: 13px;"
+                                    />
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; color: var(--color-text-primary);">
+                                        Platform
+                                    </label>
+                                    <select
+                                        id="new-project-platform"
+                                        style="width: 100%; padding: 8px; background: var(--color-bg-secondary); color: var(--color-text-primary); border: 1px solid var(--color-border-default); border-radius: 4px; font-size: 13px;"
+                                    >
+                                        <option value="">Select platform...</option>
+                                        <option value="RPI">Raspberry Pi</option>
+                                        <option value="ESP32">ESP32</option>
+                                        <option value="ESP8266">ESP8266</option>
+                                        <option value="ATmega">ATmega (Arduino)</option>
+                                        <option value="ATtiny">ATtiny</option>
+                                        <option value="STM32">STM32</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label style="display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; color: var(--color-text-primary);">
+                                        License
+                                    </label>
+                                    <select
+                                        id="new-project-license"
+                                        style="width: 100%; padding: 8px; background: var(--color-bg-secondary); color: var(--color-text-primary); border: 1px solid var(--color-border-default); border-radius: 4px; font-size: 13px;"
+                                    >
+                                        <option value="">Select license...</option>
+                                        <option value="MIT">MIT</option>
+                                        <option value="Apache-2.0">Apache 2.0</option>
+                                        <option value="GPL-3.0">GPL-3.0</option>
+                                        <option value="BSD-3-Clause">BSD 3-Clause</option>
+                                        <option value="ISC">ISC</option>
+                                        <option value="Unlicense">Unlicense</option>
+                                        <option value="Proprietary">Proprietary</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            $('#new-project-dialog').remove();
+            $('body').append(dialogHtml);
+
+            $('#new-project-dialog').dialog({
+                modal: true,
+                width: 600,
+                position: { my: "center", at: "center top+80", of: window },
+                closeOnEscape: true,
+                buttons: {
+                    'Create': function() {
+                        const name = $('#new-project-name').val().trim();
+
+                        // Validate project name
+                        if (!name) {
+                            alert('Project name is required');
+                            return;
+                        }
+
+                        if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+                            alert('Invalid project name. Please use only letters, numbers, hyphens, and underscores.');
+                            return;
+                        }
+
+                        const projectInfo = {
+                            name: name,
+                            description: $('#new-project-description').val().trim(),
+                            author: $('#new-project-author').val().trim(),
+                            version: $('#new-project-version').val().trim() || '1.0.0',
+                            platform: $('#new-project-platform').val(),
+                            license: $('#new-project-license').val()
+                        };
+
+                        $(this).dialog('close');
+                        resolve(projectInfo);
+                    },
+                    'Cancel': function() {
+                        $(this).dialog('close');
+                        resolve(null);
+                    }
+                },
+                close: function() {
+                    $(this).remove();
+                }
+            });
+
+            // Focus on name field
+            setTimeout(() => $('#new-project-name').focus(), 100);
+
+            // Handle Enter key in name field
+            $('#new-project-name').on('keypress', function(e) {
+                if (e.which === 13) { // Enter key
+                    e.preventDefault();
+                    $('.ui-dialog-buttonpane button:contains("Create")').click();
+                }
+            });
+        });
+    }
+
+    /**
      * Show error dialog when server is offline
      * @param {Function} retryCallback - Function to call when user clicks Retry
      */
@@ -67,14 +243,14 @@ class ProjectUI {
         const errorHtml = `
             <div id="server-error-dialog" title="Server Not Available" style="display: none;">
                 <div style="padding: 15px;">
-                    <div class="error-message" style="background: #ffebee; border-left: 4px solid #f44336; padding: 12px; margin: 10px 0; border-radius: 4px; color: #c62828;">
+                    <div class="error-message" style="background: var(--color-bg-tertiary); border-left: 4px solid var(--color-status-error); padding: 12px; margin: 10px 0; border-radius: 4px; color: var(--color-status-error);">
                         <strong>⚠️ Cannot connect to debugger server</strong><br><br>
-                        Please ensure the node-inspector-websocket-proxy server is running:<br><br>
-                        <code style="background: #f5f5f5; padding: 8px; display: block; margin: 10px 0; font-family: monospace;">
+                        <span style="color: var(--color-text-primary);">Please ensure the node-inspector-websocket-proxy server is running:</span><br><br>
+                        <code style="background: var(--color-bg-secondary); color: var(--color-text-primary); padding: 8px; display: block; margin: 10px 0; font-family: var(--font-family-mono); border: 1px solid var(--color-border-default); border-radius: 4px;">
                         cd ../node-inspector-websocket-proxy<br>
                         node server.js
                         </code><br>
-                        Server should be running at: <code>http://localhost:8080</code>
+                        <span style="color: var(--color-text-primary);">Server should be running at: <code style="background: var(--color-bg-secondary); padding: 2px 6px; border-radius: 3px; color: var(--brand-accent);">http://localhost:8080</code></span>
                     </div>
                 </div>
             </div>
@@ -87,6 +263,7 @@ class ProjectUI {
         $('#server-error-dialog').dialog({
             modal: true,
             width: 500,
+            position: { my: "center", at: "center top+80", of: window },
             buttons: {
                 'Retry': () => {
                     $('#server-error-dialog').dialog('close');
@@ -103,8 +280,9 @@ class ProjectUI {
      * Render workspace items in the project list container
      * @param {Array} items - Array of workspace items
      * @param {Function} onItemClick - Callback when item is clicked (item, element, packageInfo)
+     * @param {Function} onItemDelete - Callback when delete button is clicked (item, element)
      */
-    async renderWorkspaceItems(items, onItemClick) {
+    async renderWorkspaceItems(items, onItemClick, onItemDelete = null) {
         const projectListContainer = $('#project-list');
         projectListContainer.empty();
 
@@ -146,12 +324,48 @@ class ProjectUI {
                         <div class="project-item-path" style="font-size: 11px; color: #666;">/${item.name}</div>
                         ${metaHtml}
                     </div>
+                    ${onItemDelete ? `
+                        <button class="project-item-delete" title="Delete ${item.name}" style="
+                            padding: 4px 8px;
+                            background: var(--color-status-error);
+                            color: white;
+                            border: none;
+                            border-radius: 3px;
+                            cursor: pointer;
+                            font-size: 11px;
+                            margin-left: 8px;
+                            opacity: 0.7;
+                            transition: opacity 0.2s;
+                        ">
+                            🗑️ Delete
+                        </button>
+                    ` : ''}
                 </div>
             `);
 
-            workspaceItem.on('click', () => {
+            workspaceItem.on('click', (e) => {
+                // Don't trigger if clicking the delete button
+                if ($(e.target).hasClass('project-item-delete') || $(e.target).closest('.project-item-delete').length) {
+                    return;
+                }
                 onItemClick(item, workspaceItem, packageInfo);
             });
+
+            // Bind delete button if callback provided
+            if (onItemDelete) {
+                workspaceItem.find('.project-item-delete').on('click', (e) => {
+                    e.stopPropagation();
+                    onItemDelete(item, workspaceItem);
+                });
+
+                // Show delete button on hover
+                workspaceItem.on('mouseenter', function() {
+                    $(this).find('.project-item-delete').css('opacity', '1');
+                });
+                workspaceItem.on('mouseleave', function() {
+                    $(this).find('.project-item-delete').css('opacity', '0.7');
+                });
+            }
 
             projectListContainer.append(workspaceItem);
         }
@@ -216,8 +430,8 @@ class ProjectUI {
      * @param {string} itemType - Type of the item ('directory' or 'file')
      * @param {Object} packageInfo - Package.json data (optional)
      */
-    updateSelectedInfo(itemName, itemType, packageInfo = null) {
-        this.logger?.debug?.('updateSelectedInfo:', itemName, itemType, packageInfo);
+    updateSelectedInfo(itemName, itemType, packageInfo = null, itemMetadata = null) {
+        this.logger?.debug?.('updateSelectedInfo:', itemName, itemType, packageInfo, itemMetadata);
         $('#selected-project-info').show();
 
         // Update name
@@ -236,9 +450,42 @@ class ProjectUI {
 
         // Show/hide and update version
         if (packageInfo && packageInfo.version) {
-            $('#selected-project-version').show().text(`Version ${packageInfo.version}`);
+            $('#selected-project-version').show().text(`Version: ${packageInfo.version}`);
         } else {
             $('#selected-project-version').hide();
+        }
+
+        // Show/hide and update author
+        if (packageInfo && packageInfo.author) {
+            const authorText = typeof packageInfo.author === 'string'
+                ? packageInfo.author
+                : packageInfo.author.name || JSON.stringify(packageInfo.author);
+            $('#selected-project-author').show().text(`Author: ${authorText}`);
+        } else {
+            $('#selected-project-author').hide();
+        }
+
+        // Show/hide and update platform
+        if (packageInfo && packageInfo.platform) {
+            $('#selected-project-platform').show().text(`Platform: ${packageInfo.platform}`);
+        } else {
+            $('#selected-project-platform').hide();
+        }
+
+        // Show/hide and update license
+        if (packageInfo && packageInfo.license) {
+            $('#selected-project-license').show().text(`License: ${packageInfo.license}`);
+        } else {
+            $('#selected-project-license').hide();
+        }
+
+        // Show/hide and update modified date
+        if (itemMetadata && itemMetadata.modified) {
+            const modifiedDate = new Date(itemMetadata.modified);
+            const formattedDate = modifiedDate.toLocaleDateString() + ' ' + modifiedDate.toLocaleTimeString();
+            $('#selected-project-modified').show().text(`Modified: ${formattedDate}`);
+        } else {
+            $('#selected-project-modified').hide();
         }
 
         // Show/hide and update description
@@ -294,6 +541,7 @@ class ProjectUI {
             $('#file-picker-dialog').dialog({
                 modal: true,
                 width: 400,
+                position: { my: "center", at: "center top+80", of: window },
                 buttons: {
                     'Select': function() {
                         if (selectedFile) {
@@ -326,12 +574,12 @@ class ProjectUI {
             const dialogHtml = `
                 <div id="demo-project-dialog" title="Select Demo Project" style="display: none;">
                     <div style="padding: 15px;">
-                        <p style="margin-bottom: 15px;">Select an example project to copy to your workspace:</p>
+                        <p style="margin-bottom: 15px; color: var(--color-text-primary);">Select an example project to copy to your workspace:</p>
                         <div id="demo-project-list" style="max-height: 300px; overflow-y: auto;">
                             ${projects.map(p => `
-                                <div class="demo-project-item" data-name="${p.name}" style="padding: 12px; margin: 8px 0; background: #f9f9f9; border: 2px solid #ddd; border-radius: 4px; cursor: pointer;">
-                                    <div style="font-weight: bold; font-size: 14px;">${p.name}</div>
-                                    <div style="font-size: 12px; color: #666; margin-top: 4px;">${p.description || 'No description'}</div>
+                                <div class="demo-project-item" data-name="${p.name}" style="padding: 12px; margin: 8px 0; background: var(--color-bg-tertiary); border: 2px solid var(--color-border-default); border-radius: 4px; cursor: pointer; transition: all 0.2s ease;">
+                                    <div style="font-weight: bold; font-size: 14px; color: var(--color-text-primary);">${p.name}</div>
+                                    <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">${p.description || 'No description'}</div>
                                 </div>
                             `).join('')}
                         </div>
@@ -345,14 +593,21 @@ class ProjectUI {
             let selectedProject = null;
 
             $('.demo-project-item').on('click', function() {
-                $('.demo-project-item').css({ 'background': '#f9f9f9', 'border-color': '#ddd' });
-                $(this).css({ 'background': '#e3f2fd', 'border-color': '#2196F3' });
+                $('.demo-project-item').css({
+                    'background': 'var(--color-bg-tertiary)',
+                    'border-color': 'var(--color-border-default)'
+                });
+                $(this).css({
+                    'background': 'var(--color-bg-active)',
+                    'border-color': 'var(--brand-accent)'
+                });
                 selectedProject = $(this).data('name');
             });
 
             $('#demo-project-dialog').dialog({
                 modal: true,
                 width: 450,
+                position: { my: "center", at: "center top+80", of: window },
                 buttons: {
                     'Copy to Workspace': async () => {
                         if (!selectedProject) {
@@ -423,6 +678,7 @@ class ProjectUI {
             $('#create-item-dialog').dialog({
                 modal: true,
                 width: 400,
+                position: { my: "center", at: "center top+80", of: window },
                 buttons: {
                     'Create': async () => {
                         const itemName = $('#new-item-name').val().trim();
@@ -474,19 +730,32 @@ class ProjectUI {
      */
     showNotification(message, type = 'info', duration = 3000) {
         const bgColors = {
-            success: '#4CAF50',
-            error: '#f44336',
-            info: '#2196F3'
+            success: 'var(--color-status-success)',
+            error: 'var(--color-status-error)',
+            info: 'var(--color-status-info)',
+            warning: 'var(--color-status-warning)'
         };
 
         const notification = $(`
-            <div style="position: fixed; bottom: 20px; right: 20px; background: ${bgColors[type]}; color: white; padding: 12px 20px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 10001; font-size: 13px; max-width: 400px;">
+            <div class="notification-toast notification-${type}" style="position: fixed; bottom: 20px; right: 20px; background: ${bgColors[type]}; color: white; padding: 14px 20px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 10001; font-size: 13px; max-width: 400px; font-weight: 500;">
                 ${message}
             </div>
         `);
 
         $('body').append(notification);
-        setTimeout(() => notification.fadeOut(() => notification.remove()), duration);
+
+        // Slide in animation
+        notification.css({ opacity: 0, transform: 'translateX(20px)' });
+        notification.animate({ opacity: 1 }, {
+            duration: 200,
+            step: function(now) {
+                $(this).css('transform', `translateX(${20 - (now * 20)}px)`);
+            }
+        });
+
+        setTimeout(() => {
+            notification.fadeOut(300, () => notification.remove());
+        }, duration);
     }
 
     /**
