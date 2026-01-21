@@ -599,6 +599,7 @@ iframe{
     position: absolute;
     height: calc(100vh - 442px);
     background: var(--color-bg-elevated);
+    color: var(--color-text-primary);
     vertical-align: bottom;
     text-align: center;
 
@@ -612,6 +613,7 @@ iframe{
     font-size: 10pt;
     font-weight: bold;
     height: 75px;
+    color: var(--color-text-primary);
 }
 
 #step-buttons{
