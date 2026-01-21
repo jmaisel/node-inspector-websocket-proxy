@@ -598,7 +598,7 @@ iframe{
     width: 298px;
     position: absolute;
     height: calc(100vh - 442px);
-    background: var(--color-bg-elevated);
+    background: var(--color-bg-primary);
     color: var(--color-text-primary);
     vertical-align: bottom;
     text-align: center;
