@@ -572,11 +572,13 @@ iframe{
     /*display: inline-block;*/
     /*height: 800px;*/
     height: 350px;
+    background: var(--color-bg-primary);
 }
 
 #breadboard-pane{
     width: 400px;
     display: block;
+    background: var(--color-bg-primary);
 }
 
 #component-display{
