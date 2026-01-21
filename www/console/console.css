@@ -10,7 +10,8 @@
 }
 
 #console-panel.console-collapsed {
-    flex: 0 0 24px !important; /* Fixed height when collapsed */
+    /* Let Split.js handle sizing via setSizes() */
+    min-height: 24px;
 }
 
 #console-panel.console-collapsed #console-content {

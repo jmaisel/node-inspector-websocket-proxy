@@ -59,13 +59,92 @@
     }</div>
 
 <script src="/vendor/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="/vendor/ace/src-noconflict/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+<script src="/vendor/ace/src-noconflict/ext-beautify.js" type="text/javascript" charset="utf-8"></script>
+<!-- Load standalone js-beautify for full control over formatting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.11/beautify.min.js"></script>
 <script>
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/javascript");
 
+    // Enable autocomplete (Language Tools) for JavaScript
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: true,
+        enableSnippets: true
+    });
+
     // Expose editor globally so parent can access it
     window.editor = editor;
+
+    // Load beautify extension (for fallback)
+    var beautifyExt = ace.require("ace/ext/beautify");
+
+    // Use standalone js-beautify from CDN (loaded above)
+    // This gives us full control over formatting options
+    var jsBeautify = window.js_beautify;
+
+    if (jsBeautify) {
+        console.log('Successfully loaded standalone js_beautify from CDN');
+    } else {
+        console.warn('js_beautify not loaded - formatting will use defaults');
+    }
+
+    // Add format command with Ctrl+Shift+F
+    editor.commands.addCommand({
+        name: 'formatCode',
+        bindKey: {win: 'Ctrl-Shift-F', mac: 'Command-Shift-F'},
+        exec: function(editor) {
+            console.log('Format command triggered!');
+
+            // Get format preferences from parent window
+            var prefs = null;
+            try {
+                if (window.parent && window.parent.preferencesController) {
+                    prefs = window.parent.preferencesController.getPreferences();
+                    console.log('Loaded preferences:', prefs);
+                }
+            } catch (e) {
+                console.warn('Could not access parent preferences:', e);
+            }
+
+            // Try custom formatting first, fall back to Ace's beautify
+            if (jsBeautify && prefs) {
+                try {
+                    var options = {
+                        indent_size: prefs.formatIndentSize || 4,
+                        brace_style: prefs.formatBraceStyle || 'collapse',
+                        preserve_newlines: prefs.formatPreserveNewlines !== false,
+                        space_before_conditional: prefs.formatSpaceBeforeConditional !== false,
+                        keep_array_indentation: prefs.formatKeepArrayIndentation || false
+                    };
+
+                    var code = editor.getValue();
+                    var formatted = jsBeautify(code, options);
+
+                    var cursorPos = editor.getCursorPosition();
+                    editor.setValue(formatted, 1);
+                    editor.moveCursorToPosition(cursorPos);
+
+                    console.log('Code formatted with custom options:', options);
+                    return;
+                } catch (e) {
+                    console.error('Custom beautify failed:', e);
+                }
+            }
+
+            // Fallback to Ace's default beautify
+            try {
+                beautifyExt.beautify(editor.session);
+                console.log('Code formatted using Ace default beautify');
+            } catch (e) {
+                console.error('Beautify failed:', e);
+            }
+        }
+    });
+
+    console.log('Format command registered: Ctrl+Shift+F (Cmd+Shift+F on Mac)');
 
     // Handle window resize events to resize the editor
     window.addEventListener('resize', function() {

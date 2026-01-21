@@ -277,36 +277,37 @@ class ConsoleUIController {
         const panel = $('#console-panel');
         const wasCollapsed = panel.hasClass('console-collapsed');
 
+        // Update split sizes FIRST if split exists
+        if (this.consoleSplit) {
+            if (wasCollapsed) {
+                // Expanding - restore saved sizes or use defaults
+                const savedSizes = localStorage.getItem('console-split-sizes');
+                if (savedSizes) {
+                    try {
+                        this.consoleSplit.setSizes(JSON.parse(savedSizes));
+                    } catch (e) {
+                        this.consoleSplit.setSizes([70, 30]);
+                    }
+                } else {
+                    this.consoleSplit.setSizes([70, 30]);
+                }
+            } else {
+                // Collapsing - set to minimal size
+                this.consoleSplit.setSizes([98, 2]);
+            }
+        }
+
+        // Then toggle the CSS class (for hiding content)
         panel.toggleClass('console-collapsed');
 
         // Update collapse button icon
         const collapseBtn = $('#console-collapse-btn');
         collapseBtn.html(wasCollapsed ? '▼' : '▲');
 
-        // Resize Ace editor after transition
+        // Resize Ace editor after a short delay to ensure split has updated
         setTimeout(() => {
             this.resizeAceEditor();
-
-            // Update split sizes if split exists - use saved sizes or defaults
-            if (this.consoleSplit) {
-                if (wasCollapsed) {
-                    // Restore saved sizes or use defaults
-                    const savedSizes = localStorage.getItem('console-split-sizes');
-                    if (savedSizes) {
-                        try {
-                            this.consoleSplit.setSizes(JSON.parse(savedSizes));
-                        } catch (e) {
-                            this.consoleSplit.setSizes([70, 30]);
-                        }
-                    } else {
-                        this.consoleSplit.setSizes([70, 30]);
-                    }
-                } else {
-                    // Collapsing - set to minimal size
-                    this.consoleSplit.setSizes([100, 0]);
-                }
-            }
-        }, 350);
+        }, 100);
 
         // Persist state
         localStorage.setItem('console-collapsed', !wasCollapsed);

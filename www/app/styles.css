@@ -390,6 +390,37 @@ iframe{
     display: block;
 }
 
+/* File tree icons - make caret and folder icons more clickable */
+.file-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
+    font-size: 14px;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.dir-icon {
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Make file names more clickable */
+.file-name {
+    cursor: pointer;
+    padding: 4px 8px;
+    flex: 1;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+    pointer-events: none;
+}
+
 /* File action icons (like gear icon for package.json) */
 .file-action-icon {
     margin-left: auto;
@@ -399,6 +430,7 @@ iframe{
     padding: 2px 4px;
     border-radius: 3px;
     font-size: 14px;
+    pointer-events: auto;
 }
 
 .file-action-icon:hover {
@@ -440,13 +472,13 @@ iframe{
 .editor-tab {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
+    padding: 10px 16px;
     background-color: var(--color-bg-tertiary);
     border-right: 1px solid var(--color-border-default);
     cursor: pointer;
     white-space: nowrap;
     transition: background-color var(--transition-fast);
-    min-width: 100px;
+    min-width: 120px;
     max-width: 200px;
     flex-shrink: 0;
 }
@@ -467,6 +499,7 @@ iframe{
     font-size: 12px;
     color: var(--color-text-secondary);
     user-select: none;
+    pointer-events: none;
 }
 
 .editor-tab.active .editor-tab-label {
@@ -548,7 +581,7 @@ iframe{
 
 #component-display{
     display: table-cell;
-    border: 1px solid black;
+    border: 1px solid var(--color-border-default);
     width: 298px;
     position: absolute;
     height: calc(100vh - 442px);
@@ -559,11 +592,11 @@ iframe{
 
 #step-controls{
     display: table-cell;
-    border: 1px solid black;
+    border: 1px solid var(--color-border-default);
     width: 298px;
     position: absolute;
     height: calc(100vh - 442px);
-    background: var(--brand-primary);
+    background: var(--color-bg-elevated);
     vertical-align: bottom;
     text-align: center;
 
@@ -626,14 +659,14 @@ svg{
     text-align: center;
     font-size: 10px;
     font-weight: bold;
-    border: 1px solid black;
+    border: 1px solid var(--color-border-default);
     border-radius: 2px;
     display: inline-block;
 }
 
 #pm-mapping-tip{
     height: 99%;
-    background-color: pink;
+    background-color: var(--color-bg-secondary);
     display: flex;
     justify-content: center;
     align-content: center;
@@ -708,8 +741,8 @@ div.pm-bom-row:hover {
     padding: 10px;
     border-radius: 5px;
     z-index: 1000;
-    top: 50px;
-    left: 50px;
+    top: -50px;
+    left: -50px;
     width: 300px;
     height: auto;
     max-height: 500px;

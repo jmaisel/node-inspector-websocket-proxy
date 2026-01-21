@@ -1,0 +1,299 @@
+<!-- Preferences Dialog -->
+<div class="preferences-overlay" id="preferences-overlay">
+    <div class="preferences-dialog">
+        <!-- Header -->
+        <div class="preferences-header">
+            <h2 class="preferences-title">Preferences</h2>
+            <button class="preferences-close-btn" id="preferences-close-btn" title="Close">×</button>
+        </div>
+
+        <!-- Body -->
+        <div class="preferences-body">
+            <!-- Tabs Sidebar -->
+            <div class="preferences-tabs">
+                <div class="preferences-tab active" data-panel="appearance">
+                    <span class="preferences-tab-icon">🎨</span>
+                    <span>Appearance</span>
+                </div>
+                <div class="preferences-tab" data-panel="editor">
+                    <span class="preferences-tab-icon">✏️</span>
+                    <span>Editor</span>
+                </div>
+                <div class="preferences-tab" data-panel="format">
+                    <span class="preferences-tab-icon">✨</span>
+                    <span>Format</span>
+                </div>
+                <div class="preferences-tab" data-panel="console">
+                    <span class="preferences-tab-icon">🖥️</span>
+                    <span>Console</span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="preferences-content">
+                <!-- Appearance Panel -->
+                <div class="preferences-panel active" id="panel-appearance">
+                    <div class="preference-section">
+                        <h3 class="preference-section-title">Theme</h3>
+                        <div class="theme-grid" id="theme-grid">
+                            <!-- Theme cards will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Editor Panel -->
+                <div class="preferences-panel" id="panel-editor">
+                    <div class="preference-section">
+                        <h3 class="preference-section-title">Font Settings</h3>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-font-family">Font Family</label>
+                            <select class="preference-select" id="pref-font-family">
+                                <option value="'Fira Code', Monaco, Consolas, monospace">Fira Code</option>
+                                <option value="Monaco, Menlo, 'Ubuntu Mono', monospace">Monaco</option>
+                                <option value="'Courier New', Courier, monospace">Courier New</option>
+                                <option value="Consolas, Monaco, monospace">Consolas</option>
+                                <option value="Menlo, Monaco, monospace">Menlo</option>
+                                <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                                <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                            </select>
+                            <div class="preference-description">
+                                Choose your preferred monospace font for the code editor
+                            </div>
+                        </div>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-font-size">Font Size</label>
+                            <div class="preference-input-group">
+                                <input
+                                    type="number"
+                                    class="preference-input"
+                                    id="pref-font-size"
+                                    min="8"
+                                    max="24"
+                                    value="14"
+                                />
+                                <span class="preference-input-unit">px</span>
+                            </div>
+                            <div class="preference-description">
+                                Editor font size (8-24 pixels)
+                            </div>
+                        </div>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-line-height">Line Height</label>
+                            <div class="preference-input-group">
+                                <input
+                                    type="number"
+                                    class="preference-input"
+                                    id="pref-line-height"
+                                    min="1.0"
+                                    max="2.0"
+                                    step="0.1"
+                                    value="1.5"
+                                />
+                            </div>
+                            <div class="preference-description">
+                                Spacing between lines (1.0-2.0)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preference-section">
+                        <h3 class="preference-section-title">Editor Theme</h3>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-ace-theme">Ace Editor Theme</label>
+                            <select class="preference-select" id="pref-ace-theme">
+                                <optgroup label="Dark Themes">
+                                    <option value="monokai">Monokai</option>
+                                    <option value="one_dark">One Dark</option>
+                                    <option value="dracula">Dracula</option>
+                                    <option value="tomorrow_night">Tomorrow Night</option>
+                                    <option value="twilight">Twilight</option>
+                                    <option value="cobalt">Cobalt</option>
+                                    <option value="terminal">Terminal</option>
+                                    <option value="chaos">Chaos</option>
+                                    <option value="github_dark">GitHub Dark</option>
+                                </optgroup>
+                                <optgroup label="Light Themes">
+                                    <option value="chrome">Chrome</option>
+                                    <option value="github">GitHub</option>
+                                    <option value="textmate">TextMate</option>
+                                    <option value="tomorrow">Tomorrow</option>
+                                    <option value="xcode">Xcode</option>
+                                    <option value="eclipse">Eclipse</option>
+                                </optgroup>
+                            </select>
+                            <div class="preference-description">
+                                Choose color scheme for code syntax highlighting
+                            </div>
+                        </div>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-editor-bg">Background Color</label>
+                            <input
+                                type="color"
+                                class="preference-input"
+                                id="pref-editor-bg"
+                                value="#1e1e1e"
+                            />
+                            <div class="preference-description">
+                                Override editor background color
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preference-section">
+                        <h3 class="preference-section-title">Editor Behavior</h3>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-tab-size">Tab Size</label>
+                            <div class="preference-input-group">
+                                <input
+                                    type="number"
+                                    class="preference-input"
+                                    id="pref-tab-size"
+                                    min="2"
+                                    max="8"
+                                    value="4"
+                                />
+                                <span class="preference-input-unit">spaces</span>
+                            </div>
+                            <div class="preference-description">
+                                Number of spaces per tab (2-8)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Format Panel -->
+                <div class="preferences-panel" id="panel-format">
+                    <div class="preference-section">
+                        <h3 class="preference-section-title">Code Formatting</h3>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-format-indent-size">Indent Size</label>
+                            <div class="preference-input-group">
+                                <input
+                                    type="number"
+                                    class="preference-input"
+                                    id="pref-format-indent-size"
+                                    min="2"
+                                    max="8"
+                                    value="4"
+                                />
+                                <span class="preference-input-unit">spaces</span>
+                            </div>
+                            <div class="preference-description">
+                                Number of spaces for each indentation level
+                            </div>
+                        </div>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-format-brace-style">Brace Style</label>
+                            <select class="preference-select" id="pref-format-brace-style">
+                                <option value="collapse">Collapse (K&R) - if () {</option>
+                                <option value="expand">Expand (Allman) - if ()\n{</option>
+                                <option value="end-expand">End Expand - if () {\n}\nelse {</option>
+                                <option value="none">None - Preserve</option>
+                            </select>
+                            <div class="preference-description">
+                                How to place braces in formatted code
+                            </div>
+                        </div>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-format-preserve-newlines">
+                                <input type="checkbox" id="pref-format-preserve-newlines" checked />
+                                Preserve newlines
+                            </label>
+                            <div class="preference-description">
+                                Keep existing line breaks between statements
+                            </div>
+                        </div>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-format-space-before-conditional">
+                                <input type="checkbox" id="pref-format-space-before-conditional" checked />
+                                Space before conditional
+                            </label>
+                            <div class="preference-description">
+                                Add space before parentheses in conditionals (if, for, while)
+                            </div>
+                        </div>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-format-keep-array-indentation">
+                                <input type="checkbox" id="pref-format-keep-array-indentation" />
+                                Keep array indentation
+                            </label>
+                            <div class="preference-description">
+                                Preserve indentation in array literals
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preference-section">
+                        <h3 class="preference-section-title">Preview</h3>
+                        <div class="format-preview-container">
+                            <div class="format-preview-before">
+                                <div class="format-preview-label">Before</div>
+                                <pre id="format-preview-before"><code>function example(){
+var x=1,y=2;
+if(x>0){
+console.log('hello');
+}
+var arr=[1,2,3,4];
+return{x:x,y:y};
+}</code></pre>
+                            </div>
+                            <div class="format-preview-after">
+                                <div class="format-preview-label">After</div>
+                                <pre id="format-preview-after"><code><!-- Will be updated by JS --></code></pre>
+                            </div>
+                        </div>
+                        <button class="preferences-btn preferences-btn-secondary" id="format-preview-update-btn">
+                            Update Preview
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Console Panel -->
+                <div class="preferences-panel" id="panel-console">
+                    <div class="preference-section">
+                        <h3 class="preference-section-title">Console Settings</h3>
+
+                        <div class="preference-group">
+                            <label class="preference-label" for="pref-console-font-size">Font Size</label>
+                            <div class="preference-input-group">
+                                <input
+                                    type="number"
+                                    class="preference-input"
+                                    id="pref-console-font-size"
+                                    min="8"
+                                    max="18"
+                                    value="12"
+                                />
+                                <span class="preference-input-unit">px</span>
+                            </div>
+                            <div class="preference-description">
+                                Console output font size (8-18 pixels)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="preferences-footer">
+            <button class="preferences-btn preferences-btn-secondary" id="preferences-reset-btn">
+                Reset to Defaults
+            </button>
+            <button class="preferences-btn preferences-btn-primary" id="preferences-apply-btn">
+                Apply
+            </button>
+        </div>
+    </div>
+</div>

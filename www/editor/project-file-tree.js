@@ -66,6 +66,7 @@ class ProjectFileTree {
                     <span class="file-icon dir-icon">▼</span>
                     <span class="file-icon">📁</span>
                     <span class="file-name">${projectName}</span>
+                    <span class="file-action-icon add-icon" title="Create new file or folder">➕</span>
                 </div>
             `);
 
@@ -80,8 +81,18 @@ class ProjectFileTree {
             fileTree.append(projectRoot);
             fileTree.append(projectContents);
 
+            // Add icon click handler for root
+            projectRoot.find('.add-icon').on('click', async (e) => {
+                e.stopPropagation();
+                await this.handleCreateItem(projectPath, projectRoot, projectContents, 0);
+            });
+
             // Make root collapsible
             projectRoot.on('click', async (e) => {
+                // Don't collapse if clicking the add icon
+                if ($(e.target).hasClass('add-icon')) {
+                    return;
+                }
                 e.stopPropagation();
                 const dirIcon = projectRoot.find('.dir-icon');
                 const isExpanded = projectContents.hasClass('expanded');

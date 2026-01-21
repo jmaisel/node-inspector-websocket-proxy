@@ -240,6 +240,19 @@ class Pithagoras {
         ctx.toolbarController.setCtx(ctx);
         ctx.toolbarController.initialize();
 
+        // Initialize preferences controller
+        if (window.preferencesController) {
+            window.preferencesController.init();
+            // Wire up preferences button
+            const prefsBtn = document.getElementById('preferences-btn');
+            if (prefsBtn) {
+                prefsBtn.addEventListener('click', () => {
+                    window.preferencesController.open();
+                });
+                this.logger.info('Preferences button initialized');
+            }
+        }
+
         ctx.pub('application:init:layout', { timestamp: Date.now() });
         ctx.dbtsMenuController.designMode();
 
@@ -528,6 +541,27 @@ class Pithagoras {
         // Initialize split views
         ctx.pub('application:init:splits', { timestamp: Date.now() });
         this.initSplitViews();
+
+        // Ensure global dropdown close handler works
+        this.initGlobalDropdownClose();
+    }
+
+    /**
+     * Initialize global click handler to close dropdowns when clicking outside
+     */
+    initGlobalDropdownClose() {
+        const logger = new Logger('initGlobalDropdownClose');
+        logger.info('Setting up global dropdown close handler');
+
+        document.addEventListener('click', (e) => {
+            // Check if click is outside all toolbar dropdowns
+            if (!e.target.closest('.toolbar-dropdown')) {
+                logger.debug('Click outside dropdown detected, closing all dropdowns');
+                document.querySelectorAll('.toolbar-dropdown-content').forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
     }
 
     /**
@@ -546,13 +580,33 @@ class Pithagoras {
             cursor: 'row-resize',
             snapOffset: 0,  // Disable snapping
             dragInterval: 1, // Update every pixel
-            onDragEnd: function(sizes) {
+            onDragEnd: (sizes) => {
+                // If user drags console to expand it (more than 5%), remove collapsed class
+                const panel = $('#console-panel');
+                if (sizes[1] > 5 && panel.hasClass('console-collapsed')) {
+                    panel.removeClass('console-collapsed');
+                    $('#console-collapse-btn').html('▼');
+                    localStorage.setItem('console-collapsed', 'false');
+                    this.logger.info('Console expanded via drag');
+                }
+
+                // If user drags console very small (less than 5%), add collapsed class
+                if (sizes[1] <= 5 && !panel.hasClass('console-collapsed')) {
+                    panel.addClass('console-collapsed');
+                    $('#console-collapse-btn').html('▲');
+                    localStorage.setItem('console-collapsed', 'true');
+                    this.logger.info('Console collapsed via drag');
+                }
+
+                // Save sizes to localStorage (only if not collapsed)
+                if (sizes[1] > 5) {
+                    localStorage.setItem('console-split-sizes', JSON.stringify(sizes));
+                }
+
                 // Resize Ace editor after split drag
                 if (window.application && window.application.fileTreeController) {
                     window.application.fileTreeController.resizeAceEditor();
                 }
-                // Store sizes
-                localStorage.setItem('console-split-sizes', JSON.stringify(sizes));
             }
         });
 
@@ -601,9 +655,13 @@ class Pithagoras {
                     e.stopPropagation();
                     logger.info('Circuits menu button clicked, toggling dropdown');
 
-                    const isShowing = dropdown.classList.toggle('show');
+                    const isShowing = dropdown.classList.contains('show');
 
-                    if (isShowing) {
+                    // Close all other dropdowns first
+                    document.querySelectorAll('.toolbar-dropdown-content').forEach(dd => dd.classList.remove('show'));
+
+                    if (!isShowing) {
+                        dropdown.classList.add('show');
                         // Position dropdown below the button using fixed positioning
                         const rect = menuBtn.getBoundingClientRect();
                         dropdown.style.top = (rect.bottom + 4) + 'px';
@@ -637,12 +695,7 @@ class Pithagoras {
                 }
             });
 
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.circuits-dropdown')) {
-                    dropdown.classList.remove('show');
-                }
-            });
+            // Close dropdown when clicking outside (handled by toolbar controller's global handler)
         } catch (err) {
             logger.error('Failed to load circuits menu:', err);
         }
@@ -667,9 +720,13 @@ class Pithagoras {
             e.stopPropagation();
             logger.info('Project menu button clicked');
 
-            const isShowing = projectDropdown.classList.toggle('show');
+            const isShowing = projectDropdown.classList.contains('show');
 
-            if (isShowing) {
+            // Close all other dropdowns first
+            document.querySelectorAll('.toolbar-dropdown-content').forEach(dd => dd.classList.remove('show'));
+
+            if (!isShowing) {
+                projectDropdown.classList.add('show');
                 // Position dropdown below the button using fixed positioning
                 const rect = projectMenuBtn.getBoundingClientRect();
                 projectDropdown.style.top = (rect.bottom + 4) + 'px';
@@ -678,12 +735,7 @@ class Pithagoras {
             }
         });
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.project-dropdown')) {
-                projectDropdown.classList.remove('show');
-            }
-        });
+        // Close dropdown when clicking outside (handled by toolbar controller's global handler)
 
         // Wire up menu items to existing button handlers
         const menuItemMappings = [
