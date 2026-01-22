@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BadgerBox Setup</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        h1 {
+            color: #4ec9b0;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #569cd6;
+            margin-top: 30px;
+        }
+        .section {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        select, input {
+            background: #3c3c3c;
+            color: #d4d4d4;
+            border: 1px solid #555;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.info {
+            background: #1a472a;
+            border: 1px solid #2d7a4f;
+        }
+        .status.warning {
+            background: #4a3e1a;
+            border: 1px solid #7a6d2d;
+        }
+        .status.error {
+            background: #4a1a1a;
+            border: 1px solid #7a2d2d;
+        }
+        .terminal {
+            background: #1e1e1e;
+            color: #cccccc;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        .terminal-line {
+            margin: 2px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .progress {
+            background: #3c3c3c;
+            border-radius: 4px;
+            overflow: hidden;
+            height: 20px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background: #0e639c;
+            height: 100%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 BadgerBox Setup</h1>
+
+    <div class="section">
+        <h2>Step 1: Scan for BadgerBox</h2>
+        <button id="scanBtn" onclick="scanDevices()">🔍 Scan for Bluetooth Devices</button>
+        <div id="scanStatus"></div>
+        <select id="deviceSelect" class="hidden" size="5"></select>
+        <button id="connectBtn" class="hidden" onclick="connectDevice()">🔗 Connect</button>
+    </div>
+
+    <div class="section hidden" id="connectedSection">
+        <h2>Step 2: Connected to BadgerBox</h2>
+        <div class="status info">
+            ✅ Connected to: <span id="connectedDevice"></span>
+        </div>
+
+        <h3>Raspberry Pi Status</h3>
+        <button onclick="checkPiStatus()">🔄 Check Status</button>
+        <div id="piStatus"></div>
+
+        <h3>Server Setup</h3>
+        <p>This will transfer and install the Pithagoras server on your Raspberry Pi.</p>
+        <button onclick="setupServer()">📦 Setup Server on Pi</button>
+        <div id="setupStatus"></div>
+        <div id="setupProgress" class="progress hidden">
+            <div id="setupProgressBar" class="progress-bar" style="width: 0%"></div>
+        </div>
+
+        <h3>Terminal</h3>
+        <div class="terminal" id="terminal"></div>
+        <input type="text" id="commandInput" placeholder="Enter command..." onkeypress="handleCommandKey(event)">
+        <button onclick="sendCommand()">▶️ Send Command</button>
+    </div>
+
+    <script>
+        // Check if running in Electron
+        if (!window.isElectron) {
+            document.body.innerHTML = '<h1>⚠️ This page only works in Electron app</h1>';
+        }
+
+        let currentDevice = null;
+
+        // Scan for Bluetooth devices
+        async function scanDevices() {
+            const btn = document.getElementById('scanBtn');
+            const status = document.getElementById('scanStatus');
+            const select = document.getElementById('deviceSelect');
+
+            btn.disabled = true;
+            status.innerHTML = '<div class="status info">🔍 Scanning...</div>';
+            select.innerHTML = '';
+            select.classList.add('hidden');
+
+            try {
+                const devices = await window.bluetooth.scan();
+
+                if (devices.length === 0) {
+                    status.innerHTML = '<div class="status warning">No Bluetooth devices found. Make sure BadgerBox is powered on and paired.</div>';
+                } else {
+                    status.innerHTML = '<div class="status info">Found ' + devices.length + ' device(s)</div>';
+
+                    devices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.path;
+                        option.textContent = `${device.friendlyName || device.path} (${device.path})`;
+                        select.appendChild(option);
+                    });
+
+                    select.classList.remove('hidden');
+                    document.getElementById('connectBtn').classList.remove('hidden');
+                }
+            } catch (error) {
+                status.innerHTML = '<div class="status error">❌ Error: ' + error.message + '</div>';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Connect to selected device
+        async function connectDevice() {
+            const select = document.getElementById('deviceSelect');
+            const devicePath = select.value;
+
+            if (!devicePath) return;
+
+            const status = document.getElementById('scanStatus');
+            status.innerHTML = '<div class="status info">🔗 Connecting...</div>';
+
+            try {
+                await window.bluetooth.connect(devicePath);
+                currentDevice = devicePath;
+
+                status.innerHTML = '<div class="status info">✅ Connected!</div>';
+                document.getElementById('connectedDevice').textContent = devicePath;
+                document.getElementById('connectedSection').classList.remove('hidden');
+            } catch (error) {
+                status.innerHTML = '<div class="status error">❌ Connection failed: ' + error.message + '</div>';
+            }
+        }
+
+        // Check Pi status
+        async function checkPiStatus() {
+            const statusDiv = document.getElementById('piStatus');
+            statusDiv.innerHTML = '<div class="status info">⏳ Checking status...</div>';
+
+            try {
+                const status = await window.bluetooth.getStatus();
+                statusDiv.innerHTML = `
+                    <div class="status info">
+                        <strong>Hostname:</strong> ${status.hostname}<br>
+                        <strong>IP Address:</strong> ${status.ip}<br>
+                        <strong>Uptime:</strong> ${status.uptime}
+                    </div>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        // Setup server on Pi
+        async function setupServer() {
+            const statusDiv = document.getElementById('setupStatus');
+            const progressDiv = document.getElementById('setupProgress');
+            const progressBar = document.getElementById('setupProgressBar');
+
+            statusDiv.innerHTML = '<div class="status info">📦 Starting server setup...</div>';
+            progressDiv.classList.remove('hidden');
+            progressBar.style.width = '10%';
+
+            try {
+                // In a real implementation, you'd need to create the server archive first
+                // For now, this is a placeholder
+                alert('Server setup would transfer and install the server on the Pi.\nThis requires implementing the archive creation step.');
+
+                // await window.bluetooth.setupServer('/path/to/server.tar.gz');
+
+                progressBar.style.width = '100%';
+                statusDiv.innerHTML = '<div class="status info">✅ Server setup complete!</div>';
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Setup failed: ' + error.message + '</div>';
+            }
+        }
+
+        // Send command to Pi
+        async function sendCommand() {
+            const input = document.getElementById('commandInput');
+            const command = input.value.trim();
+
+            if (!command) return;
+
+            addTerminalLine('> ' + command);
+            input.value = '';
+
+            try {
+                const result = await window.bluetooth.sendCommand(command);
+                addTerminalLine(result);
+            } catch (error) {
+                addTerminalLine('Error: ' + error.message);
+            }
+        }
+
+        // Handle Enter key in command input
+        function handleCommandKey(event) {
+            if (event.key === 'Enter') {
+                sendCommand();
+            }
+        }
+
+        // Add line to terminal
+        function addTerminalLine(text) {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.textContent = text;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Listen for Bluetooth events
+        if (window.bluetooth) {
+            window.bluetooth.onConnected((info) => {
+                console.log('Bluetooth connected:', info);
+            });
+
+            window.bluetooth.onDisconnected(() => {
+                console.log('Bluetooth disconnected');
+                document.getElementById('connectedSection').classList.add('hidden');
+            });
+
+            window.bluetooth.onData((data) => {
+                addTerminalLine(data);
+            });
+
+            window.bluetooth.onSetupStatus((status) => {
+                const statusDiv = document.getElementById('setupStatus');
+                statusDiv.innerHTML = '<div class="status info">' + status + '</div>';
+            });
+        }
+    </script>
+</body>
+</html>

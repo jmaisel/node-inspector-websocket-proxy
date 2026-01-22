@@ -2,13 +2,23 @@
   "name": "node-inspector-websocket-proxy",
   "version": "v0.2.0-baseline-dist",
   "description": "Node.js Inspector WebSocket proxy with GPIO simulation support",
-  "main": "server.js",
+  "main": "electron-main.js",
   "scripts": {
-    "start": "node server.js",
+    "postinstall": "electron-builder install-app-deps",
+    "server": "cd server && npm install && npm start",
+    "electron": "electron .",
+    "electron:dev": "NODE_ENV=development electron .",
+    "dev": "npm run server",
+    "build": "electron-builder",
+    "build:all": "electron-builder -mwl",
+    "build:linux": "electron-builder --linux",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
     "build:pithagoras": "mkdir -p ../pithagoras/war/debugger-client && cp www/client/*.js ../pithagoras/war/debugger-client/",
     "sync:circuitjs1": "cp -r ../pithagoras/war/circuitjs1/* www/circuitjs1/",
     "lint": "eslint www/**/*.js server/**/*.js util/**/*.js *.js",
-    "lint:fix": "eslint --fix www/**/*.js server/**/*.js util/**/*.js *.js"
+    "lint:fix": "eslint --fix www/**/*.js server/**/*.js util/**/*.js *.js",
+    "install:server": "cd server && npm install"
   },
   "keywords": [
     "inspector",
@@ -17,32 +27,69 @@
     "proxy",
     "gpio"
   ],
-  "author": "",
+  "author": {
+    "name": "Badger Maisel",
+    "email": "badger@joebotics.com"
+  },
   "license": "ISC",
   "dependencies": {
+    "@serialport/parser-readline": "^12.0.0",
     "archiver": "^7.0.1",
-    "cors": "^2.8.5",
     "express": "^4.22.1",
+    "serialport": "^12.0.0",
     "unzipper": "^0.12.3",
     "ws": "^8.18.3"
   },
-  "server.config": {
-    "httpPort": 8080,
-    "proxyPort": 8888,
-    "gpioPort": 8081,
-    "inspectPort": 9229,
-    "workspaceRoot": "/tmp/node-inspector-websocket-proxy",
-    "staticDirs": [
-      "~/Code/node-inspector-websocket-proxy/www",
-      "~/Code/pithagoras/war"
-    ],
-    "logLevels": {
-      "http": "debug",
-      "static": "debug",
-      "websocket": "debug"
-    }
-  },
   "devDependencies": {
+    "@electron/rebuild": "^4.0.2",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.4.0",
     "eslint": "^8.57.1"
+  },
+  "build": {
+    "appId": "com.pithagoras.gpio",
+    "productName": "Pithagoras",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron-main.js",
+      "electron-preload.js",
+      "electron-bluetooth-manager.js",
+      "www/**/*",
+      "util/**/*",
+      "pithagoras-gpio/**/*",
+      "server/**/*",
+      "!server/node_modules",
+      "!node_modules",
+      "!.git",
+      "!.idea",
+      "!features",
+      "!**/.DS_Store"
+    ],
+    "asarUnpack": [
+      "server/**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Development"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.ico"
+    }
   }
 }
