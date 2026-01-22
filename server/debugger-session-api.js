@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const RemoteDebuggerProxyServer = require('../inspector-proxy-factory');
+const RemoteDebuggerProxyServer = require('./inspector-proxy-factory');
 const WorkspaceSecurity = require('./workspace-security');
 const AuthMiddleware = require('./auth-middleware');
 
@@ -14,7 +14,7 @@ const AuthMiddleware = require('./auth-middleware');
  * 1. Client establishes workspace (GET /workspace/info)
  * 2. Client browses files (GET /project/*)
  * 3. Client starts debug session (POST /debug/session with {file})
- * 4. Client connects to WebSocket (ws://localhost:8888)
+ * 4. Client connects to WebSocket (ws://0.0.0.0:8888)
  * 5. Client debugs...
  * 6. Client stops session (DELETE /debug/session/:id)
  * 7. Client can start new session with different file
@@ -68,7 +68,7 @@ class DebuggerSessionManager {
         return {
             sessionId,
             targetFile,
-            wsUrl: `ws://localhost:${this.proxyPort}`,
+            wsUrl: `ws://127.0.0.1:${this.proxyPort}`,
             inspectPort: this.inspectPort,
             proxyPort: this.proxyPort,
             status: 'running'
@@ -126,7 +126,7 @@ class DebuggerSessionManager {
             absolutePath: session.absolutePath,
             startedAt: session.startedAt,
             status: session.status,
-            wsUrl: `ws://localhost:${this.proxyPort}`,
+            wsUrl: `ws://0.0.0.0:${this.proxyPort}`,
             inspectPort: this.inspectPort,
             proxyPort: this.proxyPort
         };

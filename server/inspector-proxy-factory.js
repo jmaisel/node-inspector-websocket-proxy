@@ -2,7 +2,7 @@ const { spawn } = require('child_process');
 const WebSocket = require('ws');
 const http = require('http');
 const path = require('path');
-const Logger = require('./util/logger');
+const Logger = require('../util/logger');
 
 /**
  * Bidirectional message proxy between client and Node debugger WebSockets
@@ -96,8 +96,8 @@ class RemoteDebuggerProxyServer {
         });
 
         this.server.listen(this.proxyPort, () => {
-            this.logger.info(`Proxy API listening on http://localhost:${this.proxyPort}`);
-            this.logger.info(`Connect your client to ws://localhost:${this.proxyPort}\n`);
+            this.logger.info(`Proxy API listening on http://0.0.0.0:${this.proxyPort}`);
+            this.logger.info(`Connect your client to ws://0.0.0.0:${this.proxyPort}\n`);
             // Don't spawn process here - wait for client connection
         });
     }

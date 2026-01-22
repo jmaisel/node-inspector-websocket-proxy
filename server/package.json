@@ -1,0 +1,41 @@
+{
+  "name": "node-inspector-websocket-proxy-server",
+  "version": "0.2.0",
+  "description": "Server component for Node.js Inspector WebSocket proxy",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "inspector",
+    "debugger",
+    "websocket",
+    "proxy",
+    "server"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "express": "^4.22.1",
+    "unzipper": "^0.12.3",
+    "ws": "^8.18.3"
+  },
+  "server.config": {
+    "httpPort": 8080,
+    "proxyPort": 8888,
+    "gpioPort": 8081,
+    "inspectPort": 9229,
+    "workspaceRoot": "/tmp/node-inspector-websocket-proxy",
+    "staticDirs": [
+      "../www",
+      "~/Code/pithagoras/war"
+    ],
+    "logLevels": {
+      "http": "debug",
+      "static": "debug",
+      "websocket": "debug"
+    }
+  }
+}

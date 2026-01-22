@@ -14,7 +14,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
-const Logger = require('./util/logger');
+const Logger = require('../util/logger');
 
 class Server {
     constructor(options = {}) {
@@ -79,10 +79,10 @@ class Server {
             this.logger.info('\n' + '='.repeat(70));
             this.logger.info('Server is ready!');
             this.logger.info('='.repeat(70));
-            this.logger.info(`HTTP Server:       http://localhost:${this.options.httpPort}`);
+            this.logger.info(`HTTP Server:       http://0.0.0.0:${this.options.httpPort}`);
             this.logger.info(`Workspace Root:    ${this.options.workspaceRoot}`);
-            this.logger.info(`Debug WebSocket:   ws://localhost:${this.options.proxyPort} (when active)`);
-            this.logger.info(`GPIO WebSocket:    ws://localhost:${this.options.gpioPort}`);
+            this.logger.info(`Debug WebSocket:   ws://0.0.0.0:${this.options.proxyPort} (when active)`);
+            this.logger.info(`GPIO WebSocket:    ws://0.0.0.0:${this.options.gpioPort}`);
             this.logger.info('='.repeat(70));
             this.logger.info('Static directories:');
             this.options.staticDirs.forEach(dir => this.logger.info(`   ${dir}`));
@@ -149,9 +149,9 @@ class Server {
             app.get('/health', (req, res) => {
                 res.json({
                     status: 'ok',
-                    http: `http://localhost:${this.options.httpPort}`,
-                    websocket: `ws://localhost:${this.options.proxyPort}`,
-                    gpio: `ws://localhost:${this.options.gpioPort}`,
+                    http: `http://0.0.0.0:${this.options.httpPort}`,
+                    websocket: `ws://0.0.0.0:${this.options.proxyPort}`,
+                    gpio: `ws://0.0.0.0:${this.options.gpioPort}`,
                     workspaceRoot: this.options.workspaceRoot,
                     staticDirs: this.options.staticDirs,
                     timestamp: new Date().toISOString()
@@ -159,7 +159,7 @@ class Server {
             });
 
             // Workspace API
-            const createWorkspaceApi = require('./server/workspace-api');
+            const createWorkspaceApi = require('./workspace-api');
             const workspaceRouter = createWorkspaceApi({
                 workspaceRoot: this.options.workspaceRoot,
                 apiKeys: [process.env.WORKSPACE_API_KEY || 'dev-key-123']
@@ -169,7 +169,7 @@ class Server {
             this.logger.info('* Workspace API mounted at /project and /workspace');
 
             // Debugger Session API
-            const { createDebuggerSessionApi } = require('./server/debugger-session-api');
+            const { createDebuggerSessionApi } = require('./debugger-session-api');
             const debugRouter = createDebuggerSessionApi({
                 workspaceRoot: this.options.workspaceRoot,
                 proxyPort: this.options.proxyPort,
@@ -183,7 +183,7 @@ class Server {
             this.logger.info('* Debugger Session API mounted at /debug');
 
             // GPIO WebSocket API
-            const { createGPIOWebSocketApi } = require('./server/gpio-websocket-api');
+            const { createGPIOWebSocketApi } = require('./gpio-websocket-api');
             const gpioRouter = createGPIOWebSocketApi({
                 gpioPort: this.options.gpioPort,
                 logLevel: this.options.logLevels.websocket
@@ -193,7 +193,7 @@ class Server {
             this.logger.info('* GPIO WebSocket API mounted at /gpio');
 
             // Project Management API
-            const { createProjectApi } = require('./server/project-api');
+            const { createProjectApi } = require('./project-api');
             const projectRouter = createProjectApi({
                 workspaceRoot: this.options.workspaceRoot
             });
@@ -203,7 +203,7 @@ class Server {
             // Demo Projects API
             app.get('/api/demo-projects', async (req, res) => {
                 try {
-                    const demoProjectsDir = path.join(__dirname, 'pithagoras-gpio', 'demo-projects');
+                    const demoProjectsDir = path.join(__dirname, '..', 'pithagoras-gpio', 'demo-projects');
                     const entries = await fsPromises.readdir(demoProjectsDir, { withFileTypes: true });
 
                     const projects = [];
@@ -241,7 +241,7 @@ class Server {
                         return res.status(400).json({ error: 'Project name required' });
                     }
 
-                    const demoProjectsDir = path.join(__dirname, 'pithagoras-gpio', 'demo-projects');
+                    const demoProjectsDir = path.join(__dirname, '..', 'pithagoras-gpio', 'demo-projects');
                     const sourcePath = path.join(demoProjectsDir, projectName);
                     const finalTargetName = targetName || projectName;
                     const targetPath = path.join(this.options.workspaceRoot, finalTargetName);
@@ -273,7 +273,7 @@ class Server {
                     await fsPromises.cp(sourcePath, targetPath, { recursive: true });
 
                     // Copy GPIO driver (index.js) to the project as gpio-driver.js
-                    const driverSource = path.join(__dirname, 'pithagoras-gpio', 'gpio-driver.js');
+                    const driverSource = path.join(__dirname, '..', 'pithagoras-gpio', 'gpio-driver.js');
                     const driverTarget = path.join(targetPath, 'gpio-driver.js');
                     await fsPromises.copyFile(driverSource, driverTarget);
 
@@ -357,10 +357,10 @@ class Server {
 
     <h2>Server Status</h2>
     <div class="status">
-        <div class="status-row"><span class="status-label">HTTP Server:</span><span class="status-value">http://localhost:${this.options.httpPort}</span></div>
+        <div class="status-row"><span class="status-label">HTTP Server:</span><span class="status-value">http://0.0.0.0:${this.options.httpPort}</span></div>
         <div class="status-row"><span class="status-label">Workspace:</span><span class="status-value">${this.options.workspaceRoot}</span></div>
-        <div class="status-row"><span class="status-label">Debug WebSocket:</span><span class="status-value">ws://localhost:${this.options.proxyPort}</span></div>
-        <div class="status-row"><span class="status-label">GPIO WebSocket:</span><span class="status-value">ws://localhost:${this.options.gpioPort}</span></div>
+        <div class="status-row"><span class="status-label">Debug WebSocket:</span><span class="status-value">ws://0.0.0.0:${this.options.proxyPort}</span></div>
+        <div class="status-row"><span class="status-label">GPIO WebSocket:</span><span class="status-value">ws://0.0.0.0:${this.options.gpioPort}</span></div>
         <div class="status-row"><span class="status-label">Debug Session:</span><span class="status-value">${currentSession ? currentSession.targetFile : 'None'}</span></div>
     </div>
 

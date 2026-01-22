@@ -68,7 +68,7 @@ class GPIOWebSocketManager {
             });
         });
 
-        this.logger.info(`GPIO WebSocket server ready on ws://localhost:${this.port}`);
+        this.logger.info(`GPIO WebSocket server ready on ws://0.0.0.0:${this.port}`);
     }
 
     /**
@@ -130,6 +130,12 @@ class GPIOWebSocketManager {
                 timestamp: Date.now()
             });
 
+            // Notify all GPIO clients that simulator is now connected
+            this.broadcastToClients({
+                type: 'simulatorConnected',
+                timestamp: Date.now()
+            });
+
         } else if (role === 'gpio-client') {
             const clientId = this.nextClientId++;
             this.clients.set(clientId, {
@@ -149,6 +155,14 @@ class GPIOWebSocketManager {
                 clientId: clientId,
                 timestamp: Date.now()
             });
+
+            // If simulator is already connected, notify the new client
+            if (this.simulator && this.simulator.readyState === WebSocket.OPEN) {
+                this.send(ws, {
+                    type: 'simulatorConnected',
+                    timestamp: Date.now()
+                });
+            }
 
         } else {
             this.send(ws, {
@@ -290,7 +304,7 @@ class GPIOWebSocketManager {
         return {
             running: this.wss !== null,
             port: this.port,
-            wsUrl: `ws://localhost:${this.port}`,
+            wsUrl: `ws://0.0.0.0:${this.port}`,
             simulator: this.simulator ? 'connected' : 'disconnected',
             clientCount: this.clients.size,
             clients: Array.from(this.clients.values()).map(c => ({

@@ -29,6 +29,7 @@ class PithagorasGPIO {
         this.ws = null;
         this.connected = false;
         this.registered = false;
+        this.simulatorConnected = false;
         this.reconnectTimer = null;
 
         this.nextMessageId = 1;
@@ -36,10 +37,11 @@ class PithagorasGPIO {
         this.pins = new Map(); // pinNumber → GPIOPin
 
         this.eventHandlers = new Map(); // pinName → Set of callbacks
+        this.connectionPromise = null; // Track connection promise
 
         // Auto-connect when mode is simulator
         if (this.mode === 'simulator') {
-            this.connect();
+            this.connectionPromise = this.connect();
         } else if (this.mode === 'hardware') {
             throw new Error('Hardware mode not implemented yet - coming soon!');
         }
@@ -86,11 +88,13 @@ class PithagorasGPIO {
                     console.log('PithagorasGPIO: Disconnected', code, reason.toString());
                     this.connected = false;
                     this.registered = false;
+                    this.simulatorConnected = false;
 
                     if (this.autoReconnect && code !== 1000) { // 1000 = normal closure
                         console.log(`PithagorasGPIO: Reconnecting in ${this.reconnectDelay}ms`);
                         this.reconnectTimer = setTimeout(() => {
-                            this.connect().catch(err => console.error('Reconnect failed:', err));
+                            this.connectionPromise = this.connect();
+                            this.connectionPromise.catch(err => console.error('Reconnect failed:', err));
                         }, this.reconnectDelay);
                     }
                 });
@@ -159,8 +163,14 @@ class PithagorasGPIO {
                 this.handleGPIOOutputChanged(message);
                 break;
 
+            case 'simulatorConnected':
+                console.log('PithagorasGPIO: Simulator connected');
+                this.simulatorConnected = true;
+                break;
+
             case 'simulatorDisconnected':
                 console.warn('PithagorasGPIO: Simulator disconnected');
+                this.simulatorConnected = false;
                 break;
 
             default:
@@ -273,9 +283,33 @@ class PithagorasGPIO {
         if (!this.eventHandlers.has(pinName)) {
             this.eventHandlers.set(pinName, new Set());
 
-            // Register callback with simulator
-            this.sendRequest('registerGPIOOutputCallback', { pinName })
-                .catch(err => console.error(`Failed to register callback for ${pinName}:`, err));
+            // Wait for connection and simulator to be ready before registering
+            const registerCallback = async () => {
+                try {
+                    // Wait for initial connection if still connecting
+                    if (this.connectionPromise) {
+                        await this.connectionPromise;
+                    }
+
+                    // Wait for simulator to connect (with timeout)
+                    const timeout = 10000; // 10 second timeout
+                    const startTime = Date.now();
+                    while (!this.simulatorConnected && (Date.now() - startTime) < timeout) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+
+                    if (!this.simulatorConnected) {
+                        console.warn(`${pinName}: Simulator not connected after ${timeout}ms, callback registration may fail`);
+                    }
+
+                    // Register callback with simulator
+                    await this.sendRequest('registerGPIOOutputCallback', { pinName });
+                } catch (err) {
+                    console.error(`Failed to register callback for ${pinName}:`, err);
+                }
+            };
+
+            registerCallback();
         }
 
         this.eventHandlers.get(pinName).add(callback);
