@@ -87,22 +87,35 @@ class ProjectManager {
      * Save current project
      */
     async saveProject() {
+        console.log('[ProjectManager] saveProject() called');
+        console.log('[ProjectManager] currentProject:', this.currentProject);
+
         if (!this.currentProject) {
-            throw new Error('No project is currently open');
+            const errorMsg = 'No project is currently open';
+            console.error('[ProjectManager]', errorMsg);
+            alert(errorMsg);
+            throw new Error(errorMsg);
         }
 
         try {
             this.logger.info('Saving project:', this.currentProject.path);
+            console.log('[ProjectManager] Starting save for:', this.currentProject.path);
 
             // Collect circuit data
+            console.log('[ProjectManager] Collecting circuit data...');
+            console.log('[ProjectManager] ctx.simulator:', this.ctx.simulator);
             const circuitData = await this._exportCircuitData();
+            console.log('[ProjectManager] Circuit data collected:', circuitData ? `${circuitData.length} chars` : 'NONE');
             this.logger.info('Circuit data collected:', circuitData ? `${circuitData.length} chars` : 'NONE');
 
             // Collect editor state
+            console.log('[ProjectManager] Collecting editor state...');
             const editorState = await this._exportEditorState();
+            console.log('[ProjectManager] Editor state collected:', editorState);
             this.logger.info('Editor state collected:', editorState);
 
             // Send to backend
+            console.log('[ProjectManager] Sending to backend...');
             this.logger.info('Sending to backend...');
             const response = await this._apiRequest('/save', 'POST', {
                 projectPath: this.currentProject.path,
@@ -110,15 +123,21 @@ class ProjectManager {
                 editorState
             });
 
+            console.log('[ProjectManager] Save response:', response);
+
             this.ctx.pub('project:saved', {
                 project: this.currentProject,
                 timestamp: response.timestamp
             });
 
             this.logger.info('Project saved successfully:', response);
+            console.log('[ProjectManager] Project saved successfully');
             return response;
         } catch (err) {
+            console.error('[ProjectManager] Failed to save project:', err);
+            console.error('[ProjectManager] Error stack:', err.stack);
             this.logger.error('Failed to save project:', err);
+            alert('Failed to save project: ' + err.message);
             throw err;
         }
     }
@@ -309,22 +328,35 @@ class ProjectManager {
      * Export circuit data from simulator
      */
     async _exportCircuitData() {
+        console.log('[ProjectManager] _exportCircuitData() called');
+        console.log('[ProjectManager] this.ctx:', this.ctx);
+        console.log('[ProjectManager] this.ctx.simulator:', this.ctx.simulator);
+
         if (!this.ctx.simulator) {
+            console.warn('[ProjectManager] Simulator not available');
             this.logger.warn('Simulator not available');
             return '';
         }
 
         try {
+            console.log('[ProjectManager] Checking for exportCircuit method...');
+            console.log('[ProjectManager] typeof this.ctx.simulator.exportCircuit:', typeof this.ctx.simulator.exportCircuit);
+
             // CircuitJS1 exports exportCircuit() method
             if (this.ctx.simulator.exportCircuit) {
+                console.log('[ProjectManager] Calling exportCircuit()...');
                 const circuitText = this.ctx.simulator.exportCircuit();
+                console.log('[ProjectManager] exportCircuit() returned:', circuitText ? `${circuitText.length} chars` : 'null/undefined');
                 this.logger.info('Exported circuit data:', circuitText.length, 'chars');
                 return circuitText;
             }
 
+            console.warn('[ProjectManager] exportCircuit method not available on simulator');
             this.logger.warn('exportCircuit method not available on simulator');
             return '';
         } catch (err) {
+            console.error('[ProjectManager] Failed to export circuit data:', err);
+            console.error('[ProjectManager] Error stack:', err.stack);
             this.logger.error('Failed to export circuit data:', err);
             return '';
         }
