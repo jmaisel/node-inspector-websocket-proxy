@@ -183,7 +183,7 @@ class ProjectUI {
             $('#new-project-dialog').dialog({
                 modal: true,
                 width: 600,
-                position: { my: "center", at: "center top+80", of: window },
+                position: { my: "center", at: "center", of: window },
                 closeOnEscape: true,
                 buttons: {
                     'Create': function() {
@@ -263,7 +263,7 @@ class ProjectUI {
         $('#server-error-dialog').dialog({
             modal: true,
             width: 500,
-            position: { my: "center", at: "center top+80", of: window },
+            position: { my: "center", at: "center", of: window },
             buttons: {
                 'Retry': () => {
                     $('#server-error-dialog').dialog('close');
@@ -541,7 +541,7 @@ class ProjectUI {
             $('#file-picker-dialog').dialog({
                 modal: true,
                 width: 400,
-                position: { my: "center", at: "center top+80", of: window },
+                position: { my: "center", at: "center", of: window },
                 buttons: {
                     'Select': function() {
                         if (selectedFile) {
@@ -607,7 +607,7 @@ class ProjectUI {
             $('#demo-project-dialog').dialog({
                 modal: true,
                 width: 450,
-                position: { my: "center", at: "center top+80", of: window },
+                position: { my: "center", at: "center", of: window },
                 buttons: {
                     'Copy to Workspace': async () => {
                         if (!selectedProject) {
@@ -678,7 +678,7 @@ class ProjectUI {
             $('#create-item-dialog').dialog({
                 modal: true,
                 width: 400,
-                position: { my: "center", at: "center top+80", of: window },
+                position: { my: "center", at: "center", of: window },
                 buttons: {
                     'Create': async () => {
                         const itemName = $('#new-item-name').val().trim();

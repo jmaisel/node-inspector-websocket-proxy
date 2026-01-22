@@ -242,6 +242,7 @@ class ProjectUIController {
             const dialog = $('#project-list-dialog').dialog({
                 modal: true,
                 width: 500,
+                position: { my: "center", at: "center", of: window },
                 buttons: {
                     Cancel: function() {
                         $(this).dialog('close');

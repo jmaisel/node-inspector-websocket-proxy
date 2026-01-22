@@ -61,7 +61,7 @@ class ProjectHelper {
             autoOpen: true,
             modal: true,
             width: 550,
-            position: { my: "center", at: "center top+80", of: window },
+            position: { my: "center", at: "center", of: window },
             buttons: {
                 'Select': () => {
                     this.onProjectSelectButtonClick(dialog);
