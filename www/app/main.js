@@ -692,12 +692,23 @@ class Pithagoras{
     const bluetoothToggleBtn = document.getElementById('bluetooth-toggle-btn');
     const bluetoothPanelContainer = document.getElementById('bluetooth-panel-container');
 
+    logger.info('Bluetooth elements:', {
+        button: bluetoothToggleBtn,
+        panel: bluetoothPanelContainer
+    });
+
     if (bluetoothToggleBtn && bluetoothPanelContainer) {
         bluetoothToggleBtn.addEventListener('click', () => {
             const isVisible = bluetoothPanelContainer.style.display !== 'none';
             bluetoothPanelContainer.style.display = isVisible ? 'none' : 'block';
             logger.info('Bluetooth panel toggled:', !isVisible ? 'visible' : 'hidden');
+            console.log('Bluetooth panel display:', bluetoothPanelContainer.style.display);
         });
         logger.info('Bluetooth toggle button initialized');
+    } else {
+        logger.error('Bluetooth elements not found!', {
+            buttonFound: !!bluetoothToggleBtn,
+            panelFound: !!bluetoothPanelContainer
+        });
     }
 }
