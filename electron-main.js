@@ -69,10 +69,26 @@ async function createWindow() {
             nodeIntegration: false,
             contextIsolation: true,
             webSecurity: true,
+            enableBlinkFeatures: 'Serial',  // Enable Web Serial API
             preload: require('path').join(__dirname, 'electron-preload.js')
         },
         title: 'Pithagoras - GPIO Simulator',
         autoHideMenuBar: true
+    });
+
+    // Enable Serial API permissions
+    mainWindow.webContents.session.setPermissionCheckHandler((webContents, permission) => {
+        if (permission === 'serial') {
+            return true;
+        }
+        return false;
+    });
+
+    mainWindow.webContents.session.setDevicePermissionHandler((details) => {
+        if (details.deviceType === 'serial') {
+            return true;
+        }
+        return false;
     });
 
     // Hide menu bar completely
