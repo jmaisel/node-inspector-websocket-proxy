@@ -72,6 +72,7 @@ class BluetoothUIController {
         this.statusElement = document.getElementById('bt-status');
         this.connectButton = document.getElementById('bt-connect-btn');
         this.disconnectButton = document.getElementById('bt-disconnect-btn');
+        this.checkDevicesButton = document.getElementById('bt-check-devices-btn');
         this.terminalOutput = document.getElementById('bt-terminal-output');
         this.commandInput = document.getElementById('bt-command-input');
 
@@ -82,6 +83,10 @@ class BluetoothUIController {
 
         if (this.disconnectButton) {
             this.disconnectButton.addEventListener('click', () => this.handleDisconnect());
+        }
+
+        if (this.checkDevicesButton) {
+            this.checkDevicesButton.addEventListener('click', () => this.handleCheckDevices());
         }
 
         if (this.commandInput) {
@@ -116,7 +121,15 @@ class BluetoothUIController {
 
         } catch (error) {
             this.logger.error('Connection failed:', error);
-            this.updateStatus('Connection failed: ' + error.message, 'error');
+
+            // Handle user cancellation gracefully
+            if (error.name === 'NotFoundError' || error.message.includes('No port selected')) {
+                this.updateStatus('No device selected', 'warning');
+                this.logger.info('User cancelled port selection or no devices available');
+            } else {
+                this.updateStatus('Connection failed: ' + error.message, 'error');
+                alert('Connection failed: ' + error.message);
+            }
         }
     }
 
@@ -129,6 +142,31 @@ class BluetoothUIController {
             await this.manager.disconnect();
         } catch (error) {
             this.logger.error('Disconnect failed:', error);
+        }
+    }
+
+    /**
+     * Handle check devices button click
+     */
+    async handleCheckDevices() {
+        try {
+            this.logger.info('Checking for previously granted devices');
+            const ports = await this.manager.getGrantedPorts();
+
+            if (ports.length === 0) {
+                alert('No previously granted devices found.\n\nYou need to:\n1. Pair your Bluetooth device in OS settings first\n2. Click "Connect to Bluetooth Device" and grant permission');
+                this.appendToTerminal('=== No previously granted devices ===');
+            } else {
+                this.appendToTerminal(`=== Found ${ports.length} previously granted device(s) ===`);
+                for (const port of ports) {
+                    const info = port.getInfo();
+                    this.appendToTerminal(`Device: ${JSON.stringify(info)}`);
+                }
+                alert(`Found ${ports.length} previously granted device(s).\n\nYou can reconnect to these without selecting again.`);
+            }
+        } catch (error) {
+            this.logger.error('Check devices failed:', error);
+            alert('Failed to check devices: ' + error.message);
         }
     }
 

@@ -12,6 +12,9 @@
         <button id="bt-disconnect-btn" class="bt-btn bt-btn-danger" disabled>
             ⛔ Disconnect
         </button>
+        <button id="bt-check-devices-btn" class="bt-btn bt-btn-secondary">
+            🔍 Check Previously Granted Devices
+        </button>
     </div>
 
     <div class="bluetooth-terminal">
@@ -115,6 +118,15 @@
 
 .bt-btn-danger:not(:disabled):hover {
     background: #c62828;
+}
+
+.bt-btn-secondary {
+    background: #616161;
+    color: white;
+}
+
+.bt-btn-secondary:not(:disabled):hover {
+    background: #757575;
 }
 
 .bt-btn-small {
