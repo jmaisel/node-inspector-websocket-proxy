@@ -537,18 +537,9 @@
             </div>
         </div>
 
-        <!-- Bluetooth Panel (hidden by default, toggled via toolbar) -->
-        <div id="bluetooth-panel-container" style="display: none; position: fixed; top: 60px; right: 20px; z-index: 1000; width: 800px; max-height: 80vh; overflow-y: auto;">
-            <!-- Include Bluetooth panel HTML -->
-            <script>
-                // Load Bluetooth panel HTML
-                fetch('/bluetooth/bluetooth-panel.html')
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('bluetooth-panel-container').innerHTML = html;
-                    })
-                    .catch(error => console.error('Error loading Bluetooth panel:', error));
-            </script>
+        <!-- Bluetooth Dialog (hidden by default) -->
+        <div id="bluetooth-dialog" title="Bluetooth Serial Connection" style="display: none;">
+            <!-- Bluetooth content will be loaded here -->
         </div>
 
     </div>
@@ -701,27 +692,65 @@
                 const pithagoras = new Pithagoras();
                 await pithagoras.initialize();
 
-                // Setup Bluetooth panel toggle
+                // Setup Bluetooth dialog
                 const bluetoothToggleBtn = document.getElementById('bluetooth-toggle-btn');
-                const bluetoothPanelContainer = document.getElementById('bluetooth-panel-container');
+                const bluetoothDialog = $('#bluetooth-dialog');
 
-                logger.log('Bluetooth elements:', {
-                    button: bluetoothToggleBtn,
-                    panel: bluetoothPanelContainer
-                });
+                if (bluetoothToggleBtn && bluetoothDialog.length) {
+                    let bluetoothContentLoaded = false;
 
-                if (bluetoothToggleBtn && bluetoothPanelContainer) {
-                    bluetoothToggleBtn.addEventListener('click', () => {
-                        const isVisible = bluetoothPanelContainer.style.display !== 'none';
-                        bluetoothPanelContainer.style.display = isVisible ? 'none' : 'block';
-                        logger.log('Bluetooth panel toggled:', !isVisible ? 'visible' : 'hidden');
-                        console.log('Bluetooth panel display:', bluetoothPanelContainer.style.display);
+                    bluetoothToggleBtn.addEventListener('click', async () => {
+                        logger.log('Bluetooth button clicked');
+
+                        // Load content if not already loaded
+                        if (!bluetoothContentLoaded) {
+                            try {
+                                const response = await fetch('/bluetooth/bluetooth-panel.html');
+                                const html = await response.text();
+                                bluetoothDialog.html(html);
+                                bluetoothContentLoaded = true;
+                                logger.log('Bluetooth panel content loaded');
+                            } catch (error) {
+                                logger.error('Error loading Bluetooth panel:', error);
+                                alert('Failed to load Bluetooth panel');
+                                return;
+                            }
+                        }
+
+                        // Open dialog
+                        bluetoothDialog.dialog({
+                            modal: true,
+                            width: 800,
+                            position: { my: "center", at: "center", of: window },
+                            open: function() {
+                                logger.log('Bluetooth dialog opened');
+
+                                // Initialize Bluetooth controller if not already done
+                                if (!window.btController && window.BluetoothUIController) {
+                                    window.btController = new BluetoothUIController();
+                                    window.btController.initialize();
+                                    logger.log('Bluetooth controller initialized');
+
+                                    // Setup clear terminal button
+                                    const clearBtn = document.getElementById('bt-clear-terminal');
+                                    if (clearBtn) {
+                                        clearBtn.addEventListener('click', () => {
+                                            window.btController.clearTerminal();
+                                        });
+                                    }
+                                }
+                            },
+                            close: function() {
+                                logger.log('Bluetooth dialog closed');
+                            }
+                        });
                     });
+
                     logger.log('Bluetooth toggle button initialized');
                 } else {
                     logger.error('Bluetooth elements not found!', {
                         buttonFound: !!bluetoothToggleBtn,
-                        panelFound: !!bluetoothPanelContainer
+                        dialogFound: bluetoothDialog.length > 0
                     });
                 }
             })();
