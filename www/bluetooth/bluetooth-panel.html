@@ -1,0 +1,254 @@
+<!-- Bluetooth Connection Panel -->
+<div id="bluetooth-panel" class="bluetooth-panel">
+    <div class="bluetooth-header">
+        <h3>Bluetooth Serial Connection</h3>
+        <div id="bt-status" class="bt-status bt-status-info">Not connected</div>
+    </div>
+
+    <div class="bluetooth-controls">
+        <button id="bt-connect-btn" class="bt-btn bt-btn-primary">
+            📡 Connect to Bluetooth Device
+        </button>
+        <button id="bt-disconnect-btn" class="bt-btn bt-btn-danger" disabled>
+            ⛔ Disconnect
+        </button>
+    </div>
+
+    <div class="bluetooth-terminal">
+        <div class="terminal-header">
+            <span>Serial Terminal</span>
+            <button id="bt-clear-terminal" class="bt-btn-small">Clear</button>
+        </div>
+        <div id="bt-terminal-output" class="terminal-output"></div>
+        <div class="terminal-input">
+            <input
+                type="text"
+                id="bt-command-input"
+                class="terminal-input-field"
+                placeholder="Enter command and press Enter..."
+                disabled
+            />
+        </div>
+    </div>
+
+    <div class="bluetooth-info">
+        <p><strong>Note:</strong> Uses Web Serial API for Bluetooth Classic SPP devices.</p>
+        <p>Requires Chrome/Electron 117+ and paired Bluetooth device.</p>
+    </div>
+</div>
+
+<style>
+.bluetooth-panel {
+    padding: 20px;
+    background: var(--panel-bg, #2d2d2d);
+    color: var(--text-color, #e0e0e0);
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 20px auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.bluetooth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color, #444);
+    padding-bottom: 10px;
+}
+
+.bluetooth-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.bt-status {
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.bt-status-info {
+    background: #424242;
+    color: #b0b0b0;
+}
+
+.bt-status-success {
+    background: #2e7d32;
+    color: #fff;
+}
+
+.bt-status-warning {
+    background: #f57c00;
+    color: #fff;
+}
+
+.bt-status-error {
+    background: #c62828;
+    color: #fff;
+}
+
+.bluetooth-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.bt-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.bt-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.bt-btn-primary {
+    background: #1976d2;
+    color: white;
+}
+
+.bt-btn-primary:not(:disabled):hover {
+    background: #1565c0;
+}
+
+.bt-btn-danger {
+    background: #d32f2f;
+    color: white;
+}
+
+.bt-btn-danger:not(:disabled):hover {
+    background: #c62828;
+}
+
+.bt-btn-small {
+    padding: 4px 10px;
+    font-size: 12px;
+    background: #424242;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.bt-btn-small:hover {
+    background: #535353;
+}
+
+.bluetooth-terminal {
+    border: 1px solid var(--border-color, #444);
+    border-radius: 4px;
+    background: #1e1e1e;
+    margin-bottom: 15px;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #2d2d2d;
+    border-bottom: 1px solid #444;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.terminal-output {
+    height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    background: #1e1e1e;
+}
+
+.terminal-output div {
+    margin-bottom: 2px;
+}
+
+.terminal-input {
+    border-top: 1px solid #444;
+}
+
+.terminal-input-field {
+    width: 100%;
+    padding: 10px;
+    background: #2d2d2d;
+    border: none;
+    color: #e0e0e0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    outline: none;
+}
+
+.terminal-input-field:focus {
+    background: #353535;
+}
+
+.bluetooth-info {
+    padding: 10px;
+    background: rgba(25, 118, 210, 0.1);
+    border-left: 3px solid #1976d2;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.bluetooth-info p {
+    margin: 5px 0;
+}
+
+.bluetooth-info strong {
+    color: #1976d2;
+}
+
+/* Scrollbar styling */
+.terminal-output::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-output::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.terminal-output::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 4px;
+}
+
+.terminal-output::-webkit-scrollbar-thumb:hover {
+    background: #535353;
+}
+</style>
+
+<script>
+// Initialize Bluetooth UI when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.BluetoothUIController) {
+        const btController = new BluetoothUIController();
+        btController.initialize();
+
+        // Setup clear terminal button
+        const clearBtn = document.getElementById('bt-clear-terminal');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                btController.clearTerminal();
+            });
+        }
+
+        // Optional: auto-connect to previously granted port
+        // btController.autoConnect();
+
+        // Make controller globally accessible for debugging
+        window.btController = btController;
+    }
+});
+</script>

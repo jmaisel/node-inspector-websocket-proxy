@@ -687,4 +687,17 @@ class Pithagoras{
 
         logger.info("Project menu initialized successfully");
     }
+
+    // Bluetooth panel toggle
+    const bluetoothToggleBtn = document.getElementById('bluetooth-toggle-btn');
+    const bluetoothPanelContainer = document.getElementById('bluetooth-panel-container');
+
+    if (bluetoothToggleBtn && bluetoothPanelContainer) {
+        bluetoothToggleBtn.addEventListener('click', () => {
+            const isVisible = bluetoothPanelContainer.style.display !== 'none';
+            bluetoothPanelContainer.style.display = isVisible ? 'none' : 'block';
+            logger.info('Bluetooth panel toggled:', !isVisible ? 'visible' : 'hidden');
+        });
+        logger.info('Bluetooth toggle button initialized');
+    }
 }
