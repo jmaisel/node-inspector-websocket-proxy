@@ -7,6 +7,7 @@
 class BluetoothUIController {
     constructor() {
         this.manager = null;
+        this.detection = null;
         this.logger = new Logger('BluetoothUI');
         this.statusElement = null;
         this.connectButton = null;
@@ -18,18 +19,32 @@ class BluetoothUIController {
     /**
      * Initialize the UI controller
      */
-    initialize() {
+    async initialize() {
         this.logger.info('Initializing Bluetooth UI');
 
-        // Check if Web Serial is supported
-        if (!WebSerialBluetoothManager.isSupported()) {
-            this.logger.error('Web Serial API not supported');
-            this.showError('Web Serial API not supported in this browser/Electron version');
+        // Detect available implementations
+        const detector = new BluetoothDetection();
+        this.detection = await detector.detect();
+
+        this.logger.info('Detection result:', this.detection);
+
+        // Update info tab with detection results
+        this.updateImplementationInfo();
+
+        // Initialize manager based on detection
+        if (this.detection.recommended === 'webserial') {
+            this.logger.info('Using Web Serial API');
+            this.manager = new WebSerialBluetoothManager();
+        } else if (this.detection.recommended === 'serialport') {
+            this.logger.warn('Node.js serialport detected but not implemented yet');
+            // TODO: Implement serialport manager
+            this.showError('Node.js serialport not yet integrated. Using Web Serial API as fallback.');
+            this.manager = new WebSerialBluetoothManager();
+        } else {
+            this.logger.error('No Bluetooth implementation available');
+            this.showError('No serial communication available. Web Serial API requires Chrome/Electron 117+.');
             return;
         }
-
-        // Create manager instance
-        this.manager = new WebSerialBluetoothManager();
 
         // Setup event listeners on manager
         this.setupManagerEvents();
@@ -37,7 +52,49 @@ class BluetoothUIController {
         // Setup UI elements
         this.setupUIElements();
 
+        // Initialize tabs
+        this.initializeTabs();
+
         this.logger.info('Bluetooth UI initialized');
+    }
+
+    /**
+     * Initialize jQuery UI tabs
+     */
+    initializeTabs() {
+        const tabsElement = $('#bluetooth-tabs');
+        if (tabsElement.length) {
+            tabsElement.tabs();
+            this.logger.info('Tabs initialized');
+        }
+    }
+
+    /**
+     * Update implementation info in Info tab
+     */
+    updateImplementationInfo() {
+        const infoElement = document.getElementById('bt-implementation-info');
+        if (!infoElement) return;
+
+        if (this.detection.implementations.length === 0) {
+            infoElement.innerHTML = '<p style="color: #c62828;">No serial implementations detected.</p>';
+            return;
+        }
+
+        let html = '<ul style="list-style: none; padding: 0;">';
+        for (const impl of this.detection.implementations) {
+            const icon = impl.available ? '✅' : '❌';
+            const recommended = impl.type === this.detection.recommended ? ' <strong>(Active)</strong>' : '';
+            html += `
+                <li style="margin: 10px 0;">
+                    ${icon} <strong>${impl.name}</strong>${recommended}<br>
+                    <span style="color: #888; font-size: 12px;">${impl.description}</span>
+                </li>
+            `;
+        }
+        html += '</ul>';
+
+        infoElement.innerHTML = html;
     }
 
     /**

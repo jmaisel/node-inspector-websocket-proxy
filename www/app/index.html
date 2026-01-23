@@ -207,7 +207,8 @@
     <script src="/styles/theme-switcher.js"></script>
     <script src="/preferences/preferences-controller.js"></script>
 
-    <!-- Bluetooth Web Serial API -->
+    <!-- Bluetooth/Serial Connection -->
+    <script src="/bluetooth/bluetooth-detection.js"></script>
     <script src="/bluetooth/web-serial-manager.js"></script>
     <script src="/bluetooth/bluetooth-ui-controller.js"></script>
 
@@ -354,11 +355,11 @@
             </button>
         </div>
 
-        <!-- Bluetooth section -->
+        <!-- Connect section -->
         <div class="toolbar-section">
             <button class="toolbar-btn toolbar-btn-vertical" id="bluetooth-toggle-btn">
-                <span class="btn-icon">📡</span>
-                <span class="btn-label">Bluetooth</span>
+                <span class="btn-icon">🔌</span>
+                <span class="btn-label">Connect</span>
             </button>
         </div>
 
@@ -537,9 +538,9 @@
             </div>
         </div>
 
-        <!-- Bluetooth Dialog (hidden by default) -->
-        <div id="bluetooth-dialog" title="Bluetooth Serial Connection" style="display: none;">
-            <!-- Bluetooth content will be loaded here -->
+        <!-- Connect Dialog (hidden by default) -->
+        <div id="bluetooth-dialog" title="Serial Connection" style="display: none;">
+            <!-- Connection content will be loaded here -->
         </div>
 
     </div>
@@ -720,16 +721,17 @@
                         // Open dialog
                         bluetoothDialog.dialog({
                             modal: true,
-                            width: 800,
+                            width: 850,
+                            height: 600,
                             position: { my: "center", at: "center", of: window },
-                            open: function() {
-                                logger.log('Bluetooth dialog opened');
+                            open: async function() {
+                                logger.log('Connection dialog opened');
 
-                                // Initialize Bluetooth controller if not already done
+                                // Initialize controller if not already done
                                 if (!window.btController && window.BluetoothUIController) {
                                     window.btController = new BluetoothUIController();
-                                    window.btController.initialize();
-                                    logger.log('Bluetooth controller initialized');
+                                    await window.btController.initialize();
+                                    logger.log('Connection controller initialized');
 
                                     // Setup clear terminal button
                                     const clearBtn = document.getElementById('bt-clear-terminal');
@@ -741,7 +743,7 @@
                                 }
                             },
                             close: function() {
-                                logger.log('Bluetooth dialog closed');
+                                logger.log('Connection dialog closed');
                             }
                         });
                     });
