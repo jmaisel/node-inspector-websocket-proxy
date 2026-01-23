@@ -7,14 +7,21 @@
 
     <div class="bluetooth-controls">
         <button id="bt-connect-btn" class="bt-btn bt-btn-primary">
-            📡 Connect to Bluetooth Device
+            📡 Select New Device
         </button>
         <button id="bt-disconnect-btn" class="bt-btn bt-btn-danger" disabled>
             ⛔ Disconnect
         </button>
-        <button id="bt-check-devices-btn" class="bt-btn bt-btn-secondary">
-            🔍 Check Previously Granted Devices
-        </button>
+    </div>
+
+    <div class="bluetooth-devices">
+        <div class="bluetooth-devices-header">
+            <strong>Previously Granted Devices:</strong>
+            <button id="bt-refresh-devices-btn" class="bt-btn-small">🔄 Refresh</button>
+        </div>
+        <div id="bt-devices-list" class="devices-list">
+            <div class="devices-empty">No devices granted yet. Click "Select New Device" above.</div>
+        </div>
     </div>
 
     <div class="bluetooth-terminal">
@@ -141,6 +148,80 @@
 
 .bt-btn-small:hover {
     background: #535353;
+}
+
+.bluetooth-devices {
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color, #444);
+    border-radius: 4px;
+    background: #1e1e1e;
+}
+
+.bluetooth-devices-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #2d2d2d;
+    border-bottom: 1px solid #444;
+    font-size: 13px;
+}
+
+.devices-list {
+    padding: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.devices-empty {
+    color: #888;
+    font-style: italic;
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+}
+
+.device-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    background: #2d2d2d;
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+.device-item:hover {
+    background: #353535;
+}
+
+.device-info {
+    flex: 1;
+}
+
+.device-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.device-details {
+    font-size: 11px;
+    color: #888;
+}
+
+.device-connect-btn {
+    padding: 6px 15px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.device-connect-btn:hover {
+    background: #1565c0;
 }
 
 .bluetooth-terminal {

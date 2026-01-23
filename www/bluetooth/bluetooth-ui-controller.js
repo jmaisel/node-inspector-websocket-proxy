@@ -72,7 +72,8 @@ class BluetoothUIController {
         this.statusElement = document.getElementById('bt-status');
         this.connectButton = document.getElementById('bt-connect-btn');
         this.disconnectButton = document.getElementById('bt-disconnect-btn');
-        this.checkDevicesButton = document.getElementById('bt-check-devices-btn');
+        this.refreshDevicesButton = document.getElementById('bt-refresh-devices-btn');
+        this.devicesListElement = document.getElementById('bt-devices-list');
         this.terminalOutput = document.getElementById('bt-terminal-output');
         this.commandInput = document.getElementById('bt-command-input');
 
@@ -85,8 +86,8 @@ class BluetoothUIController {
             this.disconnectButton.addEventListener('click', () => this.handleDisconnect());
         }
 
-        if (this.checkDevicesButton) {
-            this.checkDevicesButton.addEventListener('click', () => this.handleCheckDevices());
+        if (this.refreshDevicesButton) {
+            this.refreshDevicesButton.addEventListener('click', () => this.refreshDevicesList());
         }
 
         if (this.commandInput) {
@@ -99,17 +100,22 @@ class BluetoothUIController {
 
         // Initial UI state
         this.updateUIState(false);
+
+        // Load devices list
+        this.refreshDevicesList();
     }
 
     /**
-     * Handle connect button click
+     * Handle connect button click (select new device)
      */
     async handleConnect() {
         try {
-            this.logger.info('User requesting connection');
-            this.updateStatus('Requesting port selection...', 'info');
+            this.logger.info('User requesting new device selection');
+            this.updateStatus('Opening device picker...', 'info');
+            this.appendToTerminal('=== Opening device picker dialog ===');
+            this.appendToTerminal('Look for a browser dialog to select your Bluetooth device...');
 
-            // Request port from user
+            // Request port from user - this shows the native browser picker
             const port = await this.manager.requestPort();
 
             this.updateStatus('Connecting...', 'info');
@@ -119,15 +125,23 @@ class BluetoothUIController {
                 baudRate: 115200
             });
 
+            // Refresh devices list to show the newly granted device
+            await this.refreshDevicesList();
+
         } catch (error) {
             this.logger.error('Connection failed:', error);
 
             // Handle user cancellation gracefully
             if (error.name === 'NotFoundError' || error.message.includes('No port selected')) {
                 this.updateStatus('No device selected', 'warning');
-                this.logger.info('User cancelled port selection or no devices available');
+                this.appendToTerminal('=== Device selection cancelled ===');
+                this.logger.info('User cancelled port selection');
+
+                // Show helpful message
+                alert('No device selected.\n\nMake sure:\n1. Your Bluetooth device is paired in OS settings\n2. You select a device from the picker dialog\n\nIf no devices appear in the picker, pair them in your OS Bluetooth settings first.');
             } else {
                 this.updateStatus('Connection failed: ' + error.message, 'error');
+                this.appendToTerminal('=== Connection failed: ' + error.message + ' ===');
                 alert('Connection failed: ' + error.message);
             }
         }
@@ -146,27 +160,95 @@ class BluetoothUIController {
     }
 
     /**
-     * Handle check devices button click
+     * Refresh the devices list
      */
-    async handleCheckDevices() {
+    async refreshDevicesList() {
         try {
-            this.logger.info('Checking for previously granted devices');
+            this.logger.info('Refreshing devices list');
             const ports = await this.manager.getGrantedPorts();
 
+            if (!this.devicesListElement) {
+                this.logger.warn('Devices list element not found');
+                return;
+            }
+
             if (ports.length === 0) {
-                alert('No previously granted devices found.\n\nYou need to:\n1. Pair your Bluetooth device in OS settings first\n2. Click "Connect to Bluetooth Device" and grant permission');
-                this.appendToTerminal('=== No previously granted devices ===');
+                this.devicesListElement.innerHTML = `
+                    <div class="devices-empty">
+                        No devices granted yet.<br>
+                        <br>
+                        <strong>To connect:</strong><br>
+                        1. Pair your Bluetooth device in OS settings<br>
+                        2. Click "Select New Device" above<br>
+                        3. Grant permission in the browser dialog
+                    </div>
+                `;
             } else {
-                this.appendToTerminal(`=== Found ${ports.length} previously granted device(s) ===`);
-                for (const port of ports) {
+                let html = '';
+                for (let i = 0; i < ports.length; i++) {
+                    const port = ports[i];
                     const info = port.getInfo();
-                    this.appendToTerminal(`Device: ${JSON.stringify(info)}`);
+
+                    const deviceName = info.bluetoothServiceClassId
+                        ? `Bluetooth Device (${info.bluetoothServiceClassId.substring(0, 8)}...)`
+                        : `Serial Device ${i + 1}`;
+
+                    const details = info.usbVendorId
+                        ? `USB VID:${info.usbVendorId} PID:${info.usbProductId}`
+                        : (info.bluetoothServiceClassId ? 'Bluetooth Classic SPP' : 'Serial Port');
+
+                    html += `
+                        <div class="device-item">
+                            <div class="device-info">
+                                <div class="device-name">${deviceName}</div>
+                                <div class="device-details">${details}</div>
+                            </div>
+                            <button class="device-connect-btn" data-port-index="${i}">
+                                Connect
+                            </button>
+                        </div>
+                    `;
                 }
-                alert(`Found ${ports.length} previously granted device(s).\n\nYou can reconnect to these without selecting again.`);
+                this.devicesListElement.innerHTML = html;
+
+                // Attach click handlers
+                const connectButtons = this.devicesListElement.querySelectorAll('.device-connect-btn');
+                connectButtons.forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const portIndex = parseInt(e.target.getAttribute('data-port-index'));
+                        await this.handleConnectToPort(ports[portIndex]);
+                    });
+                });
+
+                this.appendToTerminal(`=== Found ${ports.length} previously granted device(s) ===`);
             }
         } catch (error) {
-            this.logger.error('Check devices failed:', error);
-            alert('Failed to check devices: ' + error.message);
+            this.logger.error('Failed to refresh devices list:', error);
+            if (this.devicesListElement) {
+                this.devicesListElement.innerHTML = `
+                    <div class="devices-empty" style="color: #c62828;">
+                        Error loading devices: ${error.message}
+                    </div>
+                `;
+            }
+        }
+    }
+
+    /**
+     * Handle connect to a specific port
+     */
+    async handleConnectToPort(port) {
+        try {
+            this.logger.info('Connecting to port');
+            this.updateStatus('Connecting...', 'info');
+
+            await this.manager.connect(port, {
+                baudRate: 115200
+            });
+        } catch (error) {
+            this.logger.error('Connection failed:', error);
+            this.updateStatus('Connection failed: ' + error.message, 'error');
+            alert('Connection failed: ' + error.message);
         }
     }
 
@@ -205,12 +287,15 @@ class BluetoothUIController {
         let statusText = 'Connected';
 
         if (info.bluetoothServiceClassId) {
-            statusText += ` (Bluetooth: ${info.bluetoothServiceClassId})`;
+            statusText += ` (Bluetooth)`;
         }
 
         this.updateStatus(statusText, 'success');
         this.updateUIState(true);
         this.appendToTerminal('=== Connected to Bluetooth device ===');
+
+        // Refresh devices list
+        this.refreshDevicesList();
     }
 
     /**
