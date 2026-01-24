@@ -15,14 +15,77 @@
 
 const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
 const http = require('http');
+const { spawn } = require('child_process');
+const path = require('path');
 
 let mainWindow = null;
+let serverProcess = null;
 
 // Server configuration
 const SERVER_PORT = 8080;
 let SERVER_HOST = 'localhost'; // Will be updated to Pi IP after setup
 let SERVER_URL = `http://${SERVER_HOST}:${SERVER_PORT}`;
 let APP_URL = `${SERVER_URL}/app/index.html`;
+
+/**
+ * Start the local server process
+ */
+function startServer() {
+    return new Promise((resolve, reject) => {
+        console.log('Starting local server...');
+
+        const serverPath = path.join(__dirname, 'server');
+        const serverScript = path.join(serverPath, 'server.js');
+
+        // Check if we're running in packaged app or dev mode
+        const isPackaged = app.isPackaged;
+        const nodePath = isPackaged
+            ? process.execPath.replace(/electron$/i, 'node')
+            : process.execPath;
+
+        // Spawn the server process
+        serverProcess = spawn(nodePath, [serverScript], {
+            cwd: serverPath,
+            env: { ...process.env, NODE_ENV: 'production' },
+            stdio: ['ignore', 'pipe', 'pipe']
+        });
+
+        serverProcess.stdout.on('data', (data) => {
+            console.log(`[Server] ${data.toString().trim()}`);
+        });
+
+        serverProcess.stderr.on('data', (data) => {
+            console.error(`[Server Error] ${data.toString().trim()}`);
+        });
+
+        serverProcess.on('error', (error) => {
+            console.error('Failed to start server:', error);
+            reject(error);
+        });
+
+        serverProcess.on('exit', (code, signal) => {
+            console.log(`Server process exited with code ${code} and signal ${signal}`);
+            serverProcess = null;
+        });
+
+        // Wait a bit for server to start
+        setTimeout(() => {
+            console.log('Server startup initiated');
+            resolve();
+        }, 2000);
+    });
+}
+
+/**
+ * Stop the local server process
+ */
+function stopServer() {
+    if (serverProcess) {
+        console.log('Stopping local server...');
+        serverProcess.kill();
+        serverProcess = null;
+    }
+}
 
 /**
  * Check if the server is running
@@ -51,10 +114,14 @@ function showServerNotAvailableDialog() {
     dialog.showErrorBox(
         'Server Not Running',
         `Cannot connect to server at ${SERVER_URL}\n\n` +
-        'Please start the server first:\n' +
-        '  cd server && npm start\n\n' +
-        'Or on Raspberry Pi:\n' +
-        '  npm start'
+        'The local server failed to start automatically.\n\n' +
+        'Troubleshooting:\n' +
+        '1. Check if another server is already running on port 8080\n' +
+        '2. Ensure server dependencies are installed:\n' +
+        '   cd server && npm install\n' +
+        '3. Check the console for error messages\n\n' +
+        'Or start the server manually:\n' +
+        '  cd server && npm start'
     );
 }
 
@@ -92,14 +159,37 @@ async function createWindow() {
     // Hide menu bar completely
     Menu.setApplicationMenu(null);
 
-    // Check if server is running
+    // Start the local server
+    try {
+        await startServer();
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        dialog.showErrorBox(
+            'Server Startup Failed',
+            `Failed to start local server:\n\n${error.message}`
+        );
+        app.quit();
+        return;
+    }
+
+    // Check if server is running (with retries)
     try {
         console.log(`Checking for server at ${SERVER_URL}...`);
-        const serverAvailable = await checkServer();
+
+        let serverAvailable = false;
+        const maxRetries = 10;
+        for (let i = 0; i < maxRetries; i++) {
+            serverAvailable = await checkServer();
+            if (serverAvailable) break;
+
+            console.log(`Server not ready, retry ${i + 1}/${maxRetries}...`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
 
         if (!serverAvailable) {
-            console.error(`Server not available at ${SERVER_URL}`);
+            console.error(`Server not available at ${SERVER_URL} after ${maxRetries} retries`);
             showServerNotAvailableDialog();
+            stopServer();
             app.quit();
             return;
         }
@@ -121,6 +211,7 @@ async function createWindow() {
     // Handle window closed
     mainWindow.on('closed', () => {
         mainWindow = null;
+        stopServer();
     });
 }
 
@@ -147,6 +238,7 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     // On macOS it is common for applications to stay open until the user explicitly quits
     if (process.platform !== 'darwin') {
+        stopServer();
         app.quit();
     }
 });
@@ -160,7 +252,8 @@ app.on('activate', () => {
 
 // Cleanup when quitting
 app.on('before-quit', async () => {
-    // Cleanup if needed
+    console.log('Application quitting, stopping server...');
+    stopServer();
 });
 
 // Handle any uncaught errors
