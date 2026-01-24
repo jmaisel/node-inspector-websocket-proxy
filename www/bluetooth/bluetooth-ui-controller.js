@@ -453,6 +453,9 @@ class BluetoothUIController {
                 throw new Error('Debugger connection helper not available on AceController');
             }
 
+            // Reset simulator before connecting
+            window.application.simulator.menuPerformed('main', 'reset');
+
             // Connect to the debugger directly
             aceController.debuggerConnectionHelper.connectToDebugger(wsUrl);
 
