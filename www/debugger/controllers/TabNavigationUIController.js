@@ -35,6 +35,7 @@ export class TabNavigationUIController extends BaseUIController {
         this.instanceId = instanceId;
         this.debuggerUI = config.debuggerUI || null;
         this.skipRender = config.skipRender || false;
+        this.logger = new Logger("TabNavigationUIController");
 
         // Tab registry: Map<tabName, { label, paneId, active }>
         this.tabs = new Map();
@@ -141,7 +142,7 @@ export class TabNavigationUIController extends BaseUIController {
     switchToTab(tabName) {
         const tabConfig = this.tabs.get(tabName);
         if (!tabConfig) {
-            console.warn(`Tab "${tabName}" not found`);
+            this.logger.warn(`Tab "${tabName}" not found`);
             return;
         }
 

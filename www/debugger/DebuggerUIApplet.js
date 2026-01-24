@@ -144,8 +144,11 @@ export class DebuggerUIApplet {
      * Log message if verbose mode is enabled
      */
     log(...args) {
+        if (!this.logger) {
+            this.logger = new Logger("DebuggerUIApplet");
+        }
         if (this.config.verbose) {
-            console.log('🎯 [Applet]', ...args);
+            this.logger.info(...args);
         }
     }
 
@@ -191,7 +194,7 @@ export class DebuggerUIApplet {
                     defaultTemplates.push(componentName);
                 }
             } else {
-                console.warn(`⚠️ Template for "${componentName}" is not a function, skipping`);
+                this.log(`⚠️ Template for "${componentName}" is not a function, skipping`);
             }
         }
 
@@ -389,7 +392,7 @@ export class DebuggerUIApplet {
      */
     async initialize() {
         if (this.initialized) {
-            console.warn('⚠️ DebuggerUIApplet already initialized');
+            this.log('⚠️ DebuggerUIApplet already initialized');
             return;
         }
 
@@ -405,7 +408,7 @@ export class DebuggerUIApplet {
                 this.log(`  🔨 Creating ${componentName} controller...`);
                 this.controllers[componentName] = this.createController(componentName, componentConfig);
             } catch (error) {
-                console.error(`❌ Failed to create ${componentName} controller:`, error);
+                this.log(`❌ Failed to create ${componentName} controller:`, error);
                 throw error;
             }
         }
@@ -419,7 +422,7 @@ export class DebuggerUIApplet {
                 const controller = this.controllers[componentName];
                 this.mountController(componentName, controller, componentConfig);
             } catch (error) {
-                console.error(`❌ Failed to mount ${componentName} controller:`, error);
+                this.log(`❌ Failed to mount ${componentName} controller:`, error);
                 throw error;
             }
         }

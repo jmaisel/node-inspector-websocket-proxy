@@ -31,6 +31,7 @@ export class BreakpointUIController extends BaseUIController {
         this.instanceId = instanceId;
         this.debuggerUI = config.debuggerUI || null;
         this.skipRender = config.skipRender || false;
+        this.logger = new Logger("BreakpointUIController");
 
         this.breakpoints = new Map(); // breakpointId -> { url, lineNumber, enabled }
         this.nextTempId = 1; // For UI display before breakpoint is resolved
@@ -140,8 +141,8 @@ export class BreakpointUIController extends BaseUIController {
                 normalizedUrl
             );
 
-            console.log('Breakpoint set result:', result);
-            console.log('Available scripts in debugger:', Array.from(this.debuggerUI.debuggerController.scriptMap.entries()));
+            this.logger.info('Breakpoint set result:', result);
+            this.logger.info('Available scripts in debugger:', Array.from(this.debuggerUI.debuggerController.scriptMap.entries()));
 
             if (result.breakpointId) {
                 // Store the breakpoint
@@ -155,7 +156,7 @@ export class BreakpointUIController extends BaseUIController {
 
                 // Log resolved locations if available
                 if (result.locations && result.locations.length > 0) {
-                    console.log('Breakpoint resolved to locations:', result.locations);
+                    this.logger.info('Breakpoint resolved to locations:', result.locations);
                     log(`Breakpoint resolved (${result.locations.length} location(s))`, 'info');
                 } else {
                     log('Breakpoint set but not yet resolved - will resolve when script loads', 'info');
@@ -167,7 +168,7 @@ export class BreakpointUIController extends BaseUIController {
             }
         } catch (error) {
             log(`Failed to set breakpoint: ${error.message}`, 'error');
-            console.error('Breakpoint error:', error);
+            this.logger.error('Breakpoint error:', error);
         }
     }
 

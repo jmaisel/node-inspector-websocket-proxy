@@ -31,6 +31,7 @@ export class DockableUIController extends BaseUIController {
         this.draggableConfig = config.draggableConfig || {};
         this.resizableConfig = config.resizableConfig || null;
         this.isDocked = true;
+        this.logger = new Logger("DockableUIController");
     }
 
     /**
@@ -143,7 +144,7 @@ export class DockableUIController extends BaseUIController {
         try {
             return JSON.parse(saved);
         } catch (error) {
-            console.error('Failed to parse saved dock position:', error);
+            this.logger.error('Failed to parse saved dock position:', error);
             return null;
         }
     }

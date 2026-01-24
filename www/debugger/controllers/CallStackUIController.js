@@ -31,6 +31,7 @@ export class CallStackUIController extends BaseUIController {
         this.instanceId = instanceId;
         this.debuggerUI = config.debuggerUI || null;
         this.skipRender = config.skipRender || false;
+        this.logger = new Logger("CallStackUIController");
 
         // Store references (will be set after render/mount)
         this.$container = null;
@@ -89,7 +90,7 @@ export class CallStackUIController extends BaseUIController {
                 }
             }
         } catch (error) {
-            console.warn('Could not fetch source for frame:', error);
+            this.logger.warn('Could not fetch source for frame:', error);
         }
 
         return null;
@@ -104,7 +105,7 @@ export class CallStackUIController extends BaseUIController {
             this.debuggerUI.debuggerController.currentCallFrames = callFrames || [];
         }
 
-        console.log('renderCallStack called with frames:', callFrames);
+        this.logger.info('renderCallStack called with frames:', callFrames);
 
         if (!callFrames || callFrames.length === 0) {
             $(`#${this.instanceId}`).html('<div class="empty-state">Pause execution to see call stack</div>');
@@ -115,7 +116,7 @@ export class CallStackUIController extends BaseUIController {
 
         for (let index = 0; index < callFrames.length; index++) {
             const frame = callFrames[index];
-            console.log(`Frame ${index}:`, frame);
+            this.logger.info(`Frame ${index}:`, frame);
             const functionName = frame.functionName || '(anonymous)';
 
             // Try to get URL from frame, or look it up via scriptId

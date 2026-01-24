@@ -11,6 +11,7 @@ export class DebuggerUIController extends BaseUIController {
         this.isPaused = false;
         this.scriptMap = new Map(); // scriptId -> url mapping
         this.currentCallFrames = [];
+        this.logger = new Logger("DebuggerUIController");
     }
 
     /**
@@ -153,8 +154,8 @@ export class DebuggerUIController extends BaseUIController {
     setupProtocolEvents() {
         // Debugger events
         this.client.debugger.on('Debugger.paused', async (event) => {
-            console.log('Debugger.paused event:', event);
-            console.log('Call frames received:', event.callFrames?.length);
+            this.logger.info('Debugger.paused event:', event);
+            this.logger.info('Call frames received:', event.callFrames?.length);
 
             log(`Paused: ${event.reason}`, 'event');
             this.isPaused = true;
@@ -205,7 +206,7 @@ export class DebuggerUIController extends BaseUIController {
 
         this.client.debugger.on('Debugger.breakpointResolved', (event) => {
             log(`Breakpoint resolved: ${event.breakpointId} at line ${event.location.lineNumber}`, 'info');
-            console.log('Breakpoint resolved event:', event);
+            this.logger.info('Breakpoint resolved event:', event);
 
             // Update breakpoint controller if available
             if (this.debuggerUI?.breakpointController) {

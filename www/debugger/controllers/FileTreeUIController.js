@@ -28,6 +28,7 @@ export class FileTreeUIController extends BaseUIController {
         this.instanceId = instanceId;
         this.debuggerUI = config.debuggerUI || null;
         this.skipRender = config.skipRender !== undefined ? config.skipRender : true;
+        this.logger = new Logger("FileTreeUIController");
 
         this.packageDependencies = new Set();
         this.packageDevDependencies = new Set();
@@ -104,7 +105,7 @@ export class FileTreeUIController extends BaseUIController {
         }
 
         // If we get here, all paths failed
-        console.warn('Could not load package.json from any location. Dependency categorization will be limited.');
+        this.logger.warn('Could not load package.json from any location. Dependency categorization will be limited.');
     }
 
     /**
