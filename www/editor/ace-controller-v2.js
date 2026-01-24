@@ -322,6 +322,15 @@ class AceController {
                 alert('Not connected to debugger');
                 return;
             }
+
+            // Reset simulator before resuming
+            if (this.application && this.application.simulator) {
+                this.logger.info('Resetting simulator on Resume button click');
+                if (this.application.simulator.menuPerformed) {
+                    this.application.simulator.menuPerformed('main', 'reset');
+                }
+            }
+
             this.inspectorProxy.debuggerController.resume();
         });
 
@@ -331,6 +340,13 @@ class AceController {
                 alert('Not connected to debugger');
                 return;
             }
+
+            // Stop simulator when pausing
+            if (this.application && this.application.simulator) {
+                this.logger.info('Stopping simulator on Pause button click');
+                this.application.simulator.setSimRunning(false);
+            }
+
             this.inspectorProxy.debuggerController.pause();
         });
 
@@ -366,6 +382,12 @@ class AceController {
             if (!this.inspectorProxy) {
                 alert('Not connected to debugger');
                 return;
+            }
+
+            // Stop simulator when stopping debugger
+            if (this.application && this.application.simulator) {
+                this.logger.info('Stopping simulator on Stop button click');
+                this.application.simulator.setSimRunning(false);
             }
 
             try {
