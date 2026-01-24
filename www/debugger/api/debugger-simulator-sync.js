@@ -130,7 +130,7 @@ class DebuggerSimulatorSyncController {
 
     /**
      * Handle debugger connected event
-     * Start the simulator when debugging begins in design mode
+     * Reset and start the simulator when debugging begins in design mode
      */
     handleDebuggerConnected(topic, data) {
         this.logger.info("handleDebuggerConnected", { topic, data });
@@ -140,6 +140,10 @@ class DebuggerSimulatorSyncController {
 
         // Only sync simulator if we're in design mode
         if (currentMode === 'design') {
+            // Reset the simulator first to ensure clean state
+            this.logger.info("Resetting simulator on debugger connection");
+            this.resetSimulator();
+
             // Start the simulator when debugger connects
             if (!this.simulator.isRunning()) {
                 this.logger.info("Starting simulator due to debugger connection");
