@@ -156,6 +156,14 @@ class DebuggerConnectionHelper {
                 });
             }
 
+            // Reset simulator when debugger first connects
+            if (this.ace.application && this.ace.application.simulator) {
+                this.logger.info("Resetting simulator on debugger connection");
+                if (this.ace.application.simulator.menuPerformed) {
+                    this.ace.application.simulator.menuPerformed('main', 'reset');
+                }
+            }
+
             // Update UI
             this.showDebugControls();
             alert("Connected to debugger successfully!");

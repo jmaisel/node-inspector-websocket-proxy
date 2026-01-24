@@ -102,7 +102,7 @@ class DebuggerSimulatorSyncController {
 
     /**
      * Handle debugger resumed event
-     * If in design mode, reset and resume the simulator
+     * If in design mode, resume the simulator
      */
     handleDebuggerResumed(topic, data) {
         this.logger.info("handleDebuggerResumed", { topic, data });
@@ -112,11 +112,8 @@ class DebuggerSimulatorSyncController {
 
         // Only sync simulator if we're in design mode
         if (currentMode === 'design') {
-            // Reset the simulator first (clear clock and circuit state)
-            this.logger.info("Resetting simulator before resume");
-            this.resetSimulator();
-
-            // Then resume simulator
+            // Resume simulator
+            // Note: Simulator reset is handled in ace-controller.js Resume button click handler
             this.logger.info("Resuming simulator due to debugger resume");
             this.simulator.setSimRunning(true);
         } else {
@@ -130,7 +127,7 @@ class DebuggerSimulatorSyncController {
 
     /**
      * Handle debugger connected event
-     * Reset and start the simulator when debugging begins in design mode
+     * Start the simulator when debugging begins in design mode
      */
     handleDebuggerConnected(topic, data) {
         this.logger.info("handleDebuggerConnected", { topic, data });
@@ -140,11 +137,8 @@ class DebuggerSimulatorSyncController {
 
         // Only sync simulator if we're in design mode
         if (currentMode === 'design') {
-            // Reset the simulator first to ensure clean state
-            this.logger.info("Resetting simulator on debugger connection");
-            this.resetSimulator();
-
             // Start the simulator when debugger connects
+            // Note: Simulator reset is handled in debugger-connection-helper.js onConnectionOpen()
             if (!this.simulator.isRunning()) {
                 this.logger.info("Starting simulator due to debugger connection");
                 this.simulator.setSimRunning(true);
@@ -178,28 +172,6 @@ class DebuggerSimulatorSyncController {
         this.wasSimulatorRunningBeforePause = false;
 
         this.logger.info("Debugger disconnected, simulator stopped and sync state reset");
-    }
-
-    /**
-     * Reset the simulator clock and circuit to initial state
-     */
-    resetSimulator() {
-        try {
-            if (!this.simulator) {
-                this.logger.warn("Simulator not available for reset");
-                return;
-            }
-
-            // Reset using CircuitJS1's reset command
-            if (this.simulator.menuPerformed) {
-                this.logger.info("Calling simulator reset via menuPerformed");
-                this.simulator.menuPerformed('main', 'reset');
-            } else {
-                this.logger.warn("menuPerformed not available on simulator");
-            }
-        } catch (error) {
-            this.logger.error("Failed to reset simulator:", error);
-        }
     }
 
     /**
