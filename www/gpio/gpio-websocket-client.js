@@ -179,6 +179,12 @@ class GPIOWebSocketClient {
     handleRegistered(message) {
         this.logger.info('GPIOWebSocketClient: Registered as', message.role);
         this.registered = true;
+
+        // After registration, wait a bit for any callback registrations to complete,
+        // then refresh GPIO output states to sync initial values
+        setTimeout(() => {
+            this.refreshGPIOOutputStates();
+        }, 500);
     }
 
     /**
@@ -368,6 +374,40 @@ class GPIOWebSocketClient {
      */
     isConnected() {
         return this.connected && this.registered;
+    }
+
+    /**
+     * Refresh all GPIO output states
+     * Queries current state of all registered GPIO outputs and sends them
+     * Call this after simulator reset to sync initial states
+     */
+    refreshGPIOOutputStates() {
+        if (!this.isConnected()) {
+            this.logger.warn('GPIOWebSocketClient: Cannot refresh, not connected');
+            return;
+        }
+
+        this.logger.info('GPIOWebSocketClient: Refreshing GPIO output states for', this.callbackRegistrations.size, 'pins');
+
+        this.callbackRegistrations.forEach((_, pinName) => {
+            try {
+                const state = this.circuitJS1.getGPIOOutputState(pinName);
+
+                // Send current state
+                this.send({
+                    type: 'gpioOutputChanged',
+                    pinName: pinName,
+                    bcmPin: state.bcmPin,
+                    state: state.state,
+                    voltage: state.voltage,
+                    timestamp: Date.now()
+                });
+
+                this.logger.debug('Refreshed GPIO output state:', pinName, state);
+            } catch (error) {
+                this.logger.error('Failed to refresh GPIO output state for', pinName, error);
+            }
+        });
     }
 }
 

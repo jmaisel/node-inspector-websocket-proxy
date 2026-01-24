@@ -158,6 +158,7 @@ class DebuggerConnectionHelper {
 
             // Update UI
             this.showDebugControls();
+            this.ace.application.simulator.reset();
             alert("Connected to debugger successfully!");
 
         } catch (error) {

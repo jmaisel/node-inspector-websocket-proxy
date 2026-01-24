@@ -324,8 +324,11 @@ class AceController {
                 return;
             }
 
-            // Reset simulator before resuming
+            // Reset simulator when resuming
             this.application.simulator.reset();
+
+            // Refresh GPIO output states after reset
+            this.application.gpioClient?.refreshGPIOOutputStates();
 
             this.inspectorProxy.debuggerController.resume();
         });
