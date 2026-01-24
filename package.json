@@ -18,7 +18,11 @@
     "sync:circuitjs1": "cp -r ../pithagoras/war/circuitjs1/* www/circuitjs1/",
     "lint": "eslint www/**/*.js server/**/*.js util/**/*.js *.js",
     "lint:fix": "eslint --fix www/**/*.js server/**/*.js util/**/*.js *.js",
-    "install:server": "cd server && npm install"
+    "install:server": "cd server && npm install",
+    "test": "cd www/tests && npm test",
+    "test:headless": "cd www/tests && npm run test:headless",
+    "test:install": "cd www/tests && npm install",
+    "test:spec": "cd www/tests && npm run test:spec --"
   },
   "keywords": [
     "inspector",
@@ -57,6 +61,7 @@
       "electron-preload.js",
       "electron-bluetooth-manager.js",
       "www/**/*",
+      "!www/tests",
       "util/**/*",
       "pithagoras-gpio/**/*",
       "server/**/*",
