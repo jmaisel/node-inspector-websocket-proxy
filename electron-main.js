@@ -15,10 +15,8 @@
 
 const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
 const http = require('http');
-const BluetoothSerialManager = require('./electron-bluetooth-manager');
 
 let mainWindow = null;
-let bluetoothManager = null;
 
 // Server configuration
 const SERVER_PORT = 8080;
@@ -127,85 +125,9 @@ async function createWindow() {
 }
 
 /**
- * Initialize Bluetooth manager
- */
-function initBluetooth() {
-    bluetoothManager = new BluetoothSerialManager();
-
-    // Forward Bluetooth events to renderer
-    bluetoothManager.on('connected', (info) => {
-        console.log('Bluetooth connected:', info);
-        if (mainWindow) {
-            mainWindow.webContents.send('bluetooth-connected', info);
-        }
-    });
-
-    bluetoothManager.on('disconnected', () => {
-        console.log('Bluetooth disconnected');
-        if (mainWindow) {
-            mainWindow.webContents.send('bluetooth-disconnected');
-        }
-    });
-
-    bluetoothManager.on('data', (data) => {
-        if (mainWindow) {
-            mainWindow.webContents.send('bluetooth-data', data);
-        }
-    });
-
-    bluetoothManager.on('setup-status', (status) => {
-        if (mainWindow) {
-            mainWindow.webContents.send('setup-status', status);
-        }
-    });
-}
-
-/**
- * Setup IPC handlers for Bluetooth
+ * Setup IPC handlers
  */
 function setupIPCHandlers() {
-    // Scan for Bluetooth devices
-    ipcMain.handle('bluetooth-scan', async () => {
-        if (!bluetoothManager) {
-            initBluetooth();
-        }
-        return await bluetoothManager.scanDevices();
-    });
-
-    // Connect to device
-    ipcMain.handle('bluetooth-connect', async (event, devicePath) => {
-        if (!bluetoothManager) {
-            initBluetooth();
-        }
-        await bluetoothManager.connect(devicePath);
-        return { success: true };
-    });
-
-    // Send command
-    ipcMain.handle('bluetooth-command', async (event, command) => {
-        if (!bluetoothManager || !bluetoothManager.connected) {
-            throw new Error('Not connected to Bluetooth device');
-        }
-        return await bluetoothManager.sendCommand(command);
-    });
-
-    // Get Pi status
-    ipcMain.handle('bluetooth-get-status', async () => {
-        if (!bluetoothManager || !bluetoothManager.connected) {
-            throw new Error('Not connected to Bluetooth device');
-        }
-        return await bluetoothManager.getStatus();
-    });
-
-    // Setup server on Pi
-    ipcMain.handle('bluetooth-setup-server', async (event, serverArchivePath) => {
-        if (!bluetoothManager || !bluetoothManager.connected) {
-            throw new Error('Not connected to Bluetooth device');
-        }
-        await bluetoothManager.setupServer(serverArchivePath);
-        return { success: true };
-    });
-
     // Update server host
     ipcMain.handle('set-server-host', async (event, host) => {
         SERVER_HOST = host;
@@ -238,10 +160,7 @@ app.on('activate', () => {
 
 // Cleanup when quitting
 app.on('before-quit', async () => {
-    if (bluetoothManager && bluetoothManager.connected) {
-        console.log('Disconnecting Bluetooth...');
-        await bluetoothManager.disconnect();
-    }
+    // Cleanup if needed
 });
 
 // Handle any uncaught errors

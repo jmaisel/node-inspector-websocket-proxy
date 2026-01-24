@@ -1,17 +1,17 @@
 /**
- * Bluetooth UI Controller
+ * Serial Connection UI Controller
  *
- * Manages the Bluetooth connection UI and coordinates with WebSerialBluetoothManager
+ * Manages both Bluetooth and Serial port connections using Web Serial API
  */
 
 class BluetoothUIController {
     constructor() {
-        this.manager = null;
-        this.detection = null;
-        this.logger = new Logger('BluetoothUI');
+        this.manager = new WebSerialBluetoothManager();
+        this.logger = new Logger('SerialUI');
+        this.currentConnectionType = null; // 'bluetooth' or 'serial'
+
+        // UI Elements
         this.statusElement = null;
-        this.connectButton = null;
-        this.disconnectButton = null;
         this.terminalOutput = null;
         this.commandInput = null;
     }
@@ -20,29 +20,11 @@ class BluetoothUIController {
      * Initialize the UI controller
      */
     async initialize() {
-        this.logger.info('Initializing Bluetooth UI');
+        this.logger.info('Initializing Serial UI');
 
-        // Detect available implementations
-        const detector = new BluetoothDetection();
-        this.detection = await detector.detect();
-
-        this.logger.info('Detection result:', this.detection);
-
-        // Update info tab with detection results
-        this.updateImplementationInfo();
-
-        // Initialize manager based on detection
-        if (this.detection.recommended === 'webserial') {
-            this.logger.info('Using Web Serial API');
-            this.manager = new WebSerialBluetoothManager();
-        } else if (this.detection.recommended === 'serialport') {
-            this.logger.warn('Node.js serialport detected but not implemented yet');
-            // TODO: Implement serialport manager
-            this.showError('Node.js serialport not yet integrated. Using Web Serial API as fallback.');
-            this.manager = new WebSerialBluetoothManager();
-        } else {
-            this.logger.error('No Bluetooth implementation available');
-            this.showError('No serial communication available. Web Serial API requires Chrome/Electron 117+.');
+        // Check if Web Serial API is available
+        if (!navigator.serial) {
+            this.showError('Web Serial API not available. Requires Chrome/Electron with Serial support.');
             return;
         }
 
@@ -55,7 +37,7 @@ class BluetoothUIController {
         // Initialize tabs
         this.initializeTabs();
 
-        this.logger.info('Bluetooth UI initialized');
+        this.logger.info('Serial UI initialized');
     }
 
     /**
@@ -67,34 +49,6 @@ class BluetoothUIController {
             tabsElement.tabs();
             this.logger.info('Tabs initialized');
         }
-    }
-
-    /**
-     * Update implementation info in Info tab
-     */
-    updateImplementationInfo() {
-        const infoElement = document.getElementById('bt-implementation-info');
-        if (!infoElement) return;
-
-        if (this.detection.implementations.length === 0) {
-            infoElement.innerHTML = '<p style="color: #c62828;">No serial implementations detected.</p>';
-            return;
-        }
-
-        let html = '<ul style="list-style: none; padding: 0;">';
-        for (const impl of this.detection.implementations) {
-            const icon = impl.available ? '✅' : '❌';
-            const recommended = impl.type === this.detection.recommended ? ' <strong>(Active)</strong>' : '';
-            html += `
-                <li style="margin: 10px 0;">
-                    ${icon} <strong>${impl.name}</strong>${recommended}<br>
-                    <span style="color: #888; font-size: 12px;">${impl.description}</span>
-                </li>
-            `;
-        }
-        html += '</ul>';
-
-        infoElement.innerHTML = html;
     }
 
     /**
@@ -125,27 +79,12 @@ class BluetoothUIController {
      * Setup UI element references and handlers
      */
     setupUIElements() {
-        // Get UI elements
+        // Status
         this.statusElement = document.getElementById('bt-status');
-        this.connectButton = document.getElementById('bt-connect-btn');
-        this.disconnectButton = document.getElementById('bt-disconnect-btn');
-        this.refreshDevicesButton = document.getElementById('bt-refresh-devices-btn');
-        this.devicesListElement = document.getElementById('bt-devices-list');
-        this.terminalOutput = document.getElementById('bt-terminal-output');
-        this.commandInput = document.getElementById('bt-command-input');
 
-        // Setup button handlers
-        if (this.connectButton) {
-            this.connectButton.addEventListener('click', () => this.handleConnect());
-        }
-
-        if (this.disconnectButton) {
-            this.disconnectButton.addEventListener('click', () => this.handleDisconnect());
-        }
-
-        if (this.refreshDevicesButton) {
-            this.refreshDevicesButton.addEventListener('click', () => this.refreshDevicesList());
-        }
+        // Terminal
+        this.terminalOutput = document.getElementById('terminal-output');
+        this.commandInput = document.getElementById('terminal-command-input');
 
         if (this.commandInput) {
             this.commandInput.addEventListener('keypress', (e) => {
@@ -155,22 +94,66 @@ class BluetoothUIController {
             });
         }
 
+        // Clear terminal button
+        const clearBtn = document.getElementById('terminal-clear-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.clearTerminal());
+        }
+
+        // === BLUETOOTH TAB ===
+        const btSelectBtn = document.getElementById('bt-select-device-btn');
+        const btDisconnectBtn = document.getElementById('bt-disconnect-btn');
+        const btRefreshBtn = document.getElementById('bt-refresh-devices-btn');
+        const btBaudrateInput = document.getElementById('bt-baudrate');
+
+        if (btSelectBtn) {
+            btSelectBtn.addEventListener('click', () => this.handleSelectDevice('bluetooth'));
+        }
+        if (btDisconnectBtn) {
+            btDisconnectBtn.addEventListener('click', () => this.handleDisconnect());
+        }
+        if (btRefreshBtn) {
+            btRefreshBtn.addEventListener('click', () => this.refreshDevicesList('bluetooth'));
+        }
+
+        // === SERIAL TAB ===
+        const serialSelectBtn = document.getElementById('serial-select-device-btn');
+        const serialDisconnectBtn = document.getElementById('serial-disconnect-btn');
+        const serialRefreshBtn = document.getElementById('serial-refresh-devices-btn');
+        const serialBaudrateInput = document.getElementById('serial-baudrate');
+
+        if (serialSelectBtn) {
+            serialSelectBtn.addEventListener('click', () => this.handleSelectDevice('serial'));
+        }
+        if (serialDisconnectBtn) {
+            serialDisconnectBtn.addEventListener('click', () => this.handleDisconnect());
+        }
+        if (serialRefreshBtn) {
+            serialRefreshBtn.addEventListener('click', () => this.refreshDevicesList('serial'));
+        }
+
         // Initial UI state
         this.updateUIState(false);
 
-        // Load devices list
-        this.refreshDevicesList();
+        // Load both device lists
+        this.refreshDevicesList('bluetooth');
+        this.refreshDevicesList('serial');
     }
 
     /**
-     * Handle connect button click (select new device)
+     * Handle select new device button click
      */
-    async handleConnect() {
+    async handleSelectDevice(type) {
         try {
-            this.logger.info('User requesting new device selection');
+            this.logger.info(`User requesting new ${type} device selection`);
             this.updateStatus('Opening device picker...', 'info');
-            this.appendToTerminal('=== Opening device picker dialog ===');
-            this.appendToTerminal('Look for a browser dialog to select your Bluetooth device...');
+            this.appendToTerminal(`=== Opening ${type} device picker dialog ===`);
+
+            // Get baud rate from appropriate input
+            const baudrateInput = type === 'bluetooth'
+                ? document.getElementById('bt-baudrate')
+                : document.getElementById('serial-baudrate');
+            const baudRate = baudrateInput ? parseInt(baudrateInput.value) : 115200;
 
             // Request port from user - this shows the native browser picker
             const port = await this.manager.requestPort();
@@ -178,12 +161,12 @@ class BluetoothUIController {
             this.updateStatus('Connecting...', 'info');
 
             // Connect to the port
-            await this.manager.connect(port, {
-                baudRate: 115200
-            });
+            await this.manager.connect(port, { baudRate });
+
+            this.currentConnectionType = type;
 
             // Refresh devices list to show the newly granted device
-            await this.refreshDevicesList();
+            await this.refreshDevicesList(type);
 
         } catch (error) {
             this.logger.error('Connection failed:', error);
@@ -193,9 +176,6 @@ class BluetoothUIController {
                 this.updateStatus('No device selected', 'warning');
                 this.appendToTerminal('=== Device selection cancelled ===');
                 this.logger.info('User cancelled port selection');
-
-                // Show helpful message
-                alert('No device selected.\n\nMake sure:\n1. Your Bluetooth device is paired in OS settings\n2. You select a device from the picker dialog\n\nIf no devices appear in the picker, pair them in your OS Bluetooth settings first.');
             } else {
                 this.updateStatus('Connection failed: ' + error.message, 'error');
                 this.appendToTerminal('=== Connection failed: ' + error.message + ' ===');
@@ -211,6 +191,7 @@ class BluetoothUIController {
         try {
             this.logger.info('User requesting disconnection');
             await this.manager.disconnect();
+            this.currentConnectionType = null;
         } catch (error) {
             this.logger.error('Disconnect failed:', error);
         }
@@ -219,25 +200,30 @@ class BluetoothUIController {
     /**
      * Refresh the devices list
      */
-    async refreshDevicesList() {
+    async refreshDevicesList(type) {
         try {
-            this.logger.info('Refreshing devices list');
+            this.logger.info(`Refreshing ${type} devices list`);
             const ports = await this.manager.getGrantedPorts();
 
-            if (!this.devicesListElement) {
-                this.logger.warn('Devices list element not found');
+            const listElement = type === 'bluetooth'
+                ? document.getElementById('bt-devices-list')
+                : document.getElementById('serial-devices-list');
+
+            if (!listElement) {
+                this.logger.warn(`${type} devices list element not found`);
                 return;
             }
 
+            const baudrateInput = type === 'bluetooth'
+                ? document.getElementById('bt-baudrate')
+                : document.getElementById('serial-baudrate');
+
             if (ports.length === 0) {
-                this.devicesListElement.innerHTML = `
+                listElement.innerHTML = `
                     <div class="devices-empty">
                         No devices granted yet.<br>
                         <br>
-                        <strong>To connect:</strong><br>
-                        1. Pair your Bluetooth device in OS settings<br>
-                        2. Click "Select New Device" above<br>
-                        3. Grant permission in the browser dialog
+                        Click "Select ${type === 'bluetooth' ? 'Bluetooth Device' : 'Serial Port'}" above to connect.
                     </div>
                 `;
             } else {
@@ -248,7 +234,9 @@ class BluetoothUIController {
 
                     const deviceName = info.bluetoothServiceClassId
                         ? `Bluetooth Device (${info.bluetoothServiceClassId.substring(0, 8)}...)`
-                        : `Serial Device ${i + 1}`;
+                        : (info.usbVendorId
+                            ? `USB Serial (VID:${info.usbVendorId.toString(16)})`
+                            : `Serial Device ${i + 1}`);
 
                     const details = info.usbVendorId
                         ? `USB VID:${info.usbVendorId} PID:${info.usbProductId}`
@@ -260,48 +248,42 @@ class BluetoothUIController {
                                 <div class="device-name">${deviceName}</div>
                                 <div class="device-details">${details}</div>
                             </div>
-                            <button class="device-connect-btn" data-port-index="${i}">
+                            <button class="device-connect-btn" data-port-index="${i}" data-connection-type="${type}">
                                 Connect
                             </button>
                         </div>
                     `;
                 }
-                this.devicesListElement.innerHTML = html;
+                listElement.innerHTML = html;
 
                 // Attach click handlers
-                const connectButtons = this.devicesListElement.querySelectorAll('.device-connect-btn');
+                const connectButtons = listElement.querySelectorAll('.device-connect-btn');
                 connectButtons.forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         const portIndex = parseInt(e.target.getAttribute('data-port-index'));
-                        await this.handleConnectToPort(ports[portIndex]);
+                        const connectionType = e.target.getAttribute('data-connection-type');
+                        await this.handleConnectToPort(ports[portIndex], connectionType, baudrateInput);
                     });
                 });
-
-                this.appendToTerminal(`=== Found ${ports.length} previously granted device(s) ===`);
             }
         } catch (error) {
-            this.logger.error('Failed to refresh devices list:', error);
-            if (this.devicesListElement) {
-                this.devicesListElement.innerHTML = `
-                    <div class="devices-empty" style="color: #c62828;">
-                        Error loading devices: ${error.message}
-                    </div>
-                `;
-            }
+            this.logger.error(`Failed to refresh ${type} devices list:`, error);
         }
     }
 
     /**
      * Handle connect to a specific port
      */
-    async handleConnectToPort(port) {
+    async handleConnectToPort(port, type, baudrateInput) {
         try {
             this.logger.info('Connecting to port');
             this.updateStatus('Connecting...', 'info');
 
-            await this.manager.connect(port, {
-                baudRate: 115200
-            });
+            const baudRate = baudrateInput ? parseInt(baudrateInput.value) : 115200;
+
+            await this.manager.connect(port, { baudRate });
+
+            this.currentConnectionType = type;
         } catch (error) {
             this.logger.error('Connection failed:', error);
             this.updateStatus('Connection failed: ' + error.message, 'error');
@@ -341,18 +323,15 @@ class BluetoothUIController {
      */
     onConnected(detail) {
         const info = detail.portInfo;
-        let statusText = 'Connected';
-
-        if (info.bluetoothServiceClassId) {
-            statusText += ` (Bluetooth)`;
-        }
+        let statusText = `Connected via ${this.currentConnectionType || 'serial'}`;
 
         this.updateStatus(statusText, 'success');
         this.updateUIState(true);
-        this.appendToTerminal('=== Connected to Bluetooth device ===');
+        this.appendToTerminal(`=== Connected ===`);
 
-        // Refresh devices list
-        this.refreshDevicesList();
+        // Refresh both device lists
+        this.refreshDevicesList('bluetooth');
+        this.refreshDevicesList('serial');
     }
 
     /**
@@ -362,6 +341,7 @@ class BluetoothUIController {
         this.updateStatus('Disconnected', 'warning');
         this.updateUIState(false);
         this.appendToTerminal('=== Disconnected ===');
+        this.currentConnectionType = null;
     }
 
     /**
@@ -385,14 +365,21 @@ class BluetoothUIController {
      * Update UI state based on connection status
      */
     updateUIState(connected) {
-        if (this.connectButton) {
-            this.connectButton.disabled = connected;
-        }
+        // Bluetooth tab buttons
+        const btSelectBtn = document.getElementById('bt-select-device-btn');
+        const btDisconnectBtn = document.getElementById('bt-disconnect-btn');
 
-        if (this.disconnectButton) {
-            this.disconnectButton.disabled = !connected;
-        }
+        if (btSelectBtn) btSelectBtn.disabled = connected;
+        if (btDisconnectBtn) btDisconnectBtn.disabled = !connected;
 
+        // Serial tab buttons
+        const serialSelectBtn = document.getElementById('serial-select-device-btn');
+        const serialDisconnectBtn = document.getElementById('serial-disconnect-btn');
+
+        if (serialSelectBtn) serialSelectBtn.disabled = connected;
+        if (serialDisconnectBtn) serialDisconnectBtn.disabled = !connected;
+
+        // Terminal input
         if (this.commandInput) {
             this.commandInput.disabled = !connected;
         }
@@ -422,7 +409,7 @@ class BluetoothUIController {
      */
     showError(message) {
         this.updateStatus('Error: ' + message, 'error');
-        alert('Bluetooth Error: ' + message);
+        alert('Serial Error: ' + message);
     }
 
     /**

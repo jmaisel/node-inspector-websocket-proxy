@@ -6,78 +6,79 @@
 
     <div id="bluetooth-tabs">
         <ul>
-            <li><a href="#tab-serial">Serial Terminal</a></li>
-            <li><a href="#tab-devices">Devices</a></li>
-            <li><a href="#tab-info">Info</a></li>
+            <li><a href="#tab-bluetooth">Bluetooth</a></li>
+            <li><a href="#tab-serial">Serial</a></li>
+            <li><a href="#tab-terminal">Terminal</a></li>
         </ul>
 
-        <!-- Serial Terminal Tab -->
+        <!-- Bluetooth Tab -->
+        <div id="tab-bluetooth">
+            <div class="connection-controls">
+                <div class="control-row">
+                    <label>Baud Rate:</label>
+                    <input type="number" id="bt-baudrate" class="baudrate-input" value="115200" />
+                    <button id="bt-select-device-btn" class="bt-btn bt-btn-primary">
+                        📡 Select Bluetooth Device
+                    </button>
+                    <button id="bt-disconnect-btn" class="bt-btn bt-btn-danger" disabled>
+                        ⛔ Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <div class="bluetooth-devices">
+                <div class="bluetooth-devices-header">
+                    <strong>Previously Granted Bluetooth Devices:</strong>
+                    <button id="bt-refresh-devices-btn" class="bt-btn-small">🔄 Refresh</button>
+                </div>
+                <div id="bt-devices-list" class="devices-list">
+                    <div class="devices-empty">No Bluetooth devices granted yet. Click "Select Bluetooth Device" above.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Serial Tab -->
         <div id="tab-serial">
+            <div class="connection-controls">
+                <div class="control-row">
+                    <label>Baud Rate:</label>
+                    <input type="number" id="serial-baudrate" class="baudrate-input" value="115200" />
+                    <button id="serial-select-device-btn" class="bt-btn bt-btn-primary">
+                        🔌 Select Serial Port
+                    </button>
+                    <button id="serial-disconnect-btn" class="bt-btn bt-btn-danger" disabled>
+                        ⛔ Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <div class="bluetooth-devices">
+                <div class="bluetooth-devices-header">
+                    <strong>Previously Granted Serial Ports:</strong>
+                    <button id="serial-refresh-devices-btn" class="bt-btn-small">🔄 Refresh</button>
+                </div>
+                <div id="serial-devices-list" class="devices-list">
+                    <div class="devices-empty">No serial ports granted yet. Click "Select Serial Port" above.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Tab -->
+        <div id="tab-terminal">
             <div class="bluetooth-terminal">
                 <div class="terminal-header">
                     <span>Serial Terminal</span>
-                    <button id="bt-clear-terminal" class="bt-btn-small">Clear</button>
+                    <button id="terminal-clear-btn" class="bt-btn-small">Clear</button>
                 </div>
-                <div id="bt-terminal-output" class="terminal-output"></div>
+                <div id="terminal-output" class="terminal-output"></div>
                 <div class="terminal-input">
                     <input
                         type="text"
-                        id="bt-command-input"
+                        id="terminal-command-input"
                         class="terminal-input-field"
                         placeholder="Enter command and press Enter..."
                         disabled
                     />
-                </div>
-            </div>
-        </div>
-
-        <!-- Devices Tab -->
-        <div id="tab-devices">
-    <div class="bluetooth-controls">
-        <button id="bt-connect-btn" class="bt-btn bt-btn-primary">
-            📡 Select New Device
-        </button>
-        <button id="bt-disconnect-btn" class="bt-btn bt-btn-danger" disabled>
-            ⛔ Disconnect
-        </button>
-    </div>
-
-            <div class="bluetooth-devices">
-                <div class="bluetooth-devices-header">
-                    <strong>Previously Granted Devices:</strong>
-                    <button id="bt-refresh-devices-btn" class="bt-btn-small">🔄 Refresh</button>
-                </div>
-                <div id="bt-devices-list" class="devices-list">
-                    <div class="devices-empty">No devices granted yet. Click "Select New Device" above.</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Info Tab -->
-        <div id="tab-info">
-            <div class="info-section">
-                <h4>Implementation</h4>
-                <div id="bt-implementation-info" class="info-content">
-                    Detecting available implementations...
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h4>About</h4>
-                <div class="info-content">
-                    <p><strong>Web Serial API:</strong> Modern browser-based serial communication. Requires Chrome/Electron 117+ and paired Bluetooth devices.</p>
-                    <p><strong>Node.js serialport:</strong> Traditional serial port access via native modules. Requires device to be bound to /dev/rfcomm0 or similar.</p>
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h4>Setup Instructions</h4>
-                <div class="info-content">
-                    <ol>
-                        <li>Pair your Bluetooth device in OS settings (Linux: bluetoothctl)</li>
-                        <li>For Web Serial API: Click "Select New Device" in Devices tab</li>
-                        <li>For Node.js serialport: Bind device to /dev/rfcomm0</li>
-                    </ol>
                 </div>
             </div>
         </div>
@@ -176,10 +177,30 @@
     color: #fff;
 }
 
-.bluetooth-controls {
+.connection-controls {
+    margin-bottom: 20px;
+}
+
+.control-row {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    align-items: center;
+}
+
+.control-row label {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.baudrate-input {
+    width: 100px;
+    padding: 8px 10px;
+    background: #2d2d2d;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-size: 13px;
 }
 
 .bt-btn {
