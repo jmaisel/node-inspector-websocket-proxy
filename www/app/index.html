@@ -301,6 +301,9 @@
 
     <!-- Unified Toolbar spanning entire application -->
     <div class="unified-app-toolbar">
+
+
+
         <!-- Project section -->
         <div class="toolbar-section">
             <div class="toolbar-dropdown">
@@ -329,6 +332,20 @@
             </div>
         </div>
 
+        <!-- Circuits section -->
+        <div class="toolbar-section">
+            <div class="toolbar-dropdown">
+                <button class="toolbar-btn toolbar-btn-vertical" id="circuits-menu-btn">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-label">Circuits ▾</span>
+                </button>
+                <div class="toolbar-dropdown-content" id="circuits-dropdown-content">
+                    <!-- Will be populated by JavaScript -->
+                    <div style="padding: 8px; color: #888;">Loading circuits...</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Mode section -->
         <div class="toolbar-section">
             <div class="toolbar-dropdown">
@@ -343,36 +360,6 @@
                     <div class="menu-item" cmd="build" id="mode-build-btn" title="Build Mode">
                         🔨 Build
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Preferences section -->
-        <div class="toolbar-section">
-            <button class="toolbar-btn toolbar-btn-vertical" id="preferences-btn">
-                <span class="btn-icon">⚙️</span>
-                <span class="btn-label">Preferences</span>
-            </button>
-        </div>
-
-        <!-- Connect section -->
-        <div class="toolbar-section">
-            <button class="toolbar-btn toolbar-btn-vertical" id="bluetooth-toggle-btn">
-                <span class="btn-icon">🔌</span>
-                <span class="btn-label">Connect</span>
-            </button>
-        </div>
-
-        <!-- Circuits section -->
-        <div class="toolbar-section">
-            <div class="toolbar-dropdown">
-                <button class="toolbar-btn toolbar-btn-vertical" id="circuits-menu-btn">
-                    <span class="btn-icon">⚡</span>
-                    <span class="btn-label">Circuits ▾</span>
-                </button>
-                <div class="toolbar-dropdown-content" id="circuits-dropdown-content">
-                    <!-- Will be populated by JavaScript -->
-                    <div style="padding: 8px; color: #888;">Loading circuits...</div>
                 </div>
             </div>
         </div>
@@ -415,6 +402,24 @@
             <button id="debug-step-out" class="toolbar-btn toolbar-btn-vertical" title="Step Out">
                 <span class="btn-icon">△△</span>
                 <span class="btn-label">Step Out</span>
+            </button>
+        </div>
+
+        <div class="toolbar-separator"></div>
+
+        <!-- Connect section -->
+        <div class="toolbar-section">
+            <button class="toolbar-btn toolbar-btn-vertical" id="bluetooth-toggle-btn">
+                <span class="btn-icon">🔌</span>
+                <span class="btn-label">Connect</span>
+            </button>
+        </div>
+
+        <!-- Preferences section -->
+        <div class="toolbar-section">
+            <button class="toolbar-btn toolbar-btn-vertical" id="preferences-btn">
+                <span class="btn-icon">⚙️</span>
+                <span class="btn-label">Preferences</span>
             </button>
         </div>
 
