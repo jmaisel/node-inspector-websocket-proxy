@@ -8,7 +8,8 @@ class BluetoothUIController {
     constructor() {
         this.manager = new WebSerialBluetoothManager();
         this.logger = new Logger('SerialUI');
-        this.currentConnectionType = null; // 'bluetooth' or 'serial'
+        this.currentConnectionType = null; // 'bluetooth', 'serial', or 'local-server'
+        this.localServerConnected = false;
 
         // UI Elements
         this.statusElement = null;
@@ -341,6 +342,15 @@ class BluetoothUIController {
         this.updateStatus('Disconnected', 'warning');
         this.updateUIState(false);
         this.appendToTerminal('=== Disconnected ===');
+
+        // If this was a local server connection, re-enable mode button
+        if (this.currentConnectionType === 'local-server') {
+            this.enableModeButton();
+            this.updateLocalServerUIState(false);
+            this.updateLocalServerStatus('Disconnected from local server', 'warning');
+            this.localServerConnected = false;
+        }
+
         this.currentConnectionType = null;
     }
 
@@ -418,6 +428,139 @@ class BluetoothUIController {
     clearTerminal() {
         if (this.terminalOutput) {
             this.terminalOutput.innerHTML = '';
+        }
+    }
+
+    /**
+     * Handle connect to local server
+     */
+    async handleConnectLocalServer() {
+        try {
+            // Always use localhost for local server
+            // Note: Port 8888 is the debugger proxy port, not 8080 (HTTP server port)
+            const wsUrl = 'ws://localhost:8888';
+
+            this.logger.info('Connecting to local server:', wsUrl);
+            this.updateStatus('Connecting to local server...', 'info');
+            this.updateLocalServerStatus('Connecting to localhost:8888...', 'info');
+
+            // Get the debugger connection helper
+            const aceController = window.application?.aceController;
+            if (!aceController) {
+                throw new Error('AceController not available - application not initialized');
+            }
+            if (!aceController.debuggerConnectionHelper) {
+                throw new Error('Debugger connection helper not available on AceController');
+            }
+
+            // Connect to the debugger directly
+            aceController.debuggerConnectionHelper.connectToDebugger(wsUrl);
+
+            // Set connection type and update UI
+            this.currentConnectionType = 'local-server';
+            this.localServerConnected = true;
+
+            // Update local server UI
+            this.updateLocalServerUIState(true);
+            this.updateStatus('Connected to local server', 'success');
+            this.updateLocalServerStatus('Connected to localhost:8888', 'success');
+
+            // Disable the mode button
+            this.disableModeButton();
+
+            this.logger.info('Local server connection initiated');
+
+        } catch (error) {
+            this.logger.error('Local server connection failed:', error);
+            this.logger.error('Error stack:', error.stack);
+            this.updateStatus('Connection failed: ' + error.message, 'error');
+            this.updateLocalServerStatus('Connection failed: ' + error.message, 'error');
+            alert('Failed to connect to local server:\n\n' + error.message + '\n\nCheck console for details.');
+        }
+    }
+
+    /**
+     * Handle disconnect from local server
+     */
+    async handleDisconnectLocalServer() {
+        try {
+            this.logger.info('Disconnecting from local server');
+
+            // Get the inspector proxy and disconnect
+            const aceController = window.application?.aceController;
+            if (aceController && aceController.inspectorProxy && aceController.inspectorProxy.ws) {
+                aceController.inspectorProxy.ws.close();
+            }
+
+            this.localServerConnected = false;
+            this.currentConnectionType = null;
+
+            this.updateLocalServerUIState(false);
+            this.updateStatus('Disconnected from local server', 'warning');
+            this.updateLocalServerStatus('Not connected to local server', 'info');
+
+            // Re-enable the mode button
+            this.enableModeButton();
+
+            this.logger.info('Disconnected from local server');
+
+        } catch (error) {
+            this.logger.error('Local server disconnection failed:', error);
+            this.updateStatus('Disconnection failed: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Update local server UI state
+     */
+    updateLocalServerUIState(connected) {
+        const connectBtn = document.getElementById('local-server-connect-btn');
+        const disconnectBtn = document.getElementById('local-server-disconnect-btn');
+
+        if (connectBtn) connectBtn.disabled = connected;
+        if (disconnectBtn) disconnectBtn.disabled = !connected;
+    }
+
+    /**
+     * Update local server status message
+     */
+    updateLocalServerStatus(message, type = 'info') {
+        const statusMsg = document.getElementById('local-server-status-message');
+        if (!statusMsg) return;
+
+        statusMsg.textContent = message;
+
+        // Update style based on type
+        statusMsg.style.color = type === 'success' ? '#4caf50' :
+                                type === 'error' ? '#f44336' :
+                                type === 'warning' ? '#ff9800' : '#b0b0b0';
+    }
+
+    /**
+     * Disable the mode button (for local dev mode)
+     */
+    disableModeButton() {
+        const modeBtn = document.getElementById('mode-menu-btn');
+        if (modeBtn) {
+            modeBtn.disabled = true;
+            modeBtn.style.opacity = '0.5';
+            modeBtn.style.cursor = 'not-allowed';
+            modeBtn.title = 'Mode switching disabled in local development mode';
+            this.logger.info('Mode button disabled for local dev mode');
+        }
+    }
+
+    /**
+     * Enable the mode button
+     */
+    enableModeButton() {
+        const modeBtn = document.getElementById('mode-menu-btn');
+        if (modeBtn) {
+            modeBtn.disabled = false;
+            modeBtn.style.opacity = '1';
+            modeBtn.style.cursor = 'pointer';
+            modeBtn.title = 'Mode';
+            this.logger.info('Mode button enabled');
         }
     }
 

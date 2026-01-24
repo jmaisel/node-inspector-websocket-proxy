@@ -8,6 +8,7 @@
         <ul>
             <li><a href="#tab-bluetooth">Bluetooth</a></li>
             <li><a href="#tab-serial">Serial</a></li>
+            <li><a href="#tab-local-server">Local Server</a></li>
             <li><a href="#tab-terminal">Terminal</a></li>
         </ul>
 
@@ -59,6 +60,39 @@
                 </div>
                 <div id="serial-devices-list" class="devices-list">
                     <div class="devices-empty">No serial ports granted yet. Click "Select Serial Port" above.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Local Server Tab -->
+        <div id="tab-local-server">
+            <div class="info-section">
+                <h4>Local Development Mode</h4>
+                <div class="info-content">
+                    <p>Connect to a local development server for simulator-only development. This mode:</p>
+                    <ul>
+                        <li>Does not require Pi hardware</li>
+                        <li>Connects to localhost debugger server (ws://localhost:8888)</li>
+                        <li>Disables Build mode (simulator only)</li>
+                        <li>Perfect for rapid prototyping and testing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="connection-controls">
+                <div class="control-row">
+                    <button id="local-server-connect-btn" class="bt-btn bt-btn-primary" onclick="window.btController && window.btController.handleConnectLocalServer(); console.log('Local server button clicked inline!');">
+                        🖥️ Connect to Local Server
+                    </button>
+                    <button id="local-server-disconnect-btn" class="bt-btn bt-btn-danger" disabled onclick="window.btController && window.btController.handleDisconnectLocalServer();">
+                        ⛔ Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <div class="local-server-status">
+                <div class="status-message" id="local-server-status-message">
+                    Not connected to local server
                 </div>
             </div>
         </div>
@@ -400,6 +434,50 @@
 
 .terminal-output::-webkit-scrollbar-thumb:hover {
     background: #535353;
+}
+
+.info-section {
+    margin-bottom: 20px;
+}
+
+.info-section h4 {
+    margin: 0 0 10px 0;
+    color: #1976d2;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.info-content {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #e0e0e0;
+}
+
+.info-content p {
+    margin: 8px 0;
+}
+
+.info-content ol {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.info-content li {
+    margin: 5px 0;
+}
+
+.local-server-status {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid var(--border-color, #444);
+    border-radius: 4px;
+    background: #1e1e1e;
+}
+
+.status-message {
+    font-size: 13px;
+    color: #b0b0b0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
 }
 </style>
 

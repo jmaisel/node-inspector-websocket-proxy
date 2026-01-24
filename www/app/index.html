@@ -716,6 +716,17 @@
                                 bluetoothDialog.html(html);
                                 bluetoothContentLoaded = true;
                                 logger.log('Bluetooth panel content loaded');
+
+                                // Initialize tabs AFTER content is loaded into DOM
+                                setTimeout(() => {
+                                    const tabsElement = $('#bluetooth-tabs');
+                                    if (tabsElement.length) {
+                                        tabsElement.tabs();
+                                        logger.log('Bluetooth tabs initialized');
+                                    } else {
+                                        logger.error('bluetooth-tabs element not found!');
+                                    }
+                                }, 50);
                             } catch (error) {
                                 logger.error('Error loading Bluetooth panel:', error);
                                 alert('Failed to load Bluetooth panel');
