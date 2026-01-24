@@ -309,7 +309,7 @@ class AceController {
 
         debugStartBtn.on('click', () => {
             this.logger.info('Debug button clicked');
-            this.application.simulator.menuPerformed('main', 'reset');
+            this.application.simulator.reset();
             this.debuggerConnectionHelper.connectToDebuggerWithSelectedFile();
         });
     }
@@ -325,12 +325,7 @@ class AceController {
             }
 
             // Reset simulator before resuming
-            if (this.application && this.application.simulator) {
-                this.logger.info('Resetting simulator on Resume button click');
-                if (this.application.simulator.menuPerformed) {
-                    this.application.simulator.menuPerformed('main', 'reset');
-                }
-            }
+            this.application.simulator.reset();
 
             this.inspectorProxy.debuggerController.resume();
         });

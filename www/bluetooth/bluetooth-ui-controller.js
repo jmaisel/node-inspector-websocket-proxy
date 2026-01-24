@@ -454,7 +454,7 @@ class BluetoothUIController {
             }
 
             // Reset simulator before connecting
-            window.application.simulator.menuPerformed('main', 'reset');
+            window.application.simulator.reset();
 
             // Connect to the debugger directly
             aceController.debuggerConnectionHelper.connectToDebugger(wsUrl);
