@@ -102,7 +102,7 @@ class DebuggerSimulatorSyncController {
 
     /**
      * Handle debugger resumed event
-     * If in design mode, always resume the simulator
+     * If in design mode, reset and resume the simulator
      */
     handleDebuggerResumed(topic, data) {
         this.logger.info("handleDebuggerResumed", { topic, data });
@@ -112,7 +112,11 @@ class DebuggerSimulatorSyncController {
 
         // Only sync simulator if we're in design mode
         if (currentMode === 'design') {
-            // Always resume simulator when debugger resumes
+            // Reset the simulator first (clear clock and circuit state)
+            this.logger.info("Resetting simulator before resume");
+            this.resetSimulator();
+
+            // Then resume simulator
             this.logger.info("Resuming simulator due to debugger resume");
             this.simulator.setSimRunning(true);
         } else {
@@ -161,10 +165,6 @@ class DebuggerSimulatorSyncController {
             // Stop the simulator when debugger disconnects
             this.logger.info("Stopping simulator due to debugger disconnection");
             this.simulator.setSimRunning(false);
-
-            // Reset the simulator state (clock and circuit)
-            this.logger.info("Resetting simulator clock and circuit state");
-            this.resetSimulator();
         } else {
             this.logger.info("Not in design mode, skipping simulator stop");
         }
