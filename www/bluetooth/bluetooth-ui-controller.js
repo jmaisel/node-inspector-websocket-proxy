@@ -470,6 +470,13 @@ class BluetoothUIController {
 
             this.logger.info('Local server connection initiated');
 
+            // Close the dialog
+            const bluetoothDialog = $('#bluetooth-dialog');
+            if (bluetoothDialog.length) {
+                bluetoothDialog.dialog('close');
+                this.logger.info('Connection dialog closed');
+            }
+
         } catch (error) {
             this.logger.error('Local server connection failed:', error);
             this.logger.error('Error stack:', error.stack);
