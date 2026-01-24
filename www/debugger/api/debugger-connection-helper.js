@@ -154,7 +154,6 @@ class DebuggerConnectionHelper {
                     url: this.ace.debuggerUrl,
                     timestamp: Date.now()
                 });
-                this.ace.application.simulator.menuPerformed('main', 'reset');
             }
 
             // Update UI

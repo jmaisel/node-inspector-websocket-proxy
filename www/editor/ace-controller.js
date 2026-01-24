@@ -177,6 +177,7 @@ class AceController {
 
         debugStartBtn.on('click', () => {
             this.logger.info('Debug button clicked');
+            this.application.simulator.menuPerformed('main', 'reset');
             this.debuggerConnectionHelper.connectToDebuggerWithSelectedFile();
         });
     }
