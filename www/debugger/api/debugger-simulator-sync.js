@@ -161,6 +161,10 @@ class DebuggerSimulatorSyncController {
             // Stop the simulator when debugger disconnects
             this.logger.info("Stopping simulator due to debugger disconnection");
             this.simulator.setSimRunning(false);
+
+            // Reset the simulator state (clock and circuit)
+            this.logger.info("Resetting simulator clock and circuit state");
+            this.resetSimulator();
         } else {
             this.logger.info("Not in design mode, skipping simulator stop");
         }
@@ -170,6 +174,28 @@ class DebuggerSimulatorSyncController {
         this.wasSimulatorRunningBeforePause = false;
 
         this.logger.info("Debugger disconnected, simulator stopped and sync state reset");
+    }
+
+    /**
+     * Reset the simulator clock and circuit to initial state
+     */
+    resetSimulator() {
+        try {
+            if (!this.simulator) {
+                this.logger.warn("Simulator not available for reset");
+                return;
+            }
+
+            // Reset using CircuitJS1's reset command
+            if (this.simulator.menuPerformed) {
+                this.logger.info("Calling simulator reset via menuPerformed");
+                this.simulator.menuPerformed('main', 'reset');
+            } else {
+                this.logger.warn("menuPerformed not available on simulator");
+            }
+        } catch (error) {
+            this.logger.error("Failed to reset simulator:", error);
+        }
     }
 
     /**
