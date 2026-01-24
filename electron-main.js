@@ -37,11 +37,13 @@ function startServer() {
         const serverPath = path.join(__dirname, 'server');
         const serverScript = path.join(serverPath, 'server.js');
 
-        // Check if we're running in packaged app or dev mode
-        const isPackaged = app.isPackaged;
-        const nodePath = isPackaged
-            ? process.execPath.replace(/electron$/i, 'node')
-            : process.execPath;
+        console.log('Server path:', serverPath);
+        console.log('Server script:', serverScript);
+
+        // Use node from PATH instead of electron executable
+        const nodePath = 'node';
+
+        console.log('Spawning server with node:', nodePath);
 
         // Spawn the server process
         serverProcess = spawn(nodePath, [serverScript], {
@@ -50,29 +52,53 @@ function startServer() {
             stdio: ['ignore', 'pipe', 'pipe']
         });
 
+        let startupError = null;
+
         serverProcess.stdout.on('data', (data) => {
-            console.log(`[Server] ${data.toString().trim()}`);
+            const output = data.toString().trim();
+            console.log(`[Server] ${output}`);
         });
 
         serverProcess.stderr.on('data', (data) => {
-            console.error(`[Server Error] ${data.toString().trim()}`);
+            const output = data.toString().trim();
+            console.error(`[Server Error] ${output}`);
+
+            // Capture startup errors
+            if (!startupError && output.includes('Error')) {
+                startupError = output;
+            }
         });
 
         serverProcess.on('error', (error) => {
-            console.error('Failed to start server:', error);
+            console.error('Failed to spawn server process:', error);
+            startupError = error.message;
             reject(error);
         });
 
         serverProcess.on('exit', (code, signal) => {
             console.log(`Server process exited with code ${code} and signal ${signal}`);
+            if (code !== 0 && code !== null) {
+                console.error('Server exited with error code:', code);
+                if (startupError) {
+                    console.error('Startup error:', startupError);
+                }
+            }
             serverProcess = null;
         });
 
         // Wait a bit for server to start
         setTimeout(() => {
-            console.log('Server startup initiated');
-            resolve();
-        }, 2000);
+            if (serverProcess && !startupError) {
+                console.log('Server startup initiated');
+                resolve();
+            } else if (startupError) {
+                console.error('Server failed to start:', startupError);
+                reject(new Error(`Server startup failed: ${startupError}`));
+            } else {
+                console.error('Server process died during startup');
+                reject(new Error('Server process terminated during startup'));
+            }
+        }, 3000);
     });
 }
 
