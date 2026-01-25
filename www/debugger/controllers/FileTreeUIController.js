@@ -225,8 +225,10 @@ export class FileTreeUIController extends BaseUIController {
             log(`Ready to set breakpoint in: ${url}`, 'info');
         });
 
-        // Tree node toggle handler (using global function for onclick in HTML)
-        window.toggleTreeNode = (header) => this.toggleTreeNode(header);
+        // Set up event delegation for tree node toggling instead of inline onclick handlers
+        $(document).on('click', '.tree-node-header', (e) => {
+            this.toggleTreeNode(e.currentTarget);
+        });
     }
 
     /**

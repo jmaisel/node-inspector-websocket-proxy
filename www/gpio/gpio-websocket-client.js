@@ -393,13 +393,13 @@ class GPIOWebSocketClient {
             try {
                 const state = this.circuitJS1.getGPIOOutputState(pinName);
 
-                // Send current state
+                // Send current state (voltage may be undefined during initialization)
                 this.send({
                     type: 'gpioOutputChanged',
                     pinName: pinName,
                     bcmPin: state.bcmPin,
                     state: state.state,
-                    voltage: state.voltage,
+                    voltage: state.voltage !== undefined ? state.voltage : (state.state ? 3.3 : 0.0),
                     timestamp: Date.now()
                 });
 

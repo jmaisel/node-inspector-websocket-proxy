@@ -142,9 +142,9 @@ export class DebuggerUIController extends BaseUIController {
 
         this.updateStatus('Disconnected', 'disconnected');
 
-        // Clear call stack (uses global function for now)
-        if (window.renderCallStack) {
-            window.renderCallStack([]);
+        // Clear call stack
+        if (this.debuggerUI?.callStackController) {
+            this.debuggerUI.callStackController.renderCallStack([]);
         }
     }
 
@@ -166,9 +166,9 @@ export class DebuggerUIController extends BaseUIController {
             // Switch to Call Stack tab to show where we paused
             $('.tab-btn[data-tab="callstack"]').click();
 
-            // Render call stack (uses global function for now)
-            if (window.renderCallStack) {
-                await window.renderCallStack(event.callFrames);
+            // Render call stack
+            if (this.debuggerUI?.callStackController) {
+                await this.debuggerUI.callStackController.renderCallStack(event.callFrames);
             }
         });
 
@@ -180,8 +180,8 @@ export class DebuggerUIController extends BaseUIController {
             this.updateControls();
 
             // Clear call stack and scope
-            if (window.renderCallStack) {
-                window.renderCallStack([]);
+            if (this.debuggerUI?.callStackController) {
+                this.debuggerUI.callStackController.renderCallStack([]);
             }
             $('#scopeVariables').html('<div class="empty-state">No scope information available</div>');
         });

@@ -224,7 +224,7 @@ export class CallStackUIController extends BaseUIController {
 
         this.setupEventHandlers();
 
-        // Expose renderCallStack globally for debugger controller
-        window.renderCallStack = (callFrames) => this.renderCallStack(callFrames);
+        // renderCallStack is now called directly via this.debuggerUI.callStackController
+        // No need for global window function
     }
 }

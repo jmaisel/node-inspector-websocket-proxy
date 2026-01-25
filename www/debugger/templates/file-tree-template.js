@@ -23,27 +23,27 @@ export function fileTreeTemplate(data = {}, instanceId = 'files') {
         <div class="tab-pane" id="tab-${instanceId}">
             <div id="fileTree">
                 <div class="tree-node">
-                    <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                    <div class="tree-node-header" >
                         <span class="tree-icon">▶</span>
                         <span class="tree-label">${projectFilesLabel}</span>
                     </div>
                     <div class="tree-children" id="projectFiles"></div>
                 </div>
                 <div class="tree-node">
-                    <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                    <div class="tree-node-header" >
                         <span class="tree-icon">▶</span>
                         <span class="tree-label">${librariesLabel}</span>
                     </div>
                     <div class="tree-children">
                         <div class="tree-node">
-                            <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                            <div class="tree-node-header" >
                                 <span class="tree-icon">▶</span>
                                 <span class="tree-label">${dependenciesLabel}</span>
                             </div>
                             <div class="tree-children" id="dependencies"></div>
                         </div>
                         <div class="tree-node">
-                            <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                            <div class="tree-node-header" >
                                 <span class="tree-icon">▶</span>
                                 <span class="tree-label">${devDependenciesLabel}</span>
                             </div>
@@ -52,7 +52,7 @@ export function fileTreeTemplate(data = {}, instanceId = 'files') {
                     </div>
                 </div>
                 <div class="tree-node">
-                    <div class="tree-node-header" onclick="toggleTreeNode(this)">
+                    <div class="tree-node-header" >
                         <span class="tree-icon">▶</span>
                         <span class="tree-label">${nodeInternalLabel}</span>
                     </div>
