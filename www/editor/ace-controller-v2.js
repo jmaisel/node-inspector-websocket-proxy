@@ -310,6 +310,12 @@ class AceController {
         debugStartBtn.on('click', () => {
             this.logger.info('Debug button clicked');
             this.application.simulator.reset();
+
+            // Wait for reset to complete before re-registering GPIO callbacks
+            setTimeout(() => {
+                this.application.gpioClient?.refreshGPIOOutputStates();
+            }, 100);
+
             this.debuggerConnectionHelper.connectToDebuggerWithSelectedFile();
         });
     }
@@ -327,8 +333,10 @@ class AceController {
             // Reset simulator when resuming
             this.application.simulator.reset();
 
-            // Refresh GPIO output states after reset
-            this.application.gpioClient?.refreshGPIOOutputStates();
+            // Wait for reset to complete before re-registering GPIO callbacks
+            setTimeout(() => {
+                this.application.gpioClient?.refreshGPIOOutputStates();
+            }, 100);
 
             this.inspectorProxy.debuggerController.resume();
         });

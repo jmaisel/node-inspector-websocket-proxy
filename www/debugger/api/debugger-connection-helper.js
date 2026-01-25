@@ -159,6 +159,12 @@ class DebuggerConnectionHelper {
             // Update UI
             this.showDebugControls();
             this.ace.application.simulator.reset();
+
+            // Wait for reset to complete before re-registering GPIO callbacks
+            setTimeout(() => {
+                this.ace.application.gpioClient?.refreshGPIOOutputStates();
+            }, 100);
+
             alert("Connected to debugger successfully!");
 
         } catch (error) {
