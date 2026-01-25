@@ -436,13 +436,13 @@ class BluetoothUIController {
      */
     async handleConnectLocalServer() {
         try {
-            // Always use localhost for local server
-            // Note: Port 8888 is the debugger proxy port, not 8080 (HTTP server port)
-            const wsUrl = 'ws://localhost:8888';
+            // Get proxy WebSocket URL from application store
+            const serverUrls = APP_CONSTANTS.getServerUrls(window.application);
+            const wsUrl = serverUrls.proxyWs;
 
             this.logger.info('Connecting to local server:', wsUrl);
             this.updateStatus('Connecting to local server...', 'info');
-            this.updateLocalServerStatus('Connecting to localhost:8888...', 'info');
+            this.updateLocalServerStatus(`Connecting to ${wsUrl}...`, 'info');
 
             // Get the debugger connection helper
             const aceController = window.application?.aceController;
@@ -466,7 +466,7 @@ class BluetoothUIController {
             // Update local server UI
             this.updateLocalServerUIState(true);
             this.updateStatus('Connected to local server', 'success');
-            this.updateLocalServerStatus('Connected to localhost:8888', 'success');
+            this.updateLocalServerStatus(`Connected to ${wsUrl}`, 'success');
 
             // Disable the mode button
             this.disableModeButton();

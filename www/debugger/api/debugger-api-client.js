@@ -3,10 +3,22 @@
  * Handles project listing, file browsing, and debug session management
  */
 class DebuggerApiClient {
-    constructor(baseUrl = 'http://localhost:8080') {
-        this.baseUrl = baseUrl;
+    constructor(baseUrlOrContext = null) {
+        // Support both string URL (legacy) and application context
+        if (typeof baseUrlOrContext === 'string') {
+            this.baseUrl = baseUrlOrContext;
+        } else if (baseUrlOrContext && baseUrlOrContext.store) {
+            // Get URL from application store
+            const serverUrls = APP_CONSTANTS.getServerUrls(baseUrlOrContext);
+            this.baseUrl = serverUrls.httpBase;
+        } else {
+            // Fallback to default
+            this.baseUrl = APP_CONSTANTS.DEFAULT_URLS.HTTP_BASE;
+        }
+
         this.logger = new Logger("DebuggerApiClient");
         this.timeout = 5000; // 5 second timeout
+        this.logger.info("DebuggerApiClient initialized with baseUrl:", this.baseUrl);
     }
 
     /**

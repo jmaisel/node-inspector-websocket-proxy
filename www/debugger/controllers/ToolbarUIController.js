@@ -55,8 +55,15 @@ export class ToolbarUIController extends DockableUIController {
         const template = TemplateRegistry.get('toolbar') || toolbarTemplate;
         const savedSize = localStorage.getItem('debugger-icon-size') || 'medium';
 
+        // Get proxy WebSocket URL from application store if available
+        let wsUrl = 'ws://localhost:8888'; // default fallback
+        if (typeof APP_CONSTANTS !== 'undefined' && window.application) {
+            const serverUrls = APP_CONSTANTS.getServerUrls(window.application);
+            wsUrl = serverUrls.proxyWs;
+        }
+
         return template({
-            wsUrl: 'ws://localhost:8888',
+            wsUrl: wsUrl,
             iconSize: savedSize,
             debugControlsVisible: false
         }, this.instanceId);

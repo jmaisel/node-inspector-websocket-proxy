@@ -211,11 +211,16 @@ class DebuggerConnectionHelper {
             return;
         }
 
+        // Get GPIO WebSocket URL from application store
+        const serverUrls = APP_CONSTANTS.getServerUrls(this.ace.application);
+        const gpioWsUrl = serverUrls.gpioWs;
+        this.logger.info("Using GPIO WebSocket URL:", gpioWsUrl);
+
         // Create and connect GPIO client
         try {
             this.ace.application.gpioClient = new GPIOWebSocketClient(simulator, {
                 logger: this.logger,
-                serverUrl: 'ws://localhost:8081',
+                serverUrl: gpioWsUrl,
                 autoReconnect: false
             });
 

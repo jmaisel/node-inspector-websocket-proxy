@@ -18,8 +18,16 @@ class ProjectManager {
         this.ctx = context;
         this.logger = new Logger('ProjectManager');
         this.currentProject = null;
-        this.apiBaseUrl = 'http://localhost:8080/api/project';
-        this.workspaceApiBaseUrl = 'http://localhost:8080/workspace';
+
+        // Get URLs from application store
+        const serverUrls = APP_CONSTANTS.getServerUrls(this.ctx);
+        this.apiBaseUrl = `${serverUrls.httpBase}${serverUrls.apiProject}`;
+        this.workspaceApiBaseUrl = `${serverUrls.httpBase}${serverUrls.apiWorkspace}`;
+
+        this.logger.info("ProjectManager URLs:", {
+            apiBaseUrl: this.apiBaseUrl,
+            workspaceApiBaseUrl: this.workspaceApiBaseUrl
+        });
     }
 
     /**

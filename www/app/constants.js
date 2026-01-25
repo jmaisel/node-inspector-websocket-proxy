@@ -3,7 +3,7 @@
  * Centralized configuration values used across the application
  */
 
-// Server Ports
+// Server Ports (defaults - actual values loaded from server/package.json)
 const PORTS = {
     HTTP: 8080,
     GPIO_WS: 8081,
@@ -11,13 +11,40 @@ const PORTS = {
     INSPECT: 9229
 };
 
-// Default URLs
+// Default URLs (fallback if application.store not available)
 const DEFAULT_URLS = {
     HTTP_BASE: `http://localhost:${PORTS.HTTP}`,
     GPIO_WS: `ws://localhost:${PORTS.GPIO_WS}`,
     PROXY_WS: `ws://localhost:${PORTS.PROXY_WS}`,
     INSPECT_WS: `ws://localhost:${PORTS.INSPECT}`
 };
+
+/**
+ * Get server URLs from application store
+ * Falls back to DEFAULT_URLS if store is not available
+ * @param {Object} application - The application context with store
+ * @returns {Object} Server URLs object
+ */
+function getServerUrls(application) {
+    if (application && application.store && application.store.has('serverUrls')) {
+        return application.store.get('serverUrls');
+    }
+    // Fallback to defaults
+    return {
+        hostname: 'localhost',
+        httpPort: PORTS.HTTP,
+        proxyPort: PORTS.PROXY_WS,
+        gpioPort: PORTS.GPIO_WS,
+        inspectPort: PORTS.INSPECT,
+        httpBase: DEFAULT_URLS.HTTP_BASE,
+        proxyWs: DEFAULT_URLS.PROXY_WS,
+        gpioWs: DEFAULT_URLS.GPIO_WS,
+        inspectWs: DEFAULT_URLS.INSPECT_WS,
+        apiProject: '/api/project',
+        apiWorkspace: '/workspace',
+        apiDebugSession: '/debug/session'
+    };
+}
 
 // API Endpoints
 const API_ENDPOINTS = {
@@ -70,7 +97,8 @@ if (typeof window !== 'undefined') {
         API_ENDPOINTS,
         WS_MESSAGE_TYPES,
         RECONNECT,
-        WS_CLOSE_CODES
+        WS_CLOSE_CODES,
+        getServerUrls
     };
 }
 
@@ -82,6 +110,7 @@ if (typeof module !== 'undefined' && module.exports) {
         API_ENDPOINTS,
         WS_MESSAGE_TYPES,
         RECONNECT,
-        WS_CLOSE_CODES
+        WS_CLOSE_CODES,
+        getServerUrls
     };
 }

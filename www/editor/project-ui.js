@@ -240,6 +240,11 @@ class ProjectUI {
      * @param {Function} retryCallback - Function to call when user clicks Retry
      */
     showServerOfflineError(retryCallback) {
+        // Get server URL from application store
+        const serverUrls = typeof APP_CONSTANTS !== 'undefined' && window.application
+            ? APP_CONSTANTS.getServerUrls(window.application)
+            : { httpBase: 'http://localhost:8080' };
+
         const errorHtml = `
             <div id="server-error-dialog" title="Server Not Available" style="display: none;">
                 <div style="padding: 15px;">
@@ -250,7 +255,7 @@ class ProjectUI {
                         cd ../node-inspector-websocket-proxy<br>
                         node server.js
                         </code><br>
-                        <span style="color: var(--color-text-primary);">Server should be running at: <code style="background: var(--color-bg-secondary); padding: 2px 6px; border-radius: 3px; color: var(--brand-accent);">http://localhost:8080</code></span>
+                        <span style="color: var(--color-text-primary);">Server should be running at: <code style="background: var(--color-bg-secondary); padding: 2px 6px; border-radius: 3px; color: var(--brand-accent);">${serverUrls.httpBase}</code></span>
                     </div>
                 </div>
             </div>

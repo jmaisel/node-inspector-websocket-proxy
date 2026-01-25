@@ -223,9 +223,13 @@ class ProjectHelper {
         try {
             const itemPath = `/${itemName}`;
 
+            // Get server URLs from application context
+            const serverUrls = APP_CONSTANTS.getServerUrls(this.ace.application);
+            const deleteUrl = `${serverUrls.httpBase}${serverUrls.apiWorkspace}${itemPath}`;
+
             // Call API to delete
-            this.logger.info('Deleting item:', itemPath);
-            const response = await fetch(`http://localhost:8080/workspace${itemPath}`, {
+            this.logger.info('Deleting item:', deleteUrl);
+            const response = await fetch(deleteUrl, {
                 method: 'DELETE'
             });
 

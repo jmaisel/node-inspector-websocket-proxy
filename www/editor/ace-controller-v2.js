@@ -1,5 +1,5 @@
-// Import DebuggerUIApplet from node-inspector-websocket-proxy server
-import { DebuggerUIApplet } from 'http://localhost:8080/debugger/DebuggerUIApplet.js';
+// DebuggerUIApplet will be imported dynamically based on server configuration
+// See initializeApplet() method for dynamic import
 
 // =============================================================================
 // CUSTOM TOOLBAR TEMPLATE FOR PITHAGORAS
@@ -124,6 +124,18 @@ class AceController {
      */
     async initializeApplet() {
         this.logger.info('Initializing DebuggerUIApplet...');
+
+        // Get server URLs - use defaults if application context not yet available
+        const serverUrls = typeof APP_CONSTANTS !== 'undefined' && window.application
+            ? APP_CONSTANTS.getServerUrls(window.application)
+            : { httpBase: 'http://localhost:8080' };
+
+        // Dynamically import DebuggerUIApplet from the correct server URL
+        const debuggerAppletUrl = `${serverUrls.httpBase}/debugger/DebuggerUIApplet.js`;
+        this.logger.info('Loading DebuggerUIApplet from:', debuggerAppletUrl);
+
+        const { DebuggerUIApplet } = await import(debuggerAppletUrl);
+        this.logger.info('DebuggerUIApplet module loaded');
 
         // Create configuration with custom toolbar template and pithagoras-specific targets
         const config = {
@@ -433,6 +445,10 @@ class AceController {
     setCtx(ctx) {
         this.logger.info('setCtx', ctx);
         this.application = ctx;
+
+        // Reinitialize DebuggerApiClient with application context to get proper URLs
+        this.debuggerApiClient = new DebuggerApiClient(ctx);
+        this.logger.info('DebuggerApiClient reinitialized with application context');
 
         // Initialize console now that we have the application context
         if (!this.consoleController.application) {

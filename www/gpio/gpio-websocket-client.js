@@ -7,7 +7,19 @@ class GPIOWebSocketClient {
     constructor(circuitJS1, options = {}) {
         this.circuitJS1 = circuitJS1; // window.CircuitJS1 API reference
         this.logger = options.logger || console;
-        this.serverUrl = options.serverUrl || 'ws://localhost:8081';
+
+        // Support getting serverUrl from options or from application context
+        if (options.serverUrl) {
+            this.serverUrl = options.serverUrl;
+        } else if (options.application && typeof APP_CONSTANTS !== 'undefined') {
+            const serverUrls = APP_CONSTANTS.getServerUrls(options.application);
+            this.serverUrl = serverUrls.gpioWs;
+        } else if (typeof APP_CONSTANTS !== 'undefined') {
+            this.serverUrl = APP_CONSTANTS.DEFAULT_URLS.GPIO_WS;
+        } else {
+            this.serverUrl = 'ws://localhost:8081';
+        }
+
         this.autoReconnect = options.autoReconnect !== false;
         this.reconnectDelay = options.reconnectDelay || 3000;
 

@@ -469,6 +469,86 @@ class Pithagoras{
         // The CircuitModel should already be created by oncircuitread handler
     }
 
+    async loadServerConfig() {
+        this.logger.info("loadServerConfig");
+        try {
+            // Fetch server configuration from package.json
+            const response = await fetch('/server/package.json');
+            const packageJson = await response.json();
+            const serverConfig = packageJson['server.config'] || {};
+
+            this.logger.info("Server config loaded:", serverConfig);
+            return serverConfig;
+        } catch (error) {
+            this.logger.error("Failed to load server config, using defaults:", error);
+            // Return default configuration
+            return {
+                httpPort: 8080,
+                proxyPort: 8888,
+                gpioPort: 8081,
+                inspectPort: 9229
+            };
+        }
+    }
+
+    buildServerUrls(serverConfig, hostname = 'localhost') {
+        this.logger.info("buildServerUrls", serverConfig, hostname);
+
+        const urls = {
+            hostname: hostname,
+            httpPort: serverConfig.httpPort || 8080,
+            proxyPort: serverConfig.proxyPort || 8888,
+            gpioPort: serverConfig.gpioPort || 8081,
+            inspectPort: serverConfig.inspectPort || 9229,
+
+            // Constructed URLs
+            httpBase: `http://${hostname}:${serverConfig.httpPort || 8080}`,
+            proxyWs: `ws://${hostname}:${serverConfig.proxyPort || 8888}`,
+            gpioWs: `ws://${hostname}:${serverConfig.gpioPort || 8081}`,
+            inspectWs: `ws://${hostname}:${serverConfig.inspectPort || 9229}`,
+
+            // API endpoints
+            apiProject: '/api/project',
+            apiWorkspace: '/workspace',
+            apiDebugSession: '/debug/session'
+        };
+
+        this.logger.info("Built server URLs:", urls);
+        return urls;
+    }
+
+    /**
+     * Update server URLs dynamically (e.g., when connecting to a different device)
+     * @param {string} hostname - New hostname or IP address
+     * @param {Object} serverConfig - Optional server config (uses existing if not provided)
+     */
+    updateServerUrls(hostname, serverConfig = null) {
+        this.logger.info("updateServerUrls", hostname, serverConfig);
+
+        // Use existing config if not provided
+        const config = serverConfig || this.ctx.store.get('serverConfig');
+        if (!config) {
+            this.logger.error("No server config available");
+            return;
+        }
+
+        // Build new URLs with updated hostname
+        const newUrls = this.buildServerUrls(config, hostname);
+
+        // Update application store
+        this.ctx.store.set('serverUrls', newUrls);
+
+        // Publish event for components to react
+        this.ctx.pub('server:urls:updated', {
+            oldHostname: this.ctx.store.get('serverUrls')?.hostname,
+            newHostname: hostname,
+            urls: newUrls,
+            timestamp: Date.now()
+        });
+
+        this.logger.info("Server URLs updated successfully:", newUrls);
+    }
+
     createCtx(ctx){
 
         this.logger.info("createCtx", ctx);
@@ -530,11 +610,21 @@ class Pithagoras{
         return ctx;
     }
 
-    pageReady(){
+    async pageReady(){
 
         this.logger.info("pageReady()");
 
+        // Load server configuration first
+        const serverConfig = await this.loadServerConfig();
+        const serverUrls = this.buildServerUrls(serverConfig);
+
         let ctx = this.createCtx();
+
+        // Store server URLs in application store
+        ctx.store.set('serverConfig', serverConfig);
+        ctx.store.set('serverUrls', serverUrls);
+
+        this.logger.info("Server URLs stored in application.store:", serverUrls);
 
         // Expose ctx for access from HTML
         this.ctx = ctx;
