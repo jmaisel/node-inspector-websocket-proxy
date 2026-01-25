@@ -378,8 +378,10 @@ class GPIOWebSocketClient {
 
     /**
      * Refresh all GPIO output states
-     * Queries current state of all registered GPIO outputs and sends them
-     * Call this after simulator reset to sync initial states
+     * Re-registers callbacks and queries current state of all registered GPIO outputs
+     * Call this after simulator reset to restore callbacks and sync initial states
+     *
+     * Why re-register? CircuitJS1.reset() clears all callbacks internally (GWT compiled code)
      */
     refreshGPIOOutputStates() {
         if (!this.isConnected()) {
@@ -387,10 +389,29 @@ class GPIOWebSocketClient {
             return;
         }
 
-        this.logger.info('GPIOWebSocketClient: Refreshing GPIO output states for', this.callbackRegistrations.size, 'pins');
+        this.logger.info('GPIOWebSocketClient: Re-registering callbacks and refreshing GPIO output states for', this.callbackRegistrations.size, 'pins');
 
         this.callbackRegistrations.forEach((_, pinName) => {
             try {
+                // Re-register callback (simulator reset clears all callbacks)
+                const callback = (bcmPin, pinName, state, voltage) => {
+                    this.logger.debug('GPIO Output changed:', pinName, state, voltage);
+
+                    // Send to server
+                    this.send({
+                        type: 'gpioOutputChanged',
+                        pinName: pinName,
+                        bcmPin: bcmPin,
+                        state: state,
+                        voltage: voltage,
+                        timestamp: Date.now()
+                    });
+                };
+
+                this.circuitJS1.registerGPIOOutputCallback(pinName, callback);
+                this.logger.debug('Re-registered GPIO output callback for', pinName);
+
+                // Query and send current state
                 const state = this.circuitJS1.getGPIOOutputState(pinName);
 
                 // Send current state (voltage may be undefined during initialization)
