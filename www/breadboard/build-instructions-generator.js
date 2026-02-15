@@ -187,11 +187,27 @@ class BomBasedBuildInstructions{
             filteredJsids.forEach(jsid => {
                 this.logger.debug('Processing component:', jsid);
 
-                let compMsg = `Place the ${lineItem.fullLabel} ${CircuitModel.getCharacteristics(jsid)} on the breadboard`;
-                instructions.push(new BuildStep(compMsg, BuildStep.TYPE.PLACE_COMPONENT, {comp: jsid}));
-
                 // Get all pins for this component
                 let component = CircuitModel.getComponent(jsid);
+
+                // Build component description - use hardware profile if available
+                let componentDescription;
+                if (component.pinProfile && component.pinProfile.manufacturer && component.pinProfile.model) {
+                    componentDescription = `${component.pinProfile.manufacturer} ${component.pinProfile.model} ${lineItem.label}`;
+                } else {
+                    // Use characteristics + label format (avoid duplication for unhandled components)
+                    let characteristics = CircuitModel.getCharacteristics(jsid);
+                    if (characteristics === lineItem.label) {
+                        // getCharacteristics doesn't have a case for this component yet
+                        componentDescription = lineItem.fullLabel;
+                    } else {
+                        // Show value + component type (e.g., "10μF Capacitor")
+                        componentDescription = `${characteristics} ${lineItem.label}`;
+                    }
+                }
+
+                let compMsg = `Place the ${componentDescription} on the breadboard`;
+                instructions.push(new BuildStep(compMsg, BuildStep.TYPE.PLACE_COMPONENT, {comp: jsid}));
                 let pins = [];
 
                 if(CircuitModel.isSimpleComponent(component)){

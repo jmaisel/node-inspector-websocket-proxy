@@ -277,8 +277,17 @@ class CircuitModel{
         case 'Resistor':
             return info[3];
 
+        case 'Capacitor':
+            return info[3]; // Capacitance value
+
+        case 'Inductor':
+            return info[3]; // Inductance value
+
         case 'Switch':
             return info[0];
+
+        case 'LED':
+            return info[0]; // LED type/color
         }
 
         return label;
