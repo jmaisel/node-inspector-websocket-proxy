@@ -341,6 +341,17 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
     reset() {
         this.logger.info('reset()');
 
+        // Clear the instructions display
+        this.application.stepContentView.html('');
+
+        // Clear and re-sync the breadboard
+        this.breadboard.clear();
+        this.breadboard.syncToModel();
+
+        // Reset cursor state
+        this.cursor = {stepNbr: 0, component: false};
+        this.steps = [];
+
         // Emit reset and steps cleared events
         this.application.pub('tutorial:steps:cleared', {
             timestamp: Date.now()
