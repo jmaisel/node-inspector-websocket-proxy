@@ -66,9 +66,9 @@ class BomBasedBuildInstructions{
             return 'the Ground Rail (marked "G" on the left side of the breadboard)';
         }
 
-        // Handle GPIO/Logic
-        if (type === 'LogicInputElm' || type === 'LogicOutputElm' || type === 'OutputElm' ||
-            jsid.includes('Logic Input') || jsid.includes('Logic Output') || jsid.includes('Output')) {
+        // Handle GPIO (check for "GPIO" or "G P I O" in label)
+        let label = CircuitModel.labelForJsid(jsid);
+        if (label && (label.includes('GPIO') || label.includes('G P I O'))) {
             return 'the GPIO pin (on the right side of the breadboard)';
         }
 
@@ -255,19 +255,7 @@ class BomBasedBuildInstructions{
                                 let destSimple = CircuitModel.isSimpleComponent(destCmp);
 
                                 // Check if destination is a rail or GPIO
-                                let destType = '';
-                                try {
-                                    destType = destCmp.getType ? destCmp.getType() : '';
-                                } catch(e) {
-                                    destType = destJsid;
-                                }
-
-                                let isRailOrGPIO = destType === 'VoltageElm' || destType === 'GroundElm' ||
-                                                   destType === 'LogicInputElm' || destType === 'LogicOutputElm' ||
-                                                   destType === 'OutputElm' || destType.includes('Rail') ||
-                                                   destJsid.includes('Voltage') || destJsid.includes('Ground') ||
-                                                   destJsid.includes('Rail') || destJsid.includes('Logic Input') ||
-                                                   destJsid.includes('Logic Output') || destJsid.includes('Output');
+                                let isRailOrGPIO = Breadboard.isRail(destCmp) || Breadboard.isGPIO(destCmp);
 
                                 // For power/ground/GPIO, use friendly label without pin numbers
                                 let destMsg;

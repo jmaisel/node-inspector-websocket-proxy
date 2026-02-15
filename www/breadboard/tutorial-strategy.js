@@ -164,16 +164,9 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
                 try {
                     let comp = CircuitModel.getComponent(jsid);
                     if (!comp) return false;
-
-                    let type = comp.getType ? comp.getType() : '';
-                    return type === 'VoltageElm' || type === 'GroundElm' || type.includes('Rail') ||
-                           type === 'LogicInputElm' || type === 'LogicOutputElm' || type === 'OutputElm';
+                    return Breadboard.isRail(comp) || Breadboard.isGPIO(comp);
                 } catch(e) {
-                    // Fallback to label checking
-                    let label = CircuitModel.labelForJsid(jsid);
-                    return label.includes('Voltage') || label.includes('Ground') ||
-                           label.includes('Rail') || label.includes('Logic Input') ||
-                           label.includes('Logic Output') || label.includes('Output');
+                    return false;
                 }
             };
 
@@ -191,9 +184,48 @@ class ComponentFocusedTutorialStrategy extends AbstractBuildTutorialStrategy {
                 dview.highlightPin(dest.pin);
             }
 
-            // Always highlight on breadboard (works for both components and rails)
-            this.application.breadboard.highlightBus(src.comp, src.pin);
-            this.application.breadboard.highlightBus(dest.comp, dest.pin);
+            // Highlight on breadboard
+            // For rails: use rail index (0=Ground, 2=5V) directly
+            // For GPIO: use BCM pin number directly
+            if (srcIsRailOrGPIO) {
+                let srcComp = CircuitModel.getComponent(src.comp);
+                if (Breadboard.isRail(srcComp)) {
+                    let label = CircuitModel.labelForJsid(src.comp);
+                    let railIndex = (label === 'Ground') ? 0 : 2;
+                    this.application.breadboard.highlightRail(railIndex);
+                } else if (Breadboard.isGPIO(srcComp)) {
+                    try {
+                        let props = srcComp.getGPIOProperties ? srcComp.getGPIOProperties() : null;
+                        if (props && props.bcmPinNumber >= 0) {
+                            this.application.breadboard.highlightGPIO(props.bcmPinNumber);
+                        }
+                    } catch(e) {
+                        this.logger.debug('Error highlighting GPIO:', e);
+                    }
+                }
+            } else {
+                this.application.breadboard.highlightBus(src.comp, src.pin);
+            }
+
+            if (destIsRailOrGPIO) {
+                let destComp = CircuitModel.getComponent(dest.comp);
+                if (Breadboard.isRail(destComp)) {
+                    let label = CircuitModel.labelForJsid(dest.comp);
+                    let railIndex = (label === 'Ground') ? 0 : 2;
+                    this.application.breadboard.highlightRail(railIndex);
+                } else if (Breadboard.isGPIO(destComp)) {
+                    try {
+                        let props = destComp.getGPIOProperties ? destComp.getGPIOProperties() : null;
+                        if (props && props.bcmPinNumber >= 0) {
+                            this.application.breadboard.highlightGPIO(props.bcmPinNumber);
+                        }
+                    } catch(e) {
+                        this.logger.debug('Error highlighting GPIO:', e);
+                    }
+                }
+            } else {
+                this.application.breadboard.highlightBus(dest.comp, dest.pin);
+            }
         }
 
         this.logger.info('rendering instructions', step.text);
