@@ -40,25 +40,8 @@ class BomBasedBuildInstructions{
 
         // Handle voltage sources
         if (type === 'VoltageElm' || type.includes('Voltage') || jsid.includes('Voltage') || jsid.includes('Rail')) {
-            try {
-                let voltage = 5; // default
-
-                // Try getVoltageDText
-                if (component.getVoltageDText) {
-                    voltage = component.getVoltageDText();
-                }
-                // Try getInfo
-                else if (component.getInfo) {
-                    let info = component.getInfo();
-                    if (info && info.length > 1) {
-                        voltage = info[1];
-                    }
-                }
-
-                return `the ${voltage} Power Rail (on the left side of the breadboard)`;
-            } catch(e) {
-                return 'the Power Rail (on the left side of the breadboard)';
-            }
+            // Hardcode to 5v for now
+            return `the 5v Power Rail (on the left side of the breadboard)`;
         }
 
         // Handle ground
@@ -69,6 +52,16 @@ class BomBasedBuildInstructions{
         // Handle GPIO (check for "GPIO" or "G P I O" in label)
         let label = CircuitModel.labelForJsid(jsid);
         if (label && (label.includes('GPIO') || label.includes('G P I O'))) {
+            // Try to get GPIO direction (Input/Output)
+            try {
+                let props = component.getGPIOProperties ? component.getGPIOProperties() : null;
+                if (props) {
+                    let direction = props.isOutput ? 'Output' : 'Input';
+                    return `the GPIO ${direction} (on the right side of the breadboard)`;
+                }
+            } catch(e) {
+                // Fallback to generic label
+            }
             return 'the GPIO pin (on the right side of the breadboard)';
         }
 
@@ -178,14 +171,23 @@ class BomBasedBuildInstructions{
         for (let [fullLabel, lineItem] of bom.lineItems) {
             this.logger.debug('Processing line item:', fullLabel, lineItem);
 
-            let compMsg = `Place each ${lineItem.label} on the breadboard`;
-            instructions.push(new BuildStep(compMsg));
+            // Filter out GPIO and rail components - they don't need placement instructions
+            let filteredJsids = lineItem.jsids.filter(jsid => {
+                let component = CircuitModel.getComponent(jsid);
+                return !Breadboard.isGPIO(component) && !Breadboard.isRail(component);
+            });
+
+            // Only add "Place each..." if there are components to place
+            if (filteredJsids.length > 0) {
+                let compMsg = `Place each ${lineItem.label} on the breadboard`;
+                instructions.push(new BuildStep(compMsg));
+            }
 
             // Iterate over each component instance in this line item
-            lineItem.jsids.forEach(jsid => {
+            filteredJsids.forEach(jsid => {
                 this.logger.debug('Processing component:', jsid);
 
-                compMsg = `Place the ${lineItem.fullLabel} ${CircuitModel.getCharacteristics(jsid)} on the breadboard`;
+                let compMsg = `Place the ${lineItem.fullLabel} ${CircuitModel.getCharacteristics(jsid)} on the breadboard`;
                 instructions.push(new BuildStep(compMsg, BuildStep.TYPE.PLACE_COMPONENT, {comp: jsid}));
 
                 // Get all pins for this component

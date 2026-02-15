@@ -614,6 +614,9 @@ iframe{
     font-weight: bold;
     height: 75px;
     color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #step-buttons{
