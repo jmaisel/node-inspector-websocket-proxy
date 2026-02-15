@@ -102,8 +102,10 @@ class BusGroup {
         for (let i = 0; i < count; i++) {
             let rect = this.renderBus(ctx, item, i);
 
-            if(item.voltages)
-                rect.attr('voltage', item.voltages[i]);
+            console.log("nerp", item);
+
+            rect.attr('voltage', i===0?0:i===1?3:i===2?5:-1);
+            rect.attr('label', i===0?"Ground":i===1||i===2?"Rail":"");
 
             this.items.push(rect);
             ctx.cursor.x += (ctx.busStrokePx + ctx.margin);
@@ -163,9 +165,12 @@ class Breadboard {
     static isRail(component) {
         if (!component) return false;
         try {
-            let type = component.getType ? component.getType() : '';
-            return type === 'VoltageElm' || type === 'GroundElm' || type.includes('Rail');
+            let label = CircuitModel.labelForJsid(component.jsid);
+            let isRail = label === 'Voltage' || label === 'Ground' || label === 'Rail';
+            console.log('isRail check:', component.jsid, 'label:', label, 'isRail:', isRail);
+            return isRail;
         } catch(e) {
+            console.log('isRail error for', component.jsid, e);
             return false;
         }
     }
@@ -173,8 +178,9 @@ class Breadboard {
     static isGPIO(component) {
         if (!component) return false;
         try {
-            let type = component.getType ? component.getType() : '';
-            return type === 'GPIOInputElm' || type === 'GPIOOutputElm';
+            let label = CircuitModel.labelForJsid(component.jsid);
+            // Handle "GPIO" or "G P I O" (with spaces) formats
+            return label && (label.includes('GPIO') || label.includes('G P I O'));
         } catch(e) {
             return false;
         }
@@ -339,6 +345,20 @@ class Breadboard {
         }
     }
 
+    highlightRail(railIndex) {
+        this.logger.info('highlightRail', { railIndex });
+        if (this.rails.items[railIndex]) {
+            Breadboard.fill(this.rails.items[railIndex].node);
+        }
+    }
+
+    highlightGPIO(pinNumber) {
+        this.logger.info('highlightGPIO', { pinNumber });
+        if (this.gpio.items[pinNumber]) {
+            Breadboard.fill(this.gpio.items[pinNumber].node);
+        }
+    }
+
     highlightBus(jsid, logicalPin) {
         this.logger.info('highlightBus', { jsid, logicalPin });
         let bus = this.busFor(jsid, logicalPin);
@@ -444,6 +464,12 @@ class Breadboard {
     syncToModel() {
         this.logger.info('syncToModel');
 
+        // Clear all busses before re-syncing
+        this.busgroup.clear();
+        this.busgroup1.clear();
+        this.gpio.clear();
+        this.rails.clear();
+
         this.application.overlayController.clear();
         Object.values(this.application.circuitModel.getComponents()).forEach((c)=>this.overlay(c));
 
@@ -464,7 +490,7 @@ class Breadboard {
         };
 
         const assignComplexComponent = (component, row) => {
-            this.logger.info(`placing complex component ${component.jsid}`, { component });
+            this.logger.info(`assignComplexComponent ${component.jsid}`, { component });
 
             // Check if component has pinProfile from hardware profile
             if (!component.pinProfile) {
@@ -491,35 +517,46 @@ class Breadboard {
         };
 
         const assignRail = (component) => {
-            this.logger.info('assigning rail component', { component });
+            this.logger.info('assignRail called for', component.jsid);
+            let label = CircuitModel.labelForJsid(component.jsid);
+            this.logger.info('  label:', label);
 
-            // Determine voltage
-            let voltage = 5; // Default
-            try {
-                let type = component.getType ? component.getType() : '';
-                if (type === 'GroundElm') {
-                    voltage = 0;
-                } else if (component.getVoltage) {
-                    voltage = component.getVoltage();
+            // Ground → G rail (index 0)
+            if (label === 'Ground') {
+                this.logger.info('  Tagging Ground rail (0)');
+                if (!this.rails.isTagged(0)) {
+                    this.rails.tag(0, {
+                        jsid: component.jsid,
+                        label: label
+                    }, {
+                        logicalPin: 0,
+                        physicalPin: 0,
+                        name: 'G'
+                    });
+                    this.logger.info('  TAGGED');
                 }
-            } catch(e) {
-                this.logger.debug('Error getting voltage, using default', e);
+                return 0;
             }
 
-            // Find matching rail index
-            let railIndex = this.rails.voltages.indexOf(voltage);
-            if (railIndex !== -1 && !this.rails.isTagged(railIndex)) {
-                this.rails.tag(railIndex, {
-                    jsid: component.jsid,
-                    label: component.label || CircuitModel.labelForJsid(component.jsid)
-                }, {
-                    logicalPin: 0,
-                    physicalPin: 0,
-                    name: `${voltage}V`
-                });
+            // Voltage/Rail → 5V rail (index 2)
+            if (label === 'Voltage' || label === 'Rail') {
+                this.logger.info('  Tagging Voltage rail (2)');
+                if (!this.rails.isTagged(2)) {
+                    this.rails.tag(2, {
+                        jsid: component.jsid,
+                        label: label
+                    }, {
+                        logicalPin: 0,
+                        physicalPin: 0,
+                        name: '5V'
+                    });
+                    this.logger.info('  TAGGED');
+                }
+                return 0;
             }
 
-            return 0; // Don't increment cursor for rails
+            this.logger.info('  No matching label');
+            return 0;
         };
 
         const assignGPIO = (component) => {
@@ -554,6 +591,10 @@ class Breadboard {
         let cursor = 0;
         let bom = this.application.circuitModel.asBOM();
 
+        // Object.values(this.application.circuitModel.getComponents())
+        //     .filter(Breadboard.isRail)
+        //     .forEach((c) => bom.add(new LineItem(c)) && this.logger.info("sneep", c));
+
         this.logger.info('syncToModel bom:', bom);
 
         [...bom.lineItems.values()]
@@ -569,6 +610,9 @@ class Breadboard {
                         this.logger.info('\tsyncToModel lineItem:', li);
 
                         // Route component to appropriate assignment method
+                        let label = CircuitModel.labelForJsid(jsid);
+                        this.logger.info('\tComponent label:', label, 'isRail?', Breadboard.isRail(component));
+
                         if (Breadboard.isRail(component)) {
                             this.logger.info('Placing rail component', jsid);
                             assignRail(component);
