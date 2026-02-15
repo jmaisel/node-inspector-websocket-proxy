@@ -342,14 +342,6 @@ class AceController {
                 return;
             }
 
-            // Reset simulator when resuming
-            this.application.simulator.reset();
-
-            // Wait for reset to complete before re-registering GPIO callbacks
-            setTimeout(() => {
-                this.application.gpioClient?.refreshGPIOOutputStates();
-            }, 100);
-
             this.inspectorProxy.debuggerController.resume();
         });
 
@@ -358,12 +350,6 @@ class AceController {
             if (!this.inspectorProxy) {
                 alert('Not connected to debugger');
                 return;
-            }
-
-            // Stop simulator when pausing
-            if (this.application && this.application.simulator) {
-                this.logger.info('Stopping simulator on Pause button click');
-                this.application.simulator.setSimRunning(false);
             }
 
             this.inspectorProxy.debuggerController.pause();
